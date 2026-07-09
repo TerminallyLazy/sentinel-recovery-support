@@ -2,6 +2,10 @@
 
 Public, zero-cost support surface for Sentinel Recovery.
 
+**Live site:** <https://terminallylazy.github.io/sentinel-recovery-support/>
+
+**Agent manifest:** <https://terminallylazy.github.io/sentinel-recovery-support/.well-known/sentinel-agent.json>
+
 The site exposes a human-readable funding page and framework-neutral agent resources while keeping every financial action human-authorized. It never connects a wallet, requests a signature, takes custody, or promises recovery.
 
 ## Public resources
