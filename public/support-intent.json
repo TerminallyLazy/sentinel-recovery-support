@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0",
+  "intent": "voluntary-support",
+  "status": "active",
+  "purpose": "Support public evidence tooling, intake validation, monitoring, documentation, and agent-safe handoffs for Sentinel Recovery.",
+  "payment": {
+    "network": "ethereum-mainnet",
+    "chainId": 1,
+    "recipient": "0x91bdE13382c3Ee082EE42a147DF54f6A6129a412",
+    "supportedAssets": [
+      {
+        "symbol": "ETH",
+        "kind": "native",
+        "decimals": 18,
+        "contractAddress": null
+      },
+      {
+        "symbol": "USDC",
+        "kind": "erc20",
+        "decimals": 6,
+        "contractAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      },
+      {
+        "symbol": "USDT",
+        "kind": "erc20",
+        "decimals": 6,
+        "contractAddress": "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+      }
+    ],
+    "fees": {
+      "networkFeesAdditional": true,
+      "mayExceedContributionAmount": true,
+      "paidBySender": true,
+      "estimateBeforeAuthorization": true
+    },
+    "suggestedExamples": [
+      {
+        "asset": "USDC",
+        "amount": "1",
+        "note": "Illustrative only. Any amount, or no contribution, is acceptable."
+      },
+      {
+        "asset": "USDC",
+        "amount": "5",
+        "note": "Illustrative only. This is not a price or service tier."
+      },
+      {
+        "asset": "USDC",
+        "amount": "10",
+        "note": "Illustrative only. Support creates no entitlement or outcome."
+      }
+    ]
+  },
+  "authorization": {
+    "requiredAtActionTime": true,
+    "autonomousExecutionAllowed": false,
+    "agentMayExplain": true,
+    "agentMayShareThisIntent": true,
+    "agentMayOpenWallet": false,
+    "agentMaySign": false,
+    "agentMayBroadcast": false,
+    "agentMaySendFunds": false
+  },
+  "terms": {
+    "createsServiceEntitlement": false,
+    "createsQueuePriority": false,
+    "createsOwnership": false,
+    "isTaxDeductibleCharitableContribution": false,
+    "isRefundable": false,
+    "guaranteesRecovery": false
+  },
+  "verification": {
+    "humanPage": "https://terminallylazy.github.io/sentinel-recovery-support/",
+    "supportTuple": "https://terminallylazy.github.io/sentinel-recovery-support/support.json",
+    "publicSource": "https://github.com/TerminallyLazy/sentinel-recovery-support/blob/main/app/support-data.ts",
+    "blockExplorer": "https://etherscan.io/address/0x91bdE13382c3Ee082EE42a147DF54f6A6129a412"
+  }
+}

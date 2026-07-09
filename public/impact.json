@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-07-09T23:22:42Z",
+  "snapshot": {
+    "network": "ethereum-mainnet",
+    "chainId": 1,
+    "recipient": "0x91bdE13382c3Ee082EE42a147DF54f6A6129a412",
+    "baselineBlock": 25497834,
+    "observedThroughBlock": 25498257,
+    "confirmedReceiptCount": 0,
+    "confirmedReceipts": [],
+    "balances": {
+      "ETH": {
+        "baseUnits": "0",
+        "decimals": 18
+      },
+      "USDC": {
+        "baseUnits": "0",
+        "decimals": 6,
+        "contractAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      },
+      "USDT": {
+        "baseUnits": "0",
+        "decimals": 6,
+        "contractAddress": "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+      }
+    },
+    "verification": {
+      "nativeStateCheckedThroughBlock": 25498257,
+      "canonicalTokenTransferLogsCheckedThroughBlock": 25498262,
+      "nativeTransactionCountObserved": 0
+    }
+  },
+  "impact": {
+    "contributionFundedWork": [],
+    "projectWorkShippedBeforeFirstVerifiedContribution": [
+      {
+        "name": "Agent-safe voluntary-support surface",
+        "evidence": "https://github.com/TerminallyLazy/sentinel-recovery-support/blob/main/public/support-intent.json"
+      },
+      {
+        "name": "Public agent discovery manifest",
+        "evidence": "https://github.com/TerminallyLazy/sentinel-recovery-support/blob/main/public/.well-known/sentinel-agent.json"
+      },
+      {
+        "name": "Automated support-surface contract checks",
+        "evidence": "https://github.com/TerminallyLazy/sentinel-recovery-support/blob/main/tests/rendered-html.test.mjs"
+      }
+    ]
+  },
+  "limitations": [
+    "This is a historical snapshot and not a live balance or receipt feed.",
+    "A zero balance does not independently prove that no earlier transfer was later moved; the snapshot also records the receipt-history checks performed for the stated observation window.",
+    "No project work is described as contribution-funded until a matching receipt is verified."
+  ]
+}

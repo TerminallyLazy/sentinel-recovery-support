@@ -4,10 +4,12 @@
   "audience": "ai-agents",
   "description": "Machine-readable voluntary-support information for Sentinel Recovery's evidence-first Ethereum work.",
   "interfaces": {
-    "human": "/",
-    "guide": "/agent-guide.md",
-    "llms": "/llms.txt",
-    "support": "/support.json"
+    "human": "https://terminallylazy.github.io/sentinel-recovery-support/",
+    "guide": "https://terminallylazy.github.io/sentinel-recovery-support/agent-guide.md",
+    "llms": "https://terminallylazy.github.io/sentinel-recovery-support/llms.txt",
+    "support": "https://terminallylazy.github.io/sentinel-recovery-support/support.json",
+    "supportIntent": "https://terminallylazy.github.io/sentinel-recovery-support/support-intent.json",
+    "impactReceipts": "https://terminallylazy.github.io/sentinel-recovery-support/impact.json"
   },
   "support": {
     "type": "voluntary",

@@ -151,6 +151,10 @@ nav a:hover {
   line-height: 1.75;
 }
 
+.mobile-support-link {
+  display: none;
+}
+
 .hero-proof {
   display: flex;
   flex-wrap: wrap;
@@ -173,6 +177,7 @@ nav a:hover {
   background: var(--paper);
   box-shadow: 16px 16px 0 var(--ink);
   padding: clamp(28px, 4vw, 48px);
+  scroll-margin-top: 84px;
 }
 
 .support-card h2 {
@@ -184,12 +189,18 @@ nav a:hover {
 }
 
 .card-intro,
+.fee-note,
 .ownership-note,
 .copy-status {
   color: var(--muted);
   font-family: var(--font-mono), monospace;
   font-size: 14px;
   line-height: 1.6;
+}
+
+.fee-note {
+  margin: -8px 0 20px;
+  font-size: 12px;
 }
 
 .asset-row {
@@ -215,7 +226,7 @@ nav a:hover {
   margin-top: 10px;
   overflow-wrap: anywhere;
   font-family: var(--font-mono), monospace;
-  font-size: 13px;
+  font-size: clamp(11px, 0.95vw, 13px);
   font-weight: 700;
 }
 
@@ -269,6 +280,12 @@ nav a:hover {
   padding-top: 18px;
   border-top: 1px solid var(--line);
   font-size: 13px;
+}
+
+.ownership-note a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .status-strip {
@@ -668,6 +685,23 @@ footer p,
 
   .hero h1 {
     font-size: clamp(46px, 15vw, 68px);
+  }
+
+  .mobile-support-link {
+    display: inline-flex;
+    min-height: 46px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 24px;
+    border: 1px solid var(--ink);
+    background: var(--accent);
+    padding: 11px 14px;
+    font-family: var(--font-mono), monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-align: center;
+    text-transform: uppercase;
   }
 
   .support-card {

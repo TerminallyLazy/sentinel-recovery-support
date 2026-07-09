@@ -2,9 +2,11 @@ import { CopyValue, SupportActions } from "./SupportActions";
 import { ASSETS, SUPPORT_WALLET } from "./support-data";
 
 const projectUrl =
-  "https://github.com/TerminallyLazy/sentinel-recovery/tree/codex/donation-revenue";
+  "https://github.com/TerminallyLazy/sentinel-recovery-support/tree/main";
+const walletSourceUrl =
+  "https://github.com/TerminallyLazy/sentinel-recovery-support/blob/main/app/support-data.ts";
 const outreachUrl =
-  "https://agentssociety.ai/post/mira-kepler-mre10zcy-1fa690";
+  "https://agentssociety.ai/post/mira-kepler-mre10zcy-1fa690--00071716-77eb-4829-a7dd-d004be95d9a6";
 
 const workstreams = [
   {
@@ -52,6 +54,9 @@ export default function Home() {
             safety boundaries, and agent handoffs moving without pretending an
             intake receipt is a recovery result.
           </p>
+          <a className="mobile-support-link" href="#support">
+            View contribution options
+          </a>
           <div className="hero-proof" aria-label="Sentinel operating principles">
             <span>NO CUSTODY</span>
             <span>NO KEY REQUESTS</span>
@@ -59,7 +64,7 @@ export default function Home() {
           </div>
         </div>
 
-        <aside className="support-card" aria-labelledby="support-title">
+        <aside className="support-card" id="support" aria-labelledby="support-title">
           <div className="card-kicker">DIRECT PUBLIC SUPPORT</div>
           <h2 id="support-title">Contribute any amount</h2>
           <p className="card-intro">
@@ -70,12 +75,19 @@ export default function Home() {
               <span key={asset.symbol}>{asset.symbol}</span>
             ))}
           </div>
+          <p className="fee-note">
+            Ethereum network fees are additional and may exceed small
+            contribution amounts.
+          </p>
           <SupportActions />
           <p className="ownership-note">
             This site checks the address format and checksum only; that does
             not prove who controls the wallet. Verify the full address against
-            Sentinel Recovery&apos;s source branch and block explorer immediately
-            before sending.
+            the{" "}
+            <a href={walletSourceUrl} rel="noreferrer" target="_blank">
+              public support source
+            </a>{" "}
+            and block explorer immediately before sending.
           </p>
         </aside>
       </section>
@@ -159,11 +171,17 @@ export default function Home() {
             or send funds without explicit human authorization at action time.
           </p>
           <div className="agent-links">
-            <a href="/.well-known/sentinel-agent.json" target="_blank">
+            <a href="/.well-known/sentinel-agent.json" rel="noreferrer" target="_blank">
               Capability manifest
             </a>
-            <a href="/agent-guide.md" target="_blank">Agent guide</a>
-            <a href="/llms.txt" target="_blank">llms.txt</a>
+            <a href="/agent-guide.md" rel="noreferrer" target="_blank">Agent guide</a>
+            <a href="/llms.txt" rel="noreferrer" target="_blank">llms.txt</a>
+            <a href="/support-intent.json" rel="noreferrer" target="_blank">
+              Support intent
+            </a>
+            <a href="/impact.json" rel="noreferrer" target="_blank">
+              Receipt &amp; impact snapshot
+            </a>
             <a href={outreachUrl} rel="noreferrer" target="_blank">
               Public outreach thread
             </a>

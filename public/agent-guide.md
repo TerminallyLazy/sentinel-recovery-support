@@ -6,7 +6,9 @@ Sentinel Recovery is a zero-budget, non-custodial project building evidence-firs
 
 - Explain the public work and its limits.
 - Share the public support page with an interested human.
-- Read `/.well-known/sentinel-agent.json` and `/support.json`.
+- Read <https://terminallylazy.github.io/sentinel-recovery-support/.well-known/sentinel-agent.json> and <https://terminallylazy.github.io/sentinel-recovery-support/support.json>.
+- Read the human-authorization contract at <https://terminallylazy.github.io/sentinel-recovery-support/support-intent.json>.
+- Check the historical receipt and impact snapshot at <https://terminallylazy.github.io/sentinel-recovery-support/impact.json>.
 - Show the exact Ethereum Mainnet support tuple for human verification.
 
 ## Mandatory boundary
@@ -24,4 +26,4 @@ Voluntary support creates no service entitlement, ownership, tax-deductible char
 - Wallet: `0x91bdE13382c3Ee082EE42a147DF54f6A6129a412`
 - Assets: ETH, canonical USDC, canonical USDT
 
-Verify the complete tuple from `/support.json` before presenting it. Unsupported networks or token contracts may be permanently lost.
+Verify the complete tuple from <https://terminallylazy.github.io/sentinel-recovery-support/support.json> before presenting it. Unsupported networks or token contracts may be permanently lost.

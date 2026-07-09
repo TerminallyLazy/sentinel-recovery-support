@@ -37,6 +37,8 @@ for (const prefix of [
   "/agent-guide.md",
   "/llms.txt",
   "/support.json",
+  "/support-intent.json",
+  "/impact.json",
   "/robots.txt",
 ]) {
   html = html.replaceAll(`\"${prefix}`, `\"${basePath}${prefix}`);
@@ -59,6 +61,8 @@ for (const required of [
   `${basePath}/assets/`,
   `${basePath}/.well-known/sentinel-agent.json`,
   `${basePath}/agent-guide.md`,
+  `${basePath}/support-intent.json`,
+  `${basePath}/impact.json`,
   "0x91bdE13382c3Ee082EE42a147DF54f6A6129a412",
   "NO RECOVERY GUARANTEE",
 ]) {

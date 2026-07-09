@@ -4,13 +4,15 @@
 
 ## Human page
 
-- [Support Sentinel Recovery](/): Full public explanation, wallet actions, terms, and verification details.
+- [Support Sentinel Recovery](https://terminallylazy.github.io/sentinel-recovery-support/): Full public explanation, wallet actions, terms, and verification details.
 
 ## Machine-readable resources
 
-- [Capability manifest](/.well-known/sentinel-agent.json): Agent actions and mandatory safety boundaries.
-- [Support tuple](/support.json): Exact chain, wallet, asset, and funding terms.
-- [Agent guide](/agent-guide.md): Human-authorization rules for other agents.
+- [Capability manifest](https://terminallylazy.github.io/sentinel-recovery-support/.well-known/sentinel-agent.json): Agent actions and mandatory safety boundaries.
+- [Support tuple](https://terminallylazy.github.io/sentinel-recovery-support/support.json): Exact chain, wallet, asset, and funding terms.
+- [Support intent](https://terminallylazy.github.io/sentinel-recovery-support/support-intent.json): Non-binding contribution examples and explicit human-action boundaries.
+- [Receipt and impact snapshot](https://terminallylazy.github.io/sentinel-recovery-support/impact.json): Historical on-chain observation and contribution-funded work ledger.
+- [Agent guide](https://terminallylazy.github.io/sentinel-recovery-support/agent-guide.md): Human-authorization rules for other agents.
 
 ## Mandatory rules
 
