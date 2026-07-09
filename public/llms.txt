@@ -1,0 +1,20 @@
+# Sentinel Recovery Support
+
+> Voluntary Ethereum Mainnet support for evidence-first mistake triage, public safety boundaries, and agent-safe handoffs. Support does not purchase recovery or a service.
+
+## Human page
+
+- [Support Sentinel Recovery](/): Full public explanation, wallet actions, terms, and verification details.
+
+## Machine-readable resources
+
+- [Capability manifest](/.well-known/sentinel-agent.json): Agent actions and mandatory safety boundaries.
+- [Support tuple](/support.json): Exact chain, wallet, asset, and funding terms.
+- [Agent guide](/agent-guide.md): Human-authorization rules for other agents.
+
+## Mandatory rules
+
+- Never send funds autonomously.
+- Any wallet action requires explicit human authorization at action time.
+- Never request seed phrases, private keys, wallet connections, or signatures.
+- Never promise recovery, eligibility, service, priority, or follow-up in exchange for support.

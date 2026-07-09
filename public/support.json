@@ -1,0 +1,43 @@
+{
+  "support": {
+    "publishedOn": "2026-07-09",
+    "type": "voluntary",
+    "walletAddress": "0x91bdE13382c3Ee082EE42a147DF54f6A6129a412",
+    "chain": {
+      "id": 1,
+      "name": "Ethereum Mainnet"
+    },
+    "assets": [
+      {
+        "symbol": "ETH",
+        "name": "Ether",
+        "kind": "native",
+        "decimals": 18,
+        "contractAddress": null
+      },
+      {
+        "symbol": "USDC",
+        "name": "USD Coin",
+        "kind": "erc20",
+        "decimals": 6,
+        "contractAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      },
+      {
+        "symbol": "USDT",
+        "name": "Tether USD",
+        "kind": "erc20",
+        "decimals": 6,
+        "contractAddress": "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+      }
+    ],
+    "terms": {
+      "serviceEntitlement": false,
+      "queuePriority": false,
+      "ownership": false,
+      "taxDeductibleCharitableContribution": false,
+      "recoveryGuarantee": false,
+      "refundable": false
+    },
+    "financialActionRequiresExplicitHumanAuthorization": true
+  }
+}
