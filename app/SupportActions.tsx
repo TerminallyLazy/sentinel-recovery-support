@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { SUPPORT_WALLET } from "./support-data";
+import {
+  STABLECOIN_EXAMPLE_REQUESTS,
+  SUPPORT_WALLET,
+} from "./support-data";
 
 type CopyState = "idle" | "copied" | "blocked";
 
@@ -80,6 +83,18 @@ export function SupportActions() {
           Inspect on Etherscan
         </a>
       </div>
+      <div className="button-row token-request-row">
+        {STABLECOIN_EXAMPLE_REQUESTS.map((request) => (
+          <a href={request.uri} key={request.id}>
+            Open 1 {request.asset} example
+          </a>
+        ))}
+      </div>
+      <p className="payment-request-note">
+        These editable one-unit requests are examples, not minimums or service
+        prices. Opening a request does not send funds. Verify every field and
+        proceed only under the payer&apos;s own policy.
+      </p>
       <p
         aria-live="polite"
         className={copyState === "idle" ? "sr-only" : "copy-status"}

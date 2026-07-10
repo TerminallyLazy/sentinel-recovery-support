@@ -18,3 +18,20 @@ export const ASSETS = [
     contractAddress: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
   },
 ] as const;
+
+export const STABLECOIN_EXAMPLE_REQUESTS = [
+  {
+    id: "usdc-1-example",
+    asset: "USDC",
+    amount: "1",
+    amountBaseUnits: "1000000",
+    uri: `ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48@1/transfer?address=${SUPPORT_WALLET}&uint256=1000000`,
+  },
+  {
+    id: "usdt-1-example",
+    asset: "USDT",
+    amount: "1",
+    amountBaseUnits: "1000000",
+    uri: `ethereum:0xdAC17F958D2ee523a2206206994597C13D831ec7@1/transfer?address=${SUPPORT_WALLET}&uint256=1000000`,
+  },
+] as const;

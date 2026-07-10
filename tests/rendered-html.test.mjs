@@ -81,6 +81,17 @@ test("server-renders the Sentinel support surface", async () => {
   );
   assert.match(
     html,
+    /ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48@1\/transfer\?address=0x91bdE13382c3Ee082EE42a147DF54f6A6129a412&amp;uint256=1000000/,
+  );
+  assert.match(
+    html,
+    /ethereum:0xdAC17F958D2ee523a2206206994597C13D831ec7@1\/transfer\?address=0x91bdE13382c3Ee082EE42a147DF54f6A6129a412&amp;uint256=1000000/,
+  );
+  assert.match(html, /Open 1\s*(?:<!-- -->)?USDC(?:<!-- -->)?\s*example/i);
+  assert.match(html, /Open 1\s*(?:<!-- -->)?USDT(?:<!-- -->)?\s*example/i);
+  assert.match(html, /Opening a request does not send funds/i);
+  assert.match(
+    html,
     /etherscan\.io\/address\/0x91bdE13382c3Ee082EE42a147DF54f6A6129a412/,
   );
   assert.match(html, /0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/);
@@ -474,6 +485,32 @@ test("publishes a delegated-payer support intent with human-only outbound use", 
   assert.equal(intent.payment.fees.networkFeesAdditional, true);
   assert.equal(intent.payment.fees.mayExceedContributionAmount, true);
   assert.equal(intent.payment.fees.estimateBeforeSending, true);
+  assert.deepEqual(intent.payment.paymentRequests, [
+    {
+      id: "usdc-1-example",
+      standard: "ERC-681",
+      asset: "USDC",
+      amount: "1",
+      amountBaseUnits: "1000000",
+      uri: `ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48@1/transfer?address=${supportWallet}&uint256=1000000`,
+      suggested: true,
+      payerMayChangeOrDecline: true,
+      requestMovesFunds: false,
+      requiresPayerPolicyApproval: true,
+    },
+    {
+      id: "usdt-1-example",
+      standard: "ERC-681",
+      asset: "USDT",
+      amount: "1",
+      amountBaseUnits: "1000000",
+      uri: `ethereum:0xdAC17F958D2ee523a2206206994597C13D831ec7@1/transfer?address=${supportWallet}&uint256=1000000`,
+      suggested: true,
+      payerMayChangeOrDecline: true,
+      requestMovesFunds: false,
+      requiresPayerPolicyApproval: true,
+    },
+  ]);
   assert.equal("autonomousExecutionAllowed" in intent.authorization, false);
   assert.equal(
     intent.authorization.payerAgentMaySendWithinDelegatedAuthority,
