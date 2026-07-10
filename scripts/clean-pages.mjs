@@ -4,6 +4,7 @@ import path from "node:path";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-// The deployment artifact is named `pages`, which vinext would otherwise
-// mistake for a Pages Router source directory on the next build.
+// Remove the legacy artifact name so vinext never mistakes it for Pages Router
+// source, plus the current hidden deployment artifact before a clean build.
 await rm(path.join(root, "pages"), { recursive: true, force: true });
+await rm(path.join(root, ".pages-artifact"), { recursive: true, force: true });

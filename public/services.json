@@ -1,0 +1,118 @@
+{
+  "schemaVersion": "1.0",
+  "status": "active",
+  "contact": {
+    "method": "email",
+    "email": "sentinel@genesysx.org",
+    "humanReviewRequired": false,
+    "completeQuoteRequiredBeforeServicePayment": true,
+    "recipientHumanAcceptanceRequired": false
+  },
+  "offerings": [
+    {
+      "id": "claimant-context-intake",
+      "title": "Claimant Context Intake",
+      "priceUsd": 49,
+      "chainId": 1,
+      "summary": "Record the claimant's stated role, a reachable contact path, and public transaction context. This does not verify identity or wallet ownership.",
+      "deliverable": "Claimant context checklist, case reference, explicit unknowns, and a recommended next step.",
+      "turnaroundBusinessDays": 1,
+      "turnaroundLabel": "Target within 1 business day after verified payment and complete public inputs.",
+      "verifiesIdentityOrWalletOwnership": false,
+      "requiredInputs": [
+        "Ethereum Mainnet transaction hash",
+        "reachable email address"
+      ],
+      "optionalInputs": [
+        "claimant's stated role or relationship to the transaction",
+        "intended use of the evidence",
+        "preferred output format",
+        "timing need"
+      ],
+      "scopeLabel": "One Ethereum Mainnet transaction hash and one claimant context.",
+      "scope": {
+        "transactionHashes": 1,
+        "claimantContexts": 1
+      }
+    },
+    {
+      "id": "evidence-preview",
+      "title": "Evidence Preview",
+      "priceUsd": 99,
+      "chainId": 1,
+      "summary": "Summarize the public facts for one Ethereum Mainnet transaction.",
+      "deliverable": "One-page transaction summary, balances observed at a cited block number and UTC timestamp, public source links, explicit unknowns, and a recommended next step including stop when appropriate.",
+      "turnaroundBusinessDays": 2,
+      "turnaroundLabel": "Target within 2 business days after verified payment and complete public inputs.",
+      "requiredInputs": [
+        "Ethereum Mainnet transaction hash",
+        "reachable email address"
+      ],
+      "optionalInputs": [
+        "claimant's stated role or relationship to the transaction",
+        "intended use of the evidence",
+        "preferred output format",
+        "timing need"
+      ],
+      "scopeLabel": "One transaction hash; no identity attribution, legal opinion, tax advice, or recovery execution.",
+      "scope": {
+        "transactionHashes": 1,
+        "maxHops": 0
+      }
+    },
+    {
+      "id": "trace-snapshot",
+      "title": "Trace Snapshot",
+      "priceUsd": 199,
+      "chainId": 1,
+      "summary": "Capture the flagged transfer, one direct hop, and up to 25 outbound transfers from its recipient.",
+      "deliverable": "Transaction path table, balances observed at a cited block number and UTC timestamp, public source links, and explicit unknowns.",
+      "turnaroundBusinessDays": 3,
+      "turnaroundLabel": "Target within 3 business days after verified payment and complete public inputs.",
+      "requiredInputs": [
+        "Ethereum Mainnet transaction hash",
+        "reachable email address"
+      ],
+      "optionalInputs": [
+        "claimant's stated role or relationship to the transaction",
+        "intended use of the evidence",
+        "preferred output format",
+        "timing need"
+      ],
+      "scopeLabel": "One Ethereum Mainnet transaction hash, one direct hop, and a written observation cutoff.",
+      "scope": {
+        "transactionHashes": 1,
+        "maxHops": 1,
+        "maxDirectOutboundTransfers": 25,
+        "observationCutoffConfirmedInWriting": true
+      }
+    }
+  ],
+  "requestProcess": [
+    "A human sends an email request with the transaction hash, their role, and the evidence need.",
+    "Sentinel confirms scope, timing, exact payment reference, and payment instructions in writing.",
+    "The human decides whether to pay only after reviewing that confirmation.",
+    "Sentinel prepares only the confirmed evidence deliverable."
+  ],
+  "payment": {
+    "sendOnlyAfterWrittenConfirmation": true,
+    "directPaymentFromThisPageEnabled": false,
+    "paymentReferenceRequired": true,
+    "networkFeesAdditional": true,
+    "serviceTermsProvidedBeforePayment": true,
+    "quoteExpiresAfterDays": 7,
+    "voluntarySupportMetadataIsNotServicePaymentInstructions": true,
+    "canonicalPaymentContract": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
+    "writtenEmailCannotChangeRecipient": true
+  },
+  "safety": {
+    "requestsKeysOrSeedPhrases": false,
+    "requestsSignatures": false,
+    "takesCustody": false,
+    "movesFunds": false,
+    "guaranteesRecovery": false,
+    "recoveryExecutionIncluded": false,
+    "providesIdentityAttribution": false,
+    "providesLegalOrTaxAdvice": false
+  }
+}
