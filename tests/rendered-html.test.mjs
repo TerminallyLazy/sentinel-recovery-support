@@ -222,7 +222,7 @@ test("publishes a source-installable deterministic MCP preflight", async () => {
     registry: {
       name: registryName,
       version: "0.3.0",
-      publicationStatus: "publication-pending",
+      publicationStatus: "published",
       versionApiUrl: registryVersionUrl,
       serverJsonUrl:
         "https://raw.githubusercontent.com/TerminallyLazy/sentinel-recovery-support/main/mcp/server.json",

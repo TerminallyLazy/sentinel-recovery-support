@@ -43,7 +43,7 @@
     "registry": {
       "name": "io.github.TerminallyLazy/sentinel-recovery-services",
       "version": "0.3.0",
-      "publicationStatus": "publication-pending",
+      "publicationStatus": "published",
       "versionApiUrl": "https://registry.modelcontextprotocol.io/v0.1/servers/io.github.TerminallyLazy%2Fsentinel-recovery-services/versions/0.3.0",
       "serverJsonUrl": "https://raw.githubusercontent.com/TerminallyLazy/sentinel-recovery-support/main/mcp/server.json"
     },
