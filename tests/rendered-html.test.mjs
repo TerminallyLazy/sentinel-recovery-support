@@ -195,8 +195,24 @@ test("publishes a source-installable deterministic MCP preflight", async () => {
 
   assert.deepEqual(manifest.mcp, {
     transport: "stdio",
-    distributionStatus: "source-only",
+    distributionStatus: "github-release",
     remoteEndpointAvailable: false,
+    release: {
+      version: "0.2.0",
+      tag: "v0.2.0",
+      bundleUrl:
+        "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.2.0/sentinel-agent-payment-boundary-v0.2.0.mcpb",
+      checksumUrl:
+        "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.2.0/sentinel-agent-payment-boundary-v0.2.0.mcpb.sha256",
+      sha256:
+        "5712fa93ac1a56023927e44a6efbf23594db07425933d588f032982178eef1cf",
+    },
+    registry: {
+      name: "io.github.terminallylazy/sentinel-recovery-services",
+      publicationStatus: "pending-verification",
+      serverJsonUrl:
+        "https://raw.githubusercontent.com/TerminallyLazy/sentinel-recovery-support/main/mcp/server.json",
+    },
     source: {
       repository:
         "https://github.com/TerminallyLazy/sentinel-recovery-support",
@@ -248,7 +264,7 @@ test("publishes a source-installable deterministic MCP preflight", async () => {
     mcpBundle.tools.map(({ name }) => name),
     ["preflight_agent_payment_boundary"],
   );
-  assert.match(mcpReadme, /source-only/i);
+  assert.match(mcpReadme, /GitHub Release/i);
   assert.match(mcpReadme, /11 fixed checks/i);
   assert.match(mcpReadme, /sentinel:\/\/services\/catalog/);
   assert.match(mcpReadme, /moves no funds/i);
@@ -260,6 +276,49 @@ test("publishes a source-installable deterministic MCP preflight", async () => {
   assert.match(workflow, /npm run pack:check --prefix mcp/);
   assert.match(workflow, /npm run mcpb:validate --prefix mcp/);
   assert.match(serverSource, /registerTool/);
+});
+
+test("publishes checksummed MCP release metadata through GitHub OIDC", async () => {
+  const [server, workflow] = await Promise.all([
+    readJson("mcp/server.json"),
+    readText(".github/workflows/publish-mcp-registry.yml"),
+  ]);
+
+  assert.equal(
+    server.$schema,
+    "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  );
+  assert.equal(
+    server.name,
+    "io.github.terminallylazy/sentinel-recovery-services",
+  );
+  assert.equal(server.version, "0.2.0");
+  assert.deepEqual(server.repository, {
+    url: "https://github.com/TerminallyLazy/sentinel-recovery-support",
+    source: "github",
+    id: "1295829629",
+    subfolder: "mcp",
+  });
+  assert.deepEqual(server.packages, [
+    {
+      registryType: "mcpb",
+      identifier:
+        "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.2.0/sentinel-agent-payment-boundary-v0.2.0.mcpb",
+      version: "0.2.0",
+      fileSha256:
+        "5712fa93ac1a56023927e44a6efbf23594db07425933d588f032982178eef1cf",
+      transport: { type: "stdio" },
+    },
+  ]);
+  assert.match(workflow, /id-token:\s*write/i);
+  assert.match(workflow, /mcp-publisher_linux_amd64\.tar\.gz/);
+  assert.match(
+    workflow,
+    /ab128162b0616090b47cf245afe0a23f3ef08936fdce19074f5ba0a4469281ac/,
+  );
+  assert.match(workflow, /mcp-publisher" validate mcp\/server\.json/);
+  assert.match(workflow, /mcp-publisher" login github-oidc/);
+  assert.match(workflow, /mcp-publisher" publish mcp\/server\.json/);
 });
 
 test("preflights the canonical agent and payment contracts conservatively", async () => {

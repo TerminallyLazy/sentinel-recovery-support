@@ -25,7 +25,7 @@ The site exposes a human-readable funding page, `$49/$99/$199` public-data servi
 - `/agent-guide.md` — mandatory agent authority boundaries
 - `/impact.json` — historical receipt and contribution-funded-work snapshot
 - `/llms.txt` — short discovery index
-- `mcp/` — source-installable, read-only stdio MCP server with a deterministic agent-payment boundary preflight plus the live service and quote-request resources; this is repository source, not a hosted Pages endpoint or published package
+- `mcp/` — read-only stdio MCP server with a deterministic agent-payment boundary preflight plus the live service and quote-request resources; install from source or the checksummed [`v0.2.0` GitHub Release](https://github.com/TerminallyLazy/sentinel-recovery-support/releases/tag/v0.2.0), not from the static Pages site
 
 ## Local MCP preflight and resources
 
@@ -45,6 +45,12 @@ Only resource reads fetch the two hard-coded canonical live JSON contracts.
 The preflight runs locally on inline text and makes no network request. Neither
 path can submit a request, move funds, authorize payment, request credentials,
 connect a wallet, or perform wallet actions.
+
+The checksummed `v0.2.0` MCPB and its SHA-256 sidecar are published on the
+[GitHub Release](https://github.com/TerminallyLazy/sentinel-recovery-support/releases/tag/v0.2.0).
+Registry metadata lives at `mcp/server.json`; treat Registry availability as
+unverified until the public Registry API returns the exact namespace and
+version.
 
 Install and verify it from the repository root:
 
