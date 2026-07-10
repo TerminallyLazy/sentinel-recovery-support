@@ -174,6 +174,7 @@ test("publishes canonical GitHub Pages interfaces for agents", async () => {
     services: `${siteBase}services.json`,
     serviceRequest: `${siteBase}service-request.json`,
     sampleAgentPaymentBoundaryReview: `${siteBase}sample-agent-payment-boundary-review.json`,
+    sampleServiceQuote: `${siteBase}sample-service-quote.json`,
     sampleEvidencePreview: `${siteBase}sample-evidence-preview.json`,
     servicePayment: `${siteBase}service-payment.json`,
     privacy: `${siteBase}privacy.json`,
@@ -556,6 +557,10 @@ test("publishes a fixed-scope paid evidence funnel", async () => {
   const html = await response.text();
 
   assert.match(html, /Need a deliverable, not a donation\?/i);
+  assert.match(
+    html,
+    /Request → human-issued quote → exact payment → return transaction hash → delivery/i,
+  );
   assert.match(html, /Claimant Context Intake/i);
   assert.match(html, /does not verify identity or wallet ownership/i);
   assert.match(html, /Evidence Preview/i);
@@ -570,6 +575,9 @@ test("publishes a fixed-scope paid evidence funnel", async () => {
 
   assert.ok(services, "expected public/services.json to exist");
   assert.equal(services.contact.email, "sentinel@genesysx.org");
+  assert.equal(services.contact.quoteIssuanceHumanApprovalRequired, true);
+  assert.equal(services.contact.payerHumanReviewRequired, false);
+  assert.equal("humanReviewRequired" in services.contact, false);
   assert.deepEqual(
     services.offerings.map(({ id, priceUsd }) => ({ id, priceUsd })),
     [
@@ -647,7 +655,10 @@ test("publishes a fixed-scope payment-boundary review for agent builders", async
   assert.match(offer.summary, /payer authority/i);
   assert.match(offer.deliverable, /findings matrix/i);
   assert.match(html, /Agent Payment Boundary Review/i);
-  assert.match(html.replace(/<[^>]*>/g, ""), /Open \$49 email draft/i);
+  assert.match(
+    html.replace(/<[^>]*>/g, ""),
+    /Request \$49 service by email/i,
+  );
   assert.ok(
     request.requestSchema.properties.serviceId.enum.includes(
       "agent-payment-boundary-review",
@@ -865,9 +876,16 @@ test("publishes an executable quote-first service request contract", async () =>
   assert.match(request.transport.bodyTemplate, /do not.*pay.*complete written quote/i);
   assert.equal(request.workflow.completeQuoteRequiredBeforePayment, true);
   assert.equal(request.workflow.paymentAllowedBeforeCompleteQuote, false);
+  assert.equal(request.workflow.quoteIssuanceHumanApprovalRequired, true);
+  assert.equal(request.workflow.approvedQuoteRegistryRequiredForCredit, true);
+  assert.equal(request.workflow.receiptLedgerRequired, true);
   assert.equal(
     request.workflow.quoteContract,
     `${siteBase}service-payment.json`,
+  );
+  assert.equal(
+    request.workflow.sampleQuote,
+    `${siteBase}sample-service-quote.json`,
   );
   assert.equal(request.safety.publicFactsOnly, true);
   assert.ok(request.safety.forbiddenInputs.includes("private keys"));
@@ -882,6 +900,32 @@ test("publishes an executable quote-first service request contract", async () =>
   );
   assert.ok(emailCondition, "expected email-specific reply address requirement");
   assert.deepEqual(emailCondition.then.required, ["replyEmail"]);
+});
+
+test("surfaces the complete nonpayable quote example across public interfaces", async () => {
+  const [response, manifest, request, payment, guide, llms, readme] =
+    await Promise.all([
+      render(),
+      readJson("public/.well-known/sentinel-agent.json"),
+      readJson("public/service-request.json"),
+      readJson("public/service-payment.json"),
+      readText("public/agent-guide.md"),
+      readText("public/llms.txt"),
+      readText("README.md"),
+    ]);
+  const html = await response.text();
+  const sampleUrl = `${siteBase}sample-service-quote.json`;
+
+  assert.equal(manifest.interfaces.sampleServiceQuote, sampleUrl);
+  assert.equal(request.workflow.sampleQuote, sampleUrl);
+  assert.equal(payment.quote.sampleUrl, sampleUrl);
+  assert.match(
+    html,
+    /href="\/sample-service-quote\.json"[^>]*>Inspect expired, nonpayable quote example<\/a>/i,
+  );
+  for (const document of [guide, llms, readme]) {
+    assert.match(document, new RegExp(sampleUrl.replaceAll(".", "\\.")));
+  }
 });
 
 test("renders an email-independent copy fallback from the request contract", async () => {
@@ -931,7 +975,7 @@ test("publishes a public GitHub issue transport for quote requests", async () =>
     sentinelRequestsCredential: false,
     responseChannel: "created-issue",
   });
-  assert.match(html, /Open public GitHub request/i);
+  assert.match(html, /Request via public GitHub issue/i);
   assert.match(
     html,
     /github\.com\/TerminallyLazy\/sentinel-recovery-support\/issues\/new\?template=service-request\.yml&amp;title=Sentinel%20quote%20request%3A%20agent-payment-boundary-review/i,
@@ -1045,6 +1089,10 @@ test("publishes independently verifiable paid-service and privacy contracts", as
   assert.ok(privacy);
   assert.equal(payment.network.chainId, 1);
   assert.equal(payment.recipient.address, supportWallet);
+  assert.deepEqual(
+    payment.supportedAssets.map(({ symbol }) => symbol),
+    ["USDC", "USDT"],
+  );
   assert.equal(payment.verification.writtenEmailCannotChangeRecipient, true);
   assert.equal(
     "autonomousAgentPaymentAllowed" in payment.authorization,
@@ -1054,6 +1102,9 @@ test("publishes independently verifiable paid-service and privacy contracts", as
     metadataExpandsPayerAuthority: false,
     allowedOnlyWhen: {
       completeWrittenQuotePresent: true,
+      quotePayable: true,
+      quoteNotDemonstration: true,
+      quoteHumanApproved: true,
       quoteNotExpired: true,
       payerPolicyApprovesExactQuote: true,
     },
@@ -1080,9 +1131,24 @@ test("publishes independently verifiable paid-service and privacy contracts", as
     true,
   );
   assert.equal(payment.quote.maxValidityDays, 7);
+  assert.deepEqual(payment.quote.authenticity, {
+    humanApprovalRequired: true,
+    approvedQuoteRegistryRequiredForCredit: true,
+    deliveryChannelMustMatchRequest: true,
+    payerMustVerifySentinelControlledReplySource: true,
+    standaloneCryptographicSignaturePresent: false,
+  });
   assert.deepEqual(payment.quote.requiredFields, [
+    "kind",
+    "complete",
+    "demonstration",
+    "payable",
+    "approvalState",
+    "issuance",
+    "contractSnapshots",
     "quoteId",
     "serviceId",
+    "requestFingerprint",
     "priceUsd",
     "asset",
     "amountBaseUnits",
@@ -1093,7 +1159,9 @@ test("publishes independently verifiable paid-service and privacy contracts", as
     "expiresAt",
     "deliverable",
     "turnaround",
-    "cancellationAndRefundTerms"
+    "cancellationAndRefundTerms",
+    "canonicalContracts",
+    "paymentInstructions"
   ]);
   assert.equal(privacy.collection.identityDocumentsRequested, false);
   assert.equal(privacy.collection.contextFieldsOptional, true);
@@ -1140,8 +1208,10 @@ test("publishes deterministic quote replay and receipt reconciliation rules", as
     "asset",
     "amountBaseUnits",
   ]);
+  assert.equal(payment.reconciliation.minimumConfirmations, 12);
+  assert.equal(payment.reconciliation.quoteApprovalRegistryRequired, true);
+  assert.equal(payment.reconciliation.receiptLedgerRequired, true);
   assert.deepEqual(payment.reconciliation.receiptIdentity, {
-    nativeTuple: ["chainId", "transactionHash"],
     erc20Tuple: ["chainId", "transactionHash", "logIndex"],
     uniqueAcrossQuotes: true,
     reuseHandling: "do-not-credit; manual-review",
@@ -1214,6 +1284,10 @@ test("gates Pages deployment and avoids a generated Pages Router directory", asy
     (exportScript.match(/sample-agent-payment-boundary-review\.md/g) ?? [])
       .length >= 2,
     "expected the Pages exporter to rewrite and require the Markdown Boundary Review sample",
+  );
+  assert.ok(
+    (exportScript.match(/sample-service-quote\.json/g) ?? []).length >= 3,
+    "expected the Pages exporter to rewrite, require, and JSON-validate the quote sample",
   );
   assert.match(cleanScript, /\.pages-artifact/);
   assert.match(gitignore, /^\/\.pages-artifact\/$/m);

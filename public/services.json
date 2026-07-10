@@ -5,7 +5,8 @@
     "method": "email",
     "email": "sentinel@genesysx.org",
     "requestContract": "https://terminallylazy.github.io/sentinel-recovery-support/service-request.json",
-    "humanReviewRequired": false,
+    "quoteIssuanceHumanApprovalRequired": true,
+    "payerHumanReviewRequired": false,
     "completeQuoteRequiredBeforeServicePayment": true,
     "recipientHumanAcceptanceRequired": false
   },
@@ -123,6 +124,10 @@
     "Sentinel prepares only the confirmed evidence deliverable."
   ],
   "payment": {
+    "supportedQuoteAssets": [
+      "USDC",
+      "USDT"
+    ],
     "sendOnlyAfterWrittenConfirmation": true,
     "directPaymentFromThisPageEnabled": false,
     "paymentReferenceRequired": true,

@@ -151,8 +151,12 @@
     "acknowledgement": "manual",
     "completeQuoteRequiredBeforePayment": true,
     "paymentAllowedBeforeCompleteQuote": false,
+    "quoteIssuanceHumanApprovalRequired": true,
+    "approvedQuoteRegistryRequiredForCredit": true,
+    "receiptLedgerRequired": true,
     "quoteMaximumValidityDays": 7,
     "quoteContract": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
+    "sampleQuote": "https://terminallylazy.github.io/sentinel-recovery-support/sample-service-quote.json",
     "receiptReturn": {
       "method": "selected-reply-channel",
       "requiredFields": [

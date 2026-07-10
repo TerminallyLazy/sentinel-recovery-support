@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "1.0",
+  "kind": "sentinel-service-quote",
+  "complete": true,
+  "demonstration": true,
+  "payable": false,
+  "approvalState": "demonstration",
+  "issuance": {
+    "humanApproved": false,
+    "channel": "demonstration",
+    "issuerEmail": "sentinel@genesysx.org",
+    "deliveryRequiredThroughSelectedReplyChannel": true,
+    "payerMustVerifySentinelControlledReplySource": true,
+    "standaloneCryptographicSignaturePresent": false
+  },
+  "nonPaymentWarning": "Demonstration only. Do not pay this expired example quote; it creates no service entitlement.",
+  "quoteId": "11111111-1111-4111-8111-111111111111",
+  "serviceId": "agent-payment-boundary-review",
+  "requestFingerprint": "sha256:1212121212121212121212121212121212121212121212121212121212121212",
+  "priceUsd": 49,
+  "asset": {
+    "symbol": "USDC",
+    "kind": "erc20",
+    "decimals": 6,
+    "contractAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  },
+  "amountBaseUnits": "49000000",
+  "chainId": 1,
+  "recipient": "0x91bdE13382c3Ee082EE42a147DF54f6A6129a412",
+  "paymentReference": "22222222-2222-4222-8222-222222222222",
+  "issuedAt": "2026-01-01T00:00:00.000Z",
+  "expiresAt": "2026-01-08T00:00:00.000Z",
+  "deliverable": "One-page findings matrix with cited fields, contradictions, missing safety statements, and prioritized corrections.",
+  "turnaround": "Target within 1 business day after verified payment and complete public inputs.",
+  "cancellationAndRefundTerms": "The requester may cancel before payment. A verified on-chain payment is irreversible and non-refundable; Sentinel will provide only the quoted fixed-scope deliverable. Duplicate, late, partial, or excess receipts require manual review and do not expand the entitlement.",
+  "authorization": {
+    "requestMovesFunds": false,
+    "requestAuthorizesPayment": false,
+    "metadataExpandsPayerAuthority": false,
+    "payerMustFollowOwnPolicy": true,
+    "recipientHumanAcceptanceRequired": false,
+    "outboundWalletActionRequiresHumanAuthorization": true
+  },
+  "canonicalContracts": {
+    "servicePayment": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
+    "serviceRequest": "https://terminallylazy.github.io/sentinel-recovery-support/service-request.json"
+  },
+  "contractSnapshots": {
+    "services": {
+      "canonicalUrl": "https://terminallylazy.github.io/sentinel-recovery-support/services.json",
+      "canonicalJsonSha256": "33fc45ae568f2143adb9abada475b44505e81932ec9a2542b74bb1a86ff5dfb0"
+    },
+    "servicePayment": {
+      "canonicalUrl": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
+      "canonicalJsonSha256": "cbfbd066f749690e7350dc68b7be6ffca3316ed7076e60adbe0315fc104f85d4"
+    }
+  },
+  "paymentInstructions": "This field demonstrates the complete quote shape only. This expired example is not payable. A live quote would require payment of the exact quoted asset and base-unit amount on Ethereum Mainnet to the canonical recipient before expiry, subject to the payer's own policy. Never provide keys, signatures, wallet connections, credentials, or PaymentPayload."
+}

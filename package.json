@@ -13,7 +13,11 @@
     "export:pages": "npm run build && node scripts/export-pages.mjs",
     "preview:pages": "npm run export:pages && node scripts/preview-pages.mjs",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
-    "test": "npm run build && node --test tests/rendered-html.test.mjs",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "test:revenue": "node --test tests/service-quote.test.mjs tests/service-receipt.test.mjs tests/revenue-operations.test.mjs",
+    "quote:create": "node scripts/create-service-quote.mjs",
+    "quote:prepare": "node scripts/prepare-service-quote.mjs",
+    "receipt:verify": "node scripts/verify-service-receipt.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern pages"
   },
   "dependencies": {
