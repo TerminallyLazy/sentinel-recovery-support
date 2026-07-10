@@ -12,6 +12,7 @@
     "services": "https://terminallylazy.github.io/sentinel-recovery-support/services.json",
     "serviceRequest": "https://terminallylazy.github.io/sentinel-recovery-support/service-request.json",
     "sampleAgentPaymentBoundaryReview": "https://terminallylazy.github.io/sentinel-recovery-support/sample-agent-payment-boundary-review.json",
+    "sampleServiceQuote": "https://terminallylazy.github.io/sentinel-recovery-support/sample-service-quote.json",
     "sampleEvidencePreview": "https://terminallylazy.github.io/sentinel-recovery-support/sample-evidence-preview.json",
     "servicePayment": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
     "privacy": "https://terminallylazy.github.io/sentinel-recovery-support/privacy.json",

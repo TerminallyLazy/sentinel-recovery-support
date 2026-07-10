@@ -1,6 +1,8 @@
 name: Service quote request
 description: Request a written quote for one fixed-scope public-data service.
 title: "Sentinel quote request: "
+labels:
+  - service-quote-request
 body:
   - type: markdown
     attributes:

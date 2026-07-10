@@ -408,6 +408,19 @@ nav a:hover {
   border-top: 1px solid var(--ink);
 }
 
+.service-flow {
+  margin: 0;
+  border: 1px solid var(--ink);
+  border-bottom: 0;
+  background: var(--soft);
+  padding: 14px 20px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .service-card {
   display: flex;
   min-height: 430px;
@@ -459,12 +472,12 @@ nav a:hover {
 
 .service-sample-link {
   display: inline-flex;
-  min-height: 46px;
+  min-height: 34px;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--ink);
-  background: var(--accent);
-  padding: 11px 14px;
+  background: transparent;
+  padding: 7px 10px;
   font-family: var(--font-mono), monospace;
   font-size: 10px;
   font-weight: 700;
@@ -474,7 +487,7 @@ nav a:hover {
 }
 
 .service-sample-link:hover {
-  background: var(--paper);
+  background: var(--soft);
 }
 
 .service-sample-link:focus-visible {

@@ -19,6 +19,7 @@ The site exposes a human-readable funding page, `$49/$99/$199` public-data servi
 - `/services.json` — fixed-price scope, deliverable, and turnaround catalog
 - `/service-request.json` — canonical agent input schema, email and public GitHub issue transports, and copyable quote-request template: <https://terminallylazy.github.io/sentinel-recovery-support/service-request.json>
 - `/sample-agent-payment-boundary-review.json` and `.md` — inspectable `$49` self-review demonstration: [JSON](https://terminallylazy.github.io/sentinel-recovery-support/sample-agent-payment-boundary-review.json), [Markdown](https://terminallylazy.github.io/sentinel-recovery-support/sample-agent-payment-boundary-review.md)
+- [`/sample-service-quote.json`](https://terminallylazy.github.io/sentinel-recovery-support/sample-service-quote.json) — complete but expired and explicitly nonpayable quote-shape demonstration
 - `/sample-evidence-preview.json` and `.md` — inspectable `$99` format demonstration
 - `/service-payment.json` — canonical recipient, assets, quote fields, and verification rules
 - `/privacy.json` — minimal inputs, optional context, retention, and do-not-send rules
@@ -84,6 +85,74 @@ path with the absolute path on that machine:
 Direct launch uses `node mcp/server.mjs`. Do not configure the GitHub Pages URL
 as an MCP endpoint: the static site does not implement Streamable HTTP. The npm
 package is not published yet, so no `npx` installation is advertised.
+
+## Human-approved service quotes
+
+The quote path is deliberately local and human-triggered. The
+`scripts/prepare-service-quote.mjs` helper accepts public-only request JSON, but
+only runs after the operator supplies `SENTINEL_HUMAN_APPROVAL=APPROVE`. It
+creates a mode-`0600` local artifact for human review. It does not issue or
+publish the quote, comment on an issue, request payment, or expand a payer
+agent's authority. There is intentionally no public GitHub Actions quote
+workflow because a live payable quote ID and payment reference should not be
+exposed as a public-repository artifact.
+
+Prepare a live local quote and append its exact digest to a local approval
+registry (keep both paths outside the repository):
+
+```bash
+mkdir -p "$HOME/.local/state/sentinel-recovery"
+chmod 700 "$HOME/.local/state/sentinel-recovery"
+SENTINEL_HUMAN_APPROVAL=APPROVE \
+SENTINEL_REQUEST_JSON="$(jq -c . /absolute/path/request.json)" \
+SENTINEL_ASSET=USDC \
+SENTINEL_VALIDITY_DAYS=7 \
+SENTINEL_QUOTE_OUTPUT="$HOME/.local/state/sentinel-recovery/approved-quote.json" \
+SENTINEL_QUOTE_REGISTRY="$HOME/.local/state/sentinel-recovery/approved-quotes.jsonl" \
+npm run quote:prepare
+```
+
+The same deterministic formatter can run locally with operator-supplied UUID v4
+identifiers and timestamps:
+
+```bash
+node scripts/create-service-quote.mjs \
+  --request /absolute/path/request.json \
+  --asset USDC \
+  --quote-id 11111111-1111-4111-8111-111111111111 \
+  --payment-reference 22222222-2222-4222-8222-222222222222 \
+  --issued-at 2026-07-10T20:00:00.000Z \
+  --expires-at 2026-07-17T20:00:00.000Z
+```
+
+Paid quotes support canonical USDC and canonical USDT only; their base-unit
+amounts are derived from the fixed integer USD catalog price. ETH remains a
+voluntary-support asset, not a quoted USD-denominated service asset. The raw
+formatter emits a nonpayable draft to standard output so a human can inspect it.
+Only the approval-gated local preparer emits a payable quote and records its
+digest in the operator's approved-quote registry.
+
+After the requester returns a transaction hash, the read-only receipt checker
+can compare the confirmed canonical ERC-20 `Transfer` log to the exact approved
+quote tuple and reconcile it against an append-only local receipt ledger:
+
+```bash
+node scripts/verify-service-receipt.mjs \
+  --quote /absolute/path/approved-quote.json \
+  --quote-registry "$HOME/.local/state/sentinel-recovery/approved-quotes.jsonl" \
+  --receipt-ledger "$HOME/.local/state/sentinel-recovery/service-receipts.jsonl" \
+  --transaction-hash 0x... \
+  --rpc-url "$SENTINEL_ETH_RPC_URL" \
+  --confirmations 12
+```
+
+Use a trusted HTTPS Ethereum Mainnet JSON-RPC endpoint and keep credentialed RPC
+URLs out of issues, logs, and quote artifacts. The checker does not sign,
+broadcast, spend, or move funds; it requests no keys, signatures, or wallet
+connection. The local ledger makes repeated checks idempotent and routes a
+receipt reused across quotes to manual review instead of crediting it twice.
+The complete manual operator checklist is in
+[`docs/service-operations.md`](docs/service-operations.md).
 
 ## Local development
 

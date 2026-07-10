@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
   "status": "active",
-  "publishedAt": "2026-07-10T06:43:22Z",
+  "publishedAt": "2026-07-10T20:45:04Z",
   "canonicalUrl": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
   "sourceUrl": "https://github.com/TerminallyLazy/sentinel-recovery-support/blob/main/public/service-payment.json",
   "integrity": {
@@ -22,12 +22,6 @@
   },
   "supportedAssets": [
     {
-      "symbol": "ETH",
-      "kind": "native",
-      "decimals": 18,
-      "contractAddress": null
-    },
-    {
       "symbol": "USDC",
       "kind": "erc20",
       "decimals": 6,
@@ -42,10 +36,53 @@
   ],
   "quote": {
     "issuerEmail": "sentinel@genesysx.org",
+    "sampleUrl": "https://terminallylazy.github.io/sentinel-recovery-support/sample-service-quote.json",
+    "authenticity": {
+      "humanApprovalRequired": true,
+      "approvedQuoteRegistryRequiredForCredit": true,
+      "deliveryChannelMustMatchRequest": true,
+      "payerMustVerifySentinelControlledReplySource": true,
+      "standaloneCryptographicSignaturePresent": false
+    },
+    "digestSemantics": {
+      "algorithm": "sha256",
+      "canonicalJson": {
+        "representation": "sentinel-canonical-json-v1",
+        "encoding": "utf-8",
+        "rules": [
+          "Objects serialize as JSON objects with keys sorted ascending by JavaScript UTF-16 code-unit order.",
+          "Arrays preserve input order.",
+          "Object keys and primitive values use JSON.stringify serialization.",
+          "No insignificant whitespace or trailing newline is included."
+        ],
+        "referenceImplementation": "https://github.com/TerminallyLazy/sentinel-recovery-support/blob/main/scripts/lib/service-quote.mjs"
+      },
+      "requestFingerprint": {
+        "prefix": "sha256:",
+        "input": "The validated request JSON object serialized with sentinel-canonical-json-v1."
+      },
+      "contractSnapshots": {
+        "input": "The parsed canonical contract JSON object serialized with sentinel-canonical-json-v1.",
+        "differentFromRawFileDigest": true
+      },
+      "quoteArtifactDigest": {
+        "input": "The exact approved quote JSON raw file bytes delivered to the payer, including its final newline.",
+        "displayedInMarkdownSummary": true,
+        "mustMatchBeforePayment": true
+      }
+    },
     "maxValidityDays": 7,
     "requiredFields": [
+      "kind",
+      "complete",
+      "demonstration",
+      "payable",
+      "approvalState",
+      "issuance",
+      "contractSnapshots",
       "quoteId",
       "serviceId",
+      "requestFingerprint",
       "priceUsd",
       "asset",
       "amountBaseUnits",
@@ -56,7 +93,9 @@
       "expiresAt",
       "deliverable",
       "turnaround",
-      "cancellationAndRefundTerms"
+      "cancellationAndRefundTerms",
+      "canonicalContracts",
+      "paymentInstructions"
     ],
     "identifierRules": {
       "quoteId": {
@@ -94,6 +133,9 @@
       "metadataExpandsPayerAuthority": false,
       "allowedOnlyWhen": {
         "completeWrittenQuotePresent": true,
+        "quotePayable": true,
+        "quoteNotDemonstration": true,
+        "quoteHumanApproved": true,
         "quoteNotExpired": true,
         "payerPolicyApprovesExactQuote": true
       },
@@ -113,6 +155,9 @@
     "recipientAgentMayBroadcastOutboundTransaction": false
   },
   "reconciliation": {
+    "minimumConfirmations": 12,
+    "quoteApprovalRegistryRequired": true,
+    "receiptLedgerRequired": true,
     "idempotencyTuple": [
       "quoteId",
       "paymentReference",
@@ -122,10 +167,6 @@
       "amountBaseUnits"
     ],
     "receiptIdentity": {
-      "nativeTuple": [
-        "chainId",
-        "transactionHash"
-      ],
       "erc20Tuple": [
         "chainId",
         "transactionHash",
@@ -165,6 +206,7 @@
           "late",
           "partial",
           "overpayment",
+          "quote-contract-snapshot-changed",
           "reorg-or-conflicting-evidence"
         ]
       }
@@ -178,6 +220,7 @@
   },
   "warnings": [
     "Do not pay from the voluntary-support page for a paid service.",
+    "Paid-service quotes support canonical USDC and canonical USDT only; ETH is voluntary support, not a quoted service asset.",
     "Do not pay if an email lists a different recipient, chain, or asset contract from this canonical contract.",
     "Ethereum network fees are additional and crypto transfers are irreversible.",
     "Never provide private keys, seed phrases, wallet connections, signatures, passwords, identity documents, or confidential material."

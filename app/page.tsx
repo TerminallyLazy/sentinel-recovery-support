@@ -185,6 +185,9 @@ export default function Home() {
             and payment instructions in writing before you send anything.
           </p>
         </div>
+        <p className="service-flow" aria-label="Paid service sequence">
+          Request → human-issued quote → exact payment → return transaction hash → delivery
+        </p>
         <div className="work-grid service-grid">
           {paidServices.map((service) => (
             <article className="work-card service-card" key={service.id}>
@@ -200,6 +203,20 @@ export default function Home() {
                 <p>{service.turnaroundLabel}</p>
               </div>
               <div className="service-actions">
+                <a
+                  className="service-cta"
+                  href={serviceRequestUrl(service.title, service.id)}
+                >
+                  Request ${service.priceUsd} service by email
+                </a>
+                <a
+                  className="service-cta secondary"
+                  href={serviceIssueRequestUrl(service.id)}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  Request via public GitHub issue
+                </a>
                 {service.id === "agent-payment-boundary-review" ? (
                   <>
                     <a
@@ -218,6 +235,14 @@ export default function Home() {
                     >
                       Read Markdown sample
                     </a>
+                    <a
+                      className="service-sample-link"
+                      href="/sample-service-quote.json"
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      Inspect expired, nonpayable quote example
+                    </a>
                   </>
                 ) : null}
                 {service.id === "evidence-preview" ? (
@@ -225,20 +250,6 @@ export default function Home() {
                     View sample Evidence Preview
                   </a>
                 ) : null}
-                <a
-                  className="service-cta"
-                  href={serviceRequestUrl(service.title, service.id)}
-                >
-                  Open ${service.priceUsd} email draft
-                </a>
-                <a
-                  className="service-cta secondary"
-                  href={serviceIssueRequestUrl(service.id)}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  Open public GitHub request
-                </a>
                 <CopyValue
                   label="complete request"
                   value={serviceRequestText(service.id)}
@@ -260,7 +271,8 @@ export default function Home() {
           GitHub quote requests are public. Never include identity documents,
           confidential material, credentials, keys, wallet connections, or
           signatures. Email or a GitHub reply cannot change the recipient. {" "}
-          Do not pay from this page. Payment is requested only after written
+          Do not pay from this page. Paid quotes currently use canonical USDC
+          or canonical USDT on Ethereum Mainnet. Payment is requested only after written
           scope confirmation, including cancellation and refund terms. The
           seven-day quote and service-payment instructions are separate from
           voluntary-support metadata. Before paying, independently verify the
