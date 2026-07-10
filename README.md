@@ -25,16 +25,21 @@ The site exposes a human-readable funding page, `$49/$99/$199` public-data servi
 - `/agent-guide.md` — mandatory agent authority boundaries
 - `/impact.json` — historical receipt and contribution-funded-work snapshot
 - `/llms.txt` — short discovery index
-- `mcp/` — read-only stdio MCP server with a deterministic agent-payment boundary preflight plus the live service and quote-request resources; install from source or the checksummed [`v0.2.0` GitHub Release](https://github.com/TerminallyLazy/sentinel-recovery-support/releases/tag/v0.2.0), not from the static Pages site
+- `mcp/` — read-only stdio MCP server with deterministic agent-payment and x402 `PaymentRequired` preflights plus the live service and quote-request resources; install from source or the checksummed [`v0.3.0` GitHub Release](https://github.com/TerminallyLazy/sentinel-recovery-support/releases/tag/v0.3.0), not from the static Pages site
 
 ## Local MCP preflight and resources
 
-The MCP server exposes one deterministic read-only tool:
+The MCP server exposes two deterministic read-only tools:
 
 - `preflight_agent_payment_boundary` — checks one or two inline public
   documents against 11 fixed payment-authority boundaries, without fetching
   requester URLs, executing supplied text, submitting a request, or moving
   funds
+- `preflight_x402_v2_payment_required` — checks one decoded inline x402 v2
+  `PaymentRequired` JSON document under a pinned, closed-world exact-EVM
+  EIP-3009 Sentinel safety profile, without decoding headers, evaluating payer
+  policy, verifying signatures or receipts, settling, connecting a wallet, or
+  moving funds
 
 It also exposes exactly two read-only resources:
 
@@ -42,16 +47,16 @@ It also exposes exactly two read-only resources:
 - `sentinel://services/quote-request-contract`
 
 Only resource reads fetch the two hard-coded canonical live JSON contracts.
-The preflight runs locally on inline text and makes no network request. Neither
+Both preflights run locally on inline content and make no network request. Neither
 path can submit a request, move funds, authorize payment, request credentials,
 connect a wallet, or perform wallet actions.
 
-The checksummed `v0.2.0` MCPB and its SHA-256 sidecar are published on the
-[GitHub Release](https://github.com/TerminallyLazy/sentinel-recovery-support/releases/tag/v0.2.0).
-The official MCP Registry lists version `0.2.0` as
-`io.github.TerminallyLazy/sentinel-recovery-services`; verify the exact
-[Registry record](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.TerminallyLazy%2Fsentinel-recovery-services/versions/0.2.0)
-before relying on availability.
+The checksummed `v0.3.0` MCPB and its SHA-256 sidecar are published on the
+[GitHub Release](https://github.com/TerminallyLazy/sentinel-recovery-support/releases/tag/v0.3.0).
+Official MCP Registry publication for version `0.3.0` is pending under
+`io.github.TerminallyLazy/sentinel-recovery-services`; verify that the exact
+[Registry record](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.TerminallyLazy%2Fsentinel-recovery-services/versions/0.3.0)
+is active before relying on Registry availability.
 
 Install and verify it from the repository root:
 

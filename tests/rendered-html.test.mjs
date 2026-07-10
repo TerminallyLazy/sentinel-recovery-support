@@ -12,7 +12,7 @@ const supportWallet = "0x91bdE13382c3Ee082EE42a147DF54f6A6129a412";
 const registryName =
   "io.github.TerminallyLazy/sentinel-recovery-services";
 const registryVersionUrl =
-  "https://registry.modelcontextprotocol.io/v0.1/servers/io.github.TerminallyLazy%2Fsentinel-recovery-services/versions/0.2.0";
+  "https://registry.modelcontextprotocol.io/v0.1/servers/io.github.TerminallyLazy%2Fsentinel-recovery-services/versions/0.3.0";
 
 async function readJson(path) {
   try {
@@ -210,19 +210,19 @@ test("publishes a source-installable deterministic MCP preflight", async () => {
     distributionStatus: "github-release",
     remoteEndpointAvailable: false,
     release: {
-      version: "0.2.0",
-      tag: "v0.2.0",
+      version: "0.3.0",
+      tag: "v0.3.0",
       bundleUrl:
-        "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.2.0/sentinel-agent-payment-boundary-v0.2.0.mcpb",
+        "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.3.0/sentinel-agent-payment-boundary-v0.3.0.mcpb",
       checksumUrl:
-        "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.2.0/sentinel-agent-payment-boundary-v0.2.0.mcpb.sha256",
+        "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.3.0/sentinel-agent-payment-boundary-v0.3.0.mcpb.sha256",
       sha256:
-        "5712fa93ac1a56023927e44a6efbf23594db07425933d588f032982178eef1cf",
+        "dd3582fbc24d43569ada443df8d2c069ba4be157146d7e17921b558ec07d9757",
     },
     registry: {
       name: registryName,
-      version: "0.2.0",
-      publicationStatus: "published",
+      version: "0.3.0",
+      publicationStatus: "publication-pending",
       versionApiUrl: registryVersionUrl,
       serverJsonUrl:
         "https://raw.githubusercontent.com/TerminallyLazy/sentinel-recovery-support/main/mcp/server.json",
@@ -244,6 +244,19 @@ test("publishes a source-installable deterministic MCP preflight", async () => {
           networkRequests: false,
           executesSuppliedContent: false,
         },
+        {
+          name: "preflight_x402_v2_payment_required",
+          input: "one-decoded-inline-x402-v2-payment-required-json",
+          maxCombinedBytes: 102400,
+          profile: "x402-v2-exact-evm-eip3009-sentinel-safe",
+          specificationCommit: "8b1abaeaef282e6307a2936b102c6d9223e61802",
+          networkRequests: false,
+          executesSuppliedContent: false,
+          evaluatesPayerPolicy: false,
+          verifiesSignatures: false,
+          settlesPayment: false,
+          verifiesReceipts: false,
+        },
       ],
       resources: [
         {
@@ -262,6 +275,7 @@ test("publishes a source-installable deterministic MCP preflight", async () => {
       submitsQuoteRequest: false,
       authorizesPayment: false,
       requestsCredentials: false,
+      requestsSignatures: false,
       connectsWallet: false,
     },
   });
@@ -316,7 +330,7 @@ test("publishes checksummed MCP release metadata through GitHub OIDC", async () 
     server.name,
     registryName,
   );
-  assert.equal(server.version, "0.2.0");
+  assert.equal(server.version, "0.3.0");
   assert.deepEqual(server.repository, {
     url: "https://github.com/TerminallyLazy/sentinel-recovery-support",
     source: "github",
@@ -327,10 +341,10 @@ test("publishes checksummed MCP release metadata through GitHub OIDC", async () 
     {
       registryType: "mcpb",
       identifier:
-        "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.2.0/sentinel-agent-payment-boundary-v0.2.0.mcpb",
-      version: "0.2.0",
+        "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.3.0/sentinel-agent-payment-boundary-v0.3.0.mcpb",
+      version: "0.3.0",
       fileSha256:
-        "5712fa93ac1a56023927e44a6efbf23594db07425933d588f032982178eef1cf",
+        "dd3582fbc24d43569ada443df8d2c069ba4be157146d7e17921b558ec07d9757",
       transport: { type: "stdio" },
     },
   ]);
