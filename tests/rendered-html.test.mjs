@@ -46,7 +46,14 @@ test("server-renders the Sentinel support surface", async () => {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /<title>Support Sentinel Recovery<\/title>/i);
+  assert.match(
+    html,
+    /<title>Sentinel Recovery — Ethereum Evidence Services<\/title>/i,
+  );
+  assert.match(
+    html,
+    /Request fixed-scope \$49\/\$99\/\$199 public-data reviews or support evidence-first tooling/i,
+  );
   assert.match(html, /Fund evidence work that refuses to overclaim/i);
   assert.match(html, /0x91bdE13382c3Ee082EE42a147DF54f6A6129a412/);
   assert.match(
