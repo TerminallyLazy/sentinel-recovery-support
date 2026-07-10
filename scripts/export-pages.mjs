@@ -40,6 +40,8 @@ for (const prefix of [
   "/support-intent.json",
   "/services.json",
   "/service-request.json",
+  "/sample-agent-payment-boundary-review.json",
+  "/sample-agent-payment-boundary-review.md",
   "/sample-evidence-preview.json",
   "/sample-evidence-preview.md",
   "/service-payment.json",
@@ -70,6 +72,8 @@ for (const required of [
   `${basePath}/support-intent.json`,
   `${basePath}/services.json`,
   `${basePath}/service-request.json`,
+  `${basePath}/sample-agent-payment-boundary-review.json`,
+  `${basePath}/sample-agent-payment-boundary-review.md`,
   `${basePath}/sample-evidence-preview.json`,
   `${basePath}/sample-evidence-preview.md`,
   `${basePath}/service-payment.json`,
@@ -89,6 +93,7 @@ for (const requiredJson of [
   "support-intent.json",
   "services.json",
   "service-request.json",
+  "sample-agent-payment-boundary-review.json",
   "sample-evidence-preview.json",
   "service-payment.json",
   "privacy.json",
@@ -105,7 +110,13 @@ for (const requiredJson of [
   }
 }
 
-for (const requiredText of ["agent-guide.md", "llms.txt", "sample-evidence-preview.md", "robots.txt"]) {
+for (const requiredText of [
+  "agent-guide.md",
+  "llms.txt",
+  "sample-agent-payment-boundary-review.md",
+  "sample-evidence-preview.md",
+  "robots.txt",
+]) {
   await readFile(path.join(output, requiredText), "utf8");
 }
 

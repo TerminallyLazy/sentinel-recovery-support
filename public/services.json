@@ -17,6 +17,8 @@
       "chainId": 1,
       "summary": "Review public agent payment metadata for ambiguity in payer authority, recipient wallet control, supported assets and networks, and donation-versus-service boundaries.",
       "deliverable": "One-page findings matrix with cited fields, contradictions, missing safety statements, and prioritized corrections.",
+      "sampleUrl": "https://terminallylazy.github.io/sentinel-recovery-support/sample-agent-payment-boundary-review.json",
+      "sampleMarkdownUrl": "https://terminallylazy.github.io/sentinel-recovery-support/sample-agent-payment-boundary-review.md",
       "turnaroundBusinessDays": 1,
       "turnaroundLabel": "Target within 1 business day after verified payment and complete public inputs.",
       "requiredInputs": [
