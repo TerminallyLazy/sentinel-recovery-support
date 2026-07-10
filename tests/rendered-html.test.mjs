@@ -19,6 +19,18 @@ async function readJson(path) {
   }
 }
 
+async function readText(path) {
+  try {
+    return await readFile(new URL(path, root), "utf8");
+  } catch (error) {
+    if (error && typeof error === "object" && error.code === "ENOENT") {
+      return null;
+    }
+
+    throw error;
+  }
+}
+
 async function render(path = "/") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
@@ -154,6 +166,7 @@ test("publishes canonical GitHub Pages interfaces for agents", async () => {
     supportIntent: `${siteBase}support-intent.json`,
     services: `${siteBase}services.json`,
     serviceRequest: `${siteBase}service-request.json`,
+    sampleAgentPaymentBoundaryReview: `${siteBase}sample-agent-payment-boundary-review.json`,
     sampleEvidencePreview: `${siteBase}sample-evidence-preview.json`,
     servicePayment: `${siteBase}service-payment.json`,
     privacy: `${siteBase}privacy.json`,
@@ -411,6 +424,84 @@ test("publishes a fixed-scope payment-boundary review for agent builders", async
   assert.deepEqual(agentCondition.then.required, ["publicDocumentUrls"]);
 });
 
+test("publishes an inspectable Agent Payment Boundary Review sample before payment", async () => {
+  const [response, sample, markdown, services, manifest, guide, llms, readme] =
+    await Promise.all([
+      render(),
+      readJson("public/sample-agent-payment-boundary-review.json"),
+      readText("public/sample-agent-payment-boundary-review.md"),
+      readJson("public/services.json"),
+      readJson("public/.well-known/sentinel-agent.json"),
+      readFile(new URL("public/agent-guide.md", root), "utf8"),
+      readFile(new URL("public/llms.txt", root), "utf8"),
+      readFile(new URL("README.md", root), "utf8"),
+    ]);
+  const html = await response.text();
+  const sampleUrl = `${siteBase}sample-agent-payment-boundary-review.json`;
+  const sampleMarkdownUrl =
+    `${siteBase}sample-agent-payment-boundary-review.md`;
+  const offer = services.offerings.find(
+    ({ id }) => id === "agent-payment-boundary-review",
+  );
+
+  assert.ok(sample, "expected the Agent Payment Boundary Review sample");
+  assert.ok(markdown, "expected the Markdown Boundary Review sample");
+  assert.equal(sample.kind, "agent-payment-boundary-review");
+  assert.equal(sample.demonstration, true);
+  assert.equal(sample.securityCertification, false);
+  assert.equal(sample.reviewSubject.ownedByReviewer, true);
+  assert.deepEqual(sample.reviewSubject.publicDocuments, [
+    `${siteBase}.well-known/sentinel-agent.json`,
+    `${siteBase}service-payment.json`,
+  ]);
+  assert.ok(sample.findings.length >= 6);
+  assert.ok(sample.findings.some(({ status }) => status === "clear"));
+  assert.ok(sample.findings.some(({ status }) => status === "ambiguous"));
+  assert.ok(sample.findings.some(({ status }) => status === "missing"));
+  assert.equal(
+    sample.findings.find(({ id }) => id === "ABR-003").evidence.jsonPointer,
+    "/authorization",
+  );
+  assert.ok(
+    sample.findings.every(
+      ({ id, boundary, evidence, status, risk, correction }) =>
+        id && boundary && evidence?.documentUrl && evidence?.jsonPointer &&
+        ["clear", "ambiguous", "missing"].includes(status) && risk && correction,
+    ),
+  );
+  assert.match(sample.disclaimer, /demonstration/i);
+  assert.match(sample.disclaimer, /not a security certification/i);
+  assert.match(markdown, /# Sentinel Agent Payment Boundary Review/);
+  assert.match(markdown, /## Findings matrix/);
+  assert.match(
+    markdown,
+    new RegExp(sample.reviewedAtUtc.replaceAll(".", "\\.")),
+  );
+  assert.match(markdown, /Ambiguous/);
+  assert.match(markdown, /Missing/);
+  assert.equal(offer.sampleUrl, sampleUrl);
+  assert.equal(
+    offer.sampleMarkdownUrl,
+    sampleMarkdownUrl,
+  );
+  assert.equal(manifest.interfaces.sampleAgentPaymentBoundaryReview, sampleUrl);
+  assert.match(
+    html,
+    /href="\/sample-agent-payment-boundary-review\.json"[^>]*>View sample Boundary Review<\/a>/i,
+  );
+  assert.match(
+    html,
+    /href="\/sample-agent-payment-boundary-review\.md"[^>]*>Read Markdown sample<\/a>/i,
+  );
+  for (const document of [guide, llms, readme]) {
+    assert.match(document, new RegExp(sampleUrl.replaceAll(".", "\\.")));
+  }
+  assert.match(
+    readme,
+    new RegExp(sampleMarkdownUrl.replaceAll(".", "\\.")),
+  );
+});
+
 test("publishes an executable quote-first service request contract", async () => {
   const request = await readJson("public/service-request.json");
 
@@ -624,6 +715,16 @@ test("gates Pages deployment and avoids a generated Pages Router directory", asy
   assert.match(exportScript, /path\.join\(root, "\.pages-artifact"\)/);
   assert.match(exportScript, /JSON\.parse/);
   assert.match(exportScript, /service-request\.json/);
+  assert.ok(
+    (exportScript.match(/sample-agent-payment-boundary-review\.json/g) ?? [])
+      .length >= 3,
+    "expected the Pages exporter to rewrite, require, and JSON-validate the Boundary Review sample",
+  );
+  assert.ok(
+    (exportScript.match(/sample-agent-payment-boundary-review\.md/g) ?? [])
+      .length >= 2,
+    "expected the Pages exporter to rewrite and require the Markdown Boundary Review sample",
+  );
   assert.match(cleanScript, /\.pages-artifact/);
   assert.match(gitignore, /^\/\.pages-artifact\/$/m);
 });

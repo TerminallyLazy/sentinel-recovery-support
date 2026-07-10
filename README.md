@@ -18,6 +18,7 @@ The site exposes a human-readable funding page, `$49/$99/$199` public-data servi
 - `/support-intent.json` — direction-specific payer and receiving-wallet policy
 - `/services.json` — fixed-price scope, deliverable, and turnaround catalog
 - `/service-request.json` — canonical agent input schema, email transport, and copyable quote-request template: <https://terminallylazy.github.io/sentinel-recovery-support/service-request.json>
+- `/sample-agent-payment-boundary-review.json` and `.md` — inspectable `$49` self-review demonstration: [JSON](https://terminallylazy.github.io/sentinel-recovery-support/sample-agent-payment-boundary-review.json), [Markdown](https://terminallylazy.github.io/sentinel-recovery-support/sample-agent-payment-boundary-review.md)
 - `/sample-evidence-preview.json` and `.md` — inspectable `$99` format demonstration
 - `/service-payment.json` — canonical recipient, assets, quote fields, and verification rules
 - `/privacy.json` — minimal inputs, optional context, retention, and do-not-send rules

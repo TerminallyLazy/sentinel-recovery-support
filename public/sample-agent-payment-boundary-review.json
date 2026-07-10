@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "1.0",
+  "kind": "agent-payment-boundary-review",
+  "demonstration": true,
+  "securityCertification": false,
+  "reviewedAtUtc": "2026-07-10T03:54:00Z",
+  "reviewSubject": {
+    "name": "Sentinel Recovery Support self-review",
+    "ownedByReviewer": true,
+    "publicDocuments": [
+      "https://terminallylazy.github.io/sentinel-recovery-support/.well-known/sentinel-agent.json",
+      "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json"
+    ]
+  },
+  "scope": {
+    "documentsReviewed": 2,
+    "codeExecutionPerformed": false,
+    "privateSystemsReviewed": false,
+    "walletControlTested": false
+  },
+  "findings": [
+    {
+      "id": "ABR-001",
+      "boundary": "A service request does not move funds",
+      "evidence": {
+        "documentUrl": "https://terminallylazy.github.io/sentinel-recovery-support/.well-known/sentinel-agent.json",
+        "jsonPointer": "/capabilities/1/movesFunds"
+      },
+      "status": "clear",
+      "risk": "Low. The request capability explicitly reports that it does not move funds.",
+      "correction": "Keep this boolean adjacent to the request contract and preserve it in future schema versions."
+    },
+    {
+      "id": "ABR-002",
+      "boundary": "Payer policy remains the source of payment authority",
+      "evidence": {
+        "documentUrl": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
+        "jsonPointer": "/authorization/payerAgentMustFollowOwnPolicy"
+      },
+      "status": "clear",
+      "risk": "Low. The contract says its metadata does not replace the payer agent's own delegated policy.",
+      "correction": "Retain this rule in every human-readable and machine-readable payment surface."
+    },
+    {
+      "id": "ABR-003",
+      "boundary": "Recipient agents cannot use outbound wallet authority",
+      "evidence": {
+        "documentUrl": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
+        "jsonPointer": "/authorization"
+      },
+      "status": "clear",
+      "risk": "Low. Outbound signing and broadcasting are separately denied to the recipient agent.",
+      "correction": "Keep the human-only outbound rule direction-specific instead of using an actor-neutral authorization flag."
+    },
+    {
+      "id": "ABR-004",
+      "boundary": "Canonical recipient, chain, and asset contracts are fixed",
+      "evidence": {
+        "documentUrl": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
+        "jsonPointer": "/verification"
+      },
+      "status": "clear",
+      "risk": "Low. Written email is explicitly unable to change the recipient, chain ID, or supported asset contracts.",
+      "correction": "Continue requiring independent verification of the complete tuple immediately before payment."
+    },
+    {
+      "id": "ABR-005",
+      "boundary": "Autonomous payment eligibility is scoped to a specific quote",
+      "evidence": {
+        "documentUrl": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
+        "jsonPointer": "/authorization/autonomousAgentPaymentAllowed"
+      },
+      "status": "ambiguous",
+      "risk": "Medium. A global true value can be misread as blanket authority even though the surrounding fields defer to the payer's policy.",
+      "correction": "Replace the global flag with a rule that requires the payer policy to approve the quoted service ID, asset, amount, recipient, chain, payment reference, and expiry."
+    },
+    {
+      "id": "ABR-006",
+      "boundary": "Quote identity is replay-resistant and idempotent",
+      "evidence": {
+        "documentUrl": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
+        "jsonPointer": "/quote/requiredFields"
+      },
+      "status": "missing",
+      "risk": "Medium. A quote ID and payment reference are required, but their uniqueness, format, and replay handling are not defined.",
+      "correction": "Define quote ID and payment-reference formats, require one-time reconciliation, and publish duplicate, late, partial, and overpayment handling."
+    },
+    {
+      "id": "ABR-007",
+      "boundary": "Payment metadata has machine-verifiable freshness and integrity",
+      "evidence": {
+        "documentUrl": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
+        "jsonPointer": "/schemaVersion"
+      },
+      "status": "missing",
+      "risk": "Medium. HTTPS and a canonical URL help discovery, but the document has no publication timestamp, content digest, or signed version binding.",
+      "correction": "Add publishedAt, a canonical content digest, and an optional signature or repository commit reference that a payer can pin before acting."
+    },
+    {
+      "id": "ABR-008",
+      "boundary": "Receipt verification has an explicit failure-state model",
+      "evidence": {
+        "documentUrl": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
+        "jsonPointer": "/verification/returnTransactionHashWithQuoteIdForManualReceiptVerification"
+      },
+      "status": "ambiguous",
+      "risk": "Medium. Manual verification is required, but timeout, reorg, wrong-asset, wrong-chain, and insufficient-amount states are not enumerated.",
+      "correction": "Publish deterministic pending, verified, rejected, and manual-review states with exact reasons and the block-confirmation rule."
+    }
+  ],
+  "priorityCorrections": [
+    "Scope autonomous payment permission to the complete written quote and the payer's own policy decision.",
+    "Define quote replay, duplicate, late, partial, and overpayment handling.",
+    "Add version freshness and integrity fields plus deterministic receipt-verification states."
+  ],
+  "disclaimer": "This is a public format demonstration performed on Sentinel's own documents. It is not a security certification, legal opinion, wallet audit, or guarantee that an agent or payment implementation is safe."
+}

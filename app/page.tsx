@@ -194,6 +194,26 @@ export default function Home() {
                 <p>{service.turnaroundLabel}</p>
               </div>
               <div className="service-actions">
+                {service.id === "agent-payment-boundary-review" ? (
+                  <>
+                    <a
+                      className="service-sample-link"
+                      href="/sample-agent-payment-boundary-review.json"
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      View sample Boundary Review
+                    </a>
+                    <a
+                      className="service-sample-link"
+                      href="/sample-agent-payment-boundary-review.md"
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      Read Markdown sample
+                    </a>
+                  </>
+                ) : null}
                 {service.id === "evidence-preview" ? (
                   <a className="service-sample-link" href="#sample-preview">
                     View sample Evidence Preview
