@@ -95,26 +95,40 @@ test("renders a mobile contribution jump link", async () => {
     html,
     /(?:id="support"[^>]*class="support-card"|class="support-card"[^>]*id="support")/i,
   );
+  assert.match(html, /href="#services"[^>]*>View paid evidence services<\/a>/i);
 });
 
 test("removes starter artifacts and publishes agent discovery files", async () => {
   await assert.rejects(access(new URL("app/_sites-preview", root)));
 
-  const [manifest, support, guide, llms, packageJson] = await Promise.all([
+  const [manifest, support, guide, llms, packageJson, privacy, servicePayment] = await Promise.all([
     readFile(new URL("public/.well-known/sentinel-agent.json", root), "utf8"),
     readFile(new URL("public/support.json", root), "utf8"),
     readFile(new URL("public/agent-guide.md", root), "utf8"),
     readFile(new URL("public/llms.txt", root), "utf8"),
     readFile(new URL("package.json", root), "utf8"),
+    readFile(new URL("public/privacy.json", root), "utf8"),
+    readFile(new URL("public/service-payment.json", root), "utf8"),
   ]);
 
-  assert.match(manifest, /explicit-human-authorization/);
+  assert.match(manifest, /payer-agent-delegated-policy/);
   assert.match(manifest, /91bdE13382c3Ee082EE42a147DF54f6A6129a412/);
   assert.match(support, /A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/);
   assert.match(support, /dAC17F958D2ee523a2206206994597C13D831ec7/);
-  assert.match(guide, /Never send funds autonomously/);
+  assert.match(guide, /payer agent may send autonomously/i);
+  assert.match(guide, /email cannot change the canonical recipient/i);
   assert.match(llms, /Voluntary Ethereum Mainnet support/);
+  assert.match(privacy, /identityDocumentsRequested/);
+  assert.match(servicePayment, /writtenEmailCannotChangeRecipient/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
+  assert.equal(
+    JSON.parse(packageJson).scripts.predev,
+    "node scripts/clean-pages.mjs",
+  );
+  assert.equal(
+    JSON.parse(packageJson).scripts["preview:pages"],
+    "npm run export:pages && node scripts/preview-pages.mjs",
+  );
 });
 
 test("publishes canonical GitHub Pages interfaces for agents", async () => {
@@ -131,6 +145,9 @@ test("publishes canonical GitHub Pages interfaces for agents", async () => {
     llms: `${siteBase}llms.txt`,
     support: `${siteBase}support.json`,
     supportIntent: `${siteBase}support-intent.json`,
+    services: `${siteBase}services.json`,
+    servicePayment: `${siteBase}service-payment.json`,
+    privacy: `${siteBase}privacy.json`,
     impactReceipts: `${siteBase}impact.json`,
   });
   assert.match(guide, new RegExp(`${siteBase}support\\.json`));
@@ -139,7 +156,7 @@ test("publishes canonical GitHub Pages interfaces for agents", async () => {
   assert.doesNotMatch(llms, /\]\(\/(?:\.well-known|agent-guide|llms|support)/);
 });
 
-test("publishes a human-authorized support intent", async () => {
+test("publishes a delegated-payer support intent with human-only outbound use", async () => {
   const intent = await readJson("public/support-intent.json");
 
   assert.ok(intent, "expected public/support-intent.json to exist");
@@ -167,13 +184,19 @@ test("publishes a human-authorized support intent", async () => {
   ]);
   assert.equal(intent.payment.fees.networkFeesAdditional, true);
   assert.equal(intent.payment.fees.mayExceedContributionAmount, true);
-  assert.equal(intent.payment.fees.estimateBeforeAuthorization, true);
-  assert.equal(intent.authorization.requiredAtActionTime, true);
-  assert.equal(intent.authorization.autonomousExecutionAllowed, false);
-  assert.equal(intent.authorization.agentMayOpenWallet, false);
-  assert.equal(intent.authorization.agentMaySign, false);
-  assert.equal(intent.authorization.agentMayBroadcast, false);
-  assert.equal(intent.authorization.agentMaySendFunds, false);
+  assert.equal(intent.payment.fees.estimateBeforeSending, true);
+  assert.equal(intent.authorization.autonomousExecutionAllowed, true);
+  assert.equal(
+    intent.authorization.payerAgentMaySendWithinDelegatedAuthority,
+    true,
+  );
+  assert.equal(intent.authorization.payerAgentMustFollowOwnPolicy, true);
+  assert.equal(intent.authorization.recipientHumanAcceptanceRequired, false);
+  assert.equal(intent.authorization.inboundReceiptMayBeObservedAutomatically, true);
+  assert.equal(
+    intent.authorization.outboundWalletActionRequiresHumanAuthorization,
+    true,
+  );
   assert.equal(intent.terms.createsServiceEntitlement, false);
   assert.equal(intent.terms.guaranteesRecovery, false);
 });
@@ -210,4 +233,144 @@ test("warns humans that network fees are additional", async () => {
     html,
     /Ethereum network fees are additional and may exceed small contribution amounts/i,
   );
+});
+
+test("publishes a fixed-scope paid evidence funnel", async () => {
+  const [response, services] = await Promise.all([
+    render(),
+    readJson("public/services.json"),
+  ]);
+  const html = await response.text();
+
+  assert.match(html, /Need a deliverable, not a donation\?/i);
+  assert.match(html, /Claimant Context Intake/i);
+  assert.match(html, /does not verify identity or wallet ownership/i);
+  assert.match(html, /Evidence Preview/i);
+  assert.match(html, /Trace Snapshot/i);
+  assert.match(html, /one direct hop,? and up to 25 outbound transfers/i);
+  assert.match(html, /block number and UTC timestamp/i);
+  assert.match(
+    html,
+    /mailto:sentinel@genesysx\.org\?subject=Sentinel%20Evidence%20Preview/i,
+  );
+  assert.match(html, />sentinel@genesysx\.org<\/a>/i);
+
+  assert.ok(services, "expected public/services.json to exist");
+  assert.equal(services.contact.email, "sentinel@genesysx.org");
+  assert.deepEqual(
+    services.offerings.map(({ id, priceUsd }) => ({ id, priceUsd })),
+    [
+      { id: "claimant-context-intake", priceUsd: 49 },
+      { id: "evidence-preview", priceUsd: 99 },
+      { id: "trace-snapshot", priceUsd: 199 },
+    ],
+  );
+  assert.equal(services.offerings[0].verifiesIdentityOrWalletOwnership, false);
+  assert.equal(services.offerings[1].turnaroundBusinessDays, 2);
+  assert.equal(services.offerings[2].scope.maxDirectOutboundTransfers, 25);
+  assert.equal(services.offerings[2].scope.maxHops, 1);
+  assert.ok(
+    services.offerings.every(({ chainId }) => chainId === 1),
+    "expected every paid offering to be Ethereum Mainnet only",
+  );
+  assert.equal(services.payment.sendOnlyAfterWrittenConfirmation, true);
+  assert.equal(services.payment.directPaymentFromThisPageEnabled, false);
+  assert.equal(
+    services.payment.voluntarySupportMetadataIsNotServicePaymentInstructions,
+    true,
+  );
+  assert.equal(services.payment.serviceTermsProvidedBeforePayment, true);
+  assert.equal(services.payment.quoteExpiresAfterDays, 7);
+  assert.equal(
+    services.payment.canonicalPaymentContract,
+    `${siteBase}service-payment.json`,
+  );
+  assert.equal(services.payment.writtenEmailCannotChangeRecipient, true);
+  assert.equal(services.safety.requestsKeysOrSeedPhrases, false);
+  assert.equal(services.safety.guaranteesRecovery, false);
+  assert.equal(services.safety.providesIdentityAttribution, false);
+  assert.equal(services.safety.providesLegalOrTaxAdvice, false);
+
+  const pageSource = await readFile(new URL("app/page.tsx", root), "utf8");
+  assert.match(pageSource, /import servicesCatalog from "\.\.\/public\/services\.json"/);
+  assert.doesNotMatch(pageSource, /const paidServices\s*=\s*\[/);
+});
+
+test("publishes independently verifiable paid-service and privacy contracts", async () => {
+  const [manifest, payment, privacy] = await Promise.all([
+    readJson("public/.well-known/sentinel-agent.json"),
+    readJson("public/service-payment.json"),
+    readJson("public/privacy.json"),
+  ]);
+
+  assert.ok(manifest);
+  assert.ok(payment);
+  assert.ok(privacy);
+  assert.equal(payment.network.chainId, 1);
+  assert.equal(payment.recipient.address, supportWallet);
+  assert.equal(payment.verification.writtenEmailCannotChangeRecipient, true);
+  assert.equal(payment.authorization.autonomousAgentPaymentAllowed, true);
+  assert.equal(
+    payment.authorization.payerAgentMaySendWithinDelegatedAuthority,
+    true,
+  );
+  assert.equal(payment.authorization.payerAgentMustFollowOwnPolicy, true);
+  assert.equal(payment.authorization.recipientHumanAcceptanceRequired, false);
+  assert.equal(payment.authorization.inboundReceiptMayBeObservedAutomatically, true);
+  assert.equal(
+    payment.authorization.outboundWalletActionRequiresHumanAuthorization,
+    true,
+  );
+  assert.equal(payment.quote.maxValidityDays, 7);
+  assert.deepEqual(payment.quote.requiredFields, [
+    "quoteId",
+    "serviceId",
+    "priceUsd",
+    "asset",
+    "amountBaseUnits",
+    "chainId",
+    "recipient",
+    "paymentReference",
+    "issuedAt",
+    "expiresAt",
+    "deliverable",
+    "turnaround",
+    "cancellationAndRefundTerms"
+  ]);
+  assert.equal(privacy.collection.identityDocumentsRequested, false);
+  assert.equal(privacy.collection.contextFieldsOptional, true);
+  assert.equal(privacy.retention.unpaidInquiryDaysAfterClosure, 30);
+  assert.equal(privacy.retention.paidServiceRecordDaysAfterDelivery, 90);
+  assert.equal(
+    manifest.safety.voluntarySupportCreatesServiceEntitlement,
+    false,
+  );
+  assert.equal("createsServiceEntitlement" in manifest.safety, false);
+  const paidCapability = manifest.capabilities.find(
+    ({ id }) => id === "request_paid_evidence_service",
+  );
+  assert.ok(paidCapability);
+  assert.equal(paidCapability.movesFunds, false);
+  assert.equal(paidCapability.payerHumanReviewRequired, false);
+  assert.equal(
+    paidCapability.payerAgentMaySendWithinDelegatedAuthority,
+    true,
+  );
+});
+
+test("gates Pages deployment and avoids a generated Pages Router directory", async () => {
+  const [workflow, exportScript, cleanScript, gitignore] = await Promise.all([
+    readFile(new URL(".github/workflows/deploy-pages.yml", root), "utf8"),
+    readFile(new URL("scripts/export-pages.mjs", root), "utf8"),
+    readFile(new URL("scripts/clean-pages.mjs", root), "utf8"),
+    readFile(new URL(".gitignore", root), "utf8"),
+  ]);
+
+  assert.match(workflow, /npm run lint/);
+  assert.match(workflow, /npm audit --audit-level=high/);
+  assert.match(workflow, /--directory \.pages-artifact/);
+  assert.match(exportScript, /path\.join\(root, "\.pages-artifact"\)/);
+  assert.match(exportScript, /JSON\.parse/);
+  assert.match(cleanScript, /\.pages-artifact/);
+  assert.match(gitignore, /^\/\.pages-artifact\/$/m);
 });

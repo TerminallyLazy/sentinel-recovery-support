@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const output = path.join(root, "pages");
+const output = path.join(root, ".pages-artifact");
 const basePath = "/sentinel-recovery-support";
 
 const { default: worker } = await import(
@@ -38,6 +38,9 @@ for (const prefix of [
   "/llms.txt",
   "/support.json",
   "/support-intent.json",
+  "/services.json",
+  "/service-payment.json",
+  "/privacy.json",
   "/impact.json",
   "/robots.txt",
 ]) {
@@ -62,6 +65,9 @@ for (const required of [
   `${basePath}/.well-known/sentinel-agent.json`,
   `${basePath}/agent-guide.md`,
   `${basePath}/support-intent.json`,
+  `${basePath}/services.json`,
+  `${basePath}/service-payment.json`,
+  `${basePath}/privacy.json`,
   `${basePath}/impact.json`,
   "0x91bdE13382c3Ee082EE42a147DF54f6A6129a412",
   "NO RECOVERY GUARANTEE",
@@ -69,6 +75,30 @@ for (const required of [
   if (!exported.includes(required)) {
     throw new Error(`Static export is missing: ${required}`);
   }
+}
+
+for (const requiredJson of [
+  ".well-known/sentinel-agent.json",
+  "support.json",
+  "support-intent.json",
+  "services.json",
+  "service-payment.json",
+  "privacy.json",
+  "impact.json",
+]) {
+  const value = await readFile(path.join(output, requiredJson), "utf8");
+
+  try {
+    JSON.parse(value);
+  } catch (error) {
+    throw new Error(`Static export contains invalid JSON: ${requiredJson}`, {
+      cause: error,
+    });
+  }
+}
+
+for (const requiredText of ["agent-guide.md", "llms.txt", "robots.txt"]) {
+  await readFile(path.join(output, requiredText), "utf8");
 }
 
 console.log(`Exported GitHub Pages bundle to ${output}`);

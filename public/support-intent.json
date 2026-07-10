@@ -31,7 +31,7 @@
       "networkFeesAdditional": true,
       "mayExceedContributionAmount": true,
       "paidBySender": true,
-      "estimateBeforeAuthorization": true
+      "estimateBeforeSending": true
     },
     "suggestedExamples": [
       {
@@ -52,14 +52,17 @@
     ]
   },
   "authorization": {
-    "requiredAtActionTime": true,
-    "autonomousExecutionAllowed": false,
+    "autonomousExecutionAllowed": true,
+    "payerAgentMaySendWithinDelegatedAuthority": true,
+    "payerAgentMustFollowOwnPolicy": true,
+    "recipientHumanAcceptanceRequired": false,
+    "inboundReceiptMayBeObservedAutomatically": true,
+    "outboundWalletActionRequiresHumanAuthorization": true,
     "agentMayExplain": true,
     "agentMayShareThisIntent": true,
-    "agentMayOpenWallet": false,
-    "agentMaySign": false,
-    "agentMayBroadcast": false,
-    "agentMaySendFunds": false
+    "recipientAgentMaySpend": false,
+    "recipientAgentMaySignOutboundTransaction": false,
+    "recipientAgentMayBroadcastOutboundTransaction": false
   },
   "terms": {
     "createsServiceEntitlement": false,

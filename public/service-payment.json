@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "1.0",
+  "status": "active",
+  "canonicalUrl": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
+  "sourceUrl": "https://github.com/TerminallyLazy/sentinel-recovery-support/blob/main/public/service-payment.json",
+  "serviceCatalog": "https://terminallylazy.github.io/sentinel-recovery-support/services.json",
+  "network": {
+    "name": "ethereum-mainnet",
+    "chainId": 1
+  },
+  "recipient": {
+    "address": "0x91bdE13382c3Ee082EE42a147DF54f6A6129a412",
+    "sourceUrl": "https://github.com/TerminallyLazy/sentinel-recovery-support/blob/main/app/support-data.ts"
+  },
+  "supportedAssets": [
+    {
+      "symbol": "ETH",
+      "kind": "native",
+      "decimals": 18,
+      "contractAddress": null
+    },
+    {
+      "symbol": "USDC",
+      "kind": "erc20",
+      "decimals": 6,
+      "contractAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    },
+    {
+      "symbol": "USDT",
+      "kind": "erc20",
+      "decimals": 6,
+      "contractAddress": "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+    }
+  ],
+  "quote": {
+    "issuerEmail": "sentinel@genesysx.org",
+    "maxValidityDays": 7,
+    "requiredFields": [
+      "quoteId",
+      "serviceId",
+      "priceUsd",
+      "asset",
+      "amountBaseUnits",
+      "chainId",
+      "recipient",
+      "paymentReference",
+      "issuedAt",
+      "expiresAt",
+      "deliverable",
+      "turnaround",
+      "cancellationAndRefundTerms"
+    ],
+    "paymentStartsWorkOnlyAfterReceiptVerification": true,
+    "acceptedPaymentCreatesEntitlementToConfirmedDeliverable": true
+  },
+  "verification": {
+    "writtenEmailCannotChangeRecipient": true,
+    "writtenEmailCannotChangeChainId": true,
+    "writtenEmailCannotAddAssetContracts": true,
+    "rejectExpiredOrIncompleteQuote": true,
+    "verifyCanonicalUrlImmediatelyBeforePayment": true,
+    "verifyRecipientAndAssetOnBlockExplorer": true,
+    "returnTransactionHashWithQuoteIdForManualReceiptVerification": true
+  },
+  "authorization": {
+    "payerHumanReviewRequired": false,
+    "payerAgentMaySendWithinDelegatedAuthority": true,
+    "payerAgentMustFollowOwnPolicy": true,
+    "recipientHumanAcceptanceRequired": false,
+    "inboundReceiptMayBeObservedAutomatically": true,
+    "outboundWalletActionRequiresHumanAuthorization": true,
+    "autonomousAgentPaymentAllowed": true,
+    "recipientAgentMaySpend": false,
+    "recipientAgentMaySignOutboundTransaction": false,
+    "recipientAgentMayBroadcastOutboundTransaction": false
+  },
+  "warnings": [
+    "Do not pay from the voluntary-support page for a paid service.",
+    "Do not pay if an email lists a different recipient, chain, or asset contract from this canonical contract.",
+    "Ethereum network fees are additional and crypto transfers are irreversible.",
+    "Never provide private keys, seed phrases, wallet connections, signatures, passwords, identity documents, or confidential material."
+  ]
+}

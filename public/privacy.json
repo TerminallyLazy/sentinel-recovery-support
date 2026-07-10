@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "1.0",
+  "status": "active",
+  "canonicalUrl": "https://terminallylazy.github.io/sentinel-recovery-support/privacy.json",
+  "contact": "sentinel@genesysx.org",
+  "collection": {
+    "required": [
+      "Ethereum Mainnet transaction hash",
+      "reply email address supplied by the sender's email client"
+    ],
+    "optional": [
+      "stated role or relationship to the transaction",
+      "intended use of the evidence",
+      "preferred output format",
+      "timing need"
+    ],
+    "contextFieldsOptional": true,
+    "identityDocumentsRequested": false,
+    "walletSignaturesRequested": false,
+    "privateKeysOrSeedPhrasesRequested": false,
+    "confidentialMaterialRequested": false
+  },
+  "use": {
+    "purposes": [
+      "review and quote the requested fixed-scope public-data service",
+      "prepare and deliver an accepted evidence product",
+      "verify a quoted payment and respond to service questions"
+    ],
+    "sold": false,
+    "usedForUnrelatedMarketing": false,
+    "sharing": "Only infrastructure providers needed to operate email and public hosting may process the data."
+  },
+  "retention": {
+    "unpaidInquiryDaysAfterClosure": 30,
+    "paidServiceRecordDaysAfterDelivery": 90,
+    "exceptions": "A shorter deletion request will be honored where practical; accounting, fraud-prevention, dispute, or legal obligations may require limited records for longer."
+  },
+  "security": {
+    "ordinaryEmailIsNotConfidential": true,
+    "sendPublicFactsOnly": true,
+    "doNotSend": [
+      "identity documents",
+      "private keys",
+      "seed phrases",
+      "wallet connections",
+      "signatures",
+      "passwords",
+      "confidential or non-public account information"
+    ]
+  },
+  "rights": {
+    "correctionOrDeletionRequestEmail": "sentinel@genesysx.org",
+    "identityVerificationMayBeRequiredForDeletion": false
+  }
+}
