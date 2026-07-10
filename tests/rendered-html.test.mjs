@@ -185,7 +185,7 @@ test("publishes a delegated-payer support intent with human-only outbound use", 
   assert.equal(intent.payment.fees.networkFeesAdditional, true);
   assert.equal(intent.payment.fees.mayExceedContributionAmount, true);
   assert.equal(intent.payment.fees.estimateBeforeSending, true);
-  assert.equal(intent.authorization.autonomousExecutionAllowed, true);
+  assert.equal("autonomousExecutionAllowed" in intent.authorization, false);
   assert.equal(
     intent.authorization.payerAgentMaySendWithinDelegatedAuthority,
     true,
@@ -199,6 +199,31 @@ test("publishes a delegated-payer support intent with human-only outbound use", 
   );
   assert.equal(intent.terms.createsServiceEntitlement, false);
   assert.equal(intent.terms.guaranteesRecovery, false);
+});
+
+test("keeps payer and recipient wallet authority direction-specific", async () => {
+  const [supportDocument, intent, services, payment] = await Promise.all([
+    readJson("public/support.json"),
+    readJson("public/support-intent.json"),
+    readJson("public/services.json"),
+    readJson("public/service-payment.json"),
+  ]);
+  const support = supportDocument.support;
+
+  assert.equal(
+    "financialActionRequiresExplicitHumanAuthorization" in support,
+    false,
+  );
+  for (const contract of [support.authorization, intent.authorization, payment.authorization]) {
+    assert.equal(contract.payerAgentMaySendWithinDelegatedAuthority, true);
+    assert.equal(contract.payerAgentMustFollowOwnPolicy, true);
+    assert.equal(contract.recipientHumanAcceptanceRequired, false);
+    assert.equal(contract.inboundReceiptMayBeObservedAutomatically, true);
+    assert.equal(contract.outboundWalletActionRequiresHumanAuthorization, true);
+  }
+  assert.match(services.requestProcess[0], /human or payer agent/i);
+  assert.match(services.requestProcess[2], /requester decides/i);
+  assert.doesNotMatch(services.requestProcess.join(" "), /the human decides/i);
 });
 
 test("publishes a truthful zero-receipt impact snapshot", async () => {

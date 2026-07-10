@@ -89,9 +89,9 @@
     }
   ],
   "requestProcess": [
-    "A human sends an email request with the transaction hash, their role, and the evidence need.",
+    "A human or payer agent operating within its own delegated policy sends an email request with the transaction hash and any optional context.",
     "Sentinel confirms scope, timing, exact payment reference, and payment instructions in writing.",
-    "The human decides whether to pay only after reviewing that confirmation.",
+    "The requester decides whether to pay only after verifying the complete quote and canonical service-payment contract.",
     "Sentinel prepares only the confirmed evidence deliverable."
   ],
   "payment": {
