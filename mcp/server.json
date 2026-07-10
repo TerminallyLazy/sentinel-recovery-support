@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.terminallylazy/sentinel-recovery-services",
+  "name": "io.github.TerminallyLazy/sentinel-recovery-services",
   "title": "Sentinel Agent Payment Boundary Preflight",
   "description": "Read-only preflight for agent payment authority, replay, receipts, secrets, and wallet boundaries.",
   "repository": {
