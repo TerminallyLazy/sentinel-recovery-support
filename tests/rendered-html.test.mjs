@@ -208,7 +208,7 @@ test("publishes a source-installable deterministic MCP preflight", async () => {
         "5712fa93ac1a56023927e44a6efbf23594db07425933d588f032982178eef1cf",
     },
     registry: {
-      name: "io.github.terminallylazy/sentinel-recovery-services",
+      name: "io.github.TerminallyLazy/sentinel-recovery-services",
       publicationStatus: "pending-verification",
       serverJsonUrl:
         "https://raw.githubusercontent.com/TerminallyLazy/sentinel-recovery-support/main/mcp/server.json",
@@ -290,7 +290,7 @@ test("publishes checksummed MCP release metadata through GitHub OIDC", async () 
   );
   assert.equal(
     server.name,
-    "io.github.terminallylazy/sentinel-recovery-services",
+    "io.github.TerminallyLazy/sentinel-recovery-services",
   );
   assert.equal(server.version, "0.2.0");
   assert.deepEqual(server.repository, {
