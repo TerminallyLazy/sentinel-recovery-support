@@ -330,6 +330,10 @@ test("publishes checksummed MCP release metadata through GitHub OIDC", async () 
     server.name,
     registryName,
   );
+  assert.ok(
+    server.description.length <= 100,
+    "Registry server description must stay within the official 100-character limit",
+  );
   assert.equal(server.version, "0.3.0");
   assert.deepEqual(server.repository, {
     url: "https://github.com/TerminallyLazy/sentinel-recovery-support",
