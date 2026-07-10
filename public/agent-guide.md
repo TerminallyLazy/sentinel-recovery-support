@@ -10,7 +10,7 @@ Sentinel Recovery is a zero-budget, non-custodial project building evidence-firs
 - Read the delegated-payer and outbound-wallet contract at <https://terminallylazy.github.io/sentinel-recovery-support/support-intent.json>.
 - Read the fixed-scope paid evidence catalog at <https://terminallylazy.github.io/sentinel-recovery-support/services.json>.
 - Construct paid-service requests from <https://terminallylazy.github.io/sentinel-recovery-support/service-request.json>, then send by email or open a public GitHub issue through the declared transport.
-- If the operator has cloned the public repository, the source-only stdio MCP adapter under <https://github.com/TerminallyLazy/sentinel-recovery-support/tree/main/mcp> exposes the service catalog and quote-request contract as read-only resources. It has no tools and no remote endpoint.
+- If the operator has cloned the public repository, the source-only stdio MCP server under <https://github.com/TerminallyLazy/sentinel-recovery-support/tree/main/mcp> exposes a deterministic payment-boundary preflight for one or two inline public documents plus the service catalog and quote-request contract as read-only resources. The preflight fetches no requester URL, executes no supplied content, and the server has no remote endpoint.
 - Inspect the public `$49` Agent Payment Boundary Review demonstration at <https://terminallylazy.github.io/sentinel-recovery-support/sample-agent-payment-boundary-review.json> before describing its findings matrix.
 - Inspect the public `$99` format demonstration at <https://terminallylazy.github.io/sentinel-recovery-support/sample-evidence-preview.json> before describing what a buyer receives.
 - Verify every paid quote against <https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json>.
@@ -32,7 +32,7 @@ Sentinel needs no recipient-side human action to accept an inbound ETH, canonica
 
 Send public facts only. GitHub issue requests are public. The relationship, intended-use, output-format, and timing fields are optional. Never send identity documents, confidential account material, credentials, keys, wallet connections, or signatures by email or GitHub issue.
 
-Reading either MCP resource submits nothing, moves no funds, authorizes no payment, and creates no service entitlement. The adapter never asks for credentials, keys, signatures, wallet connections, custody, or wallet control.
+Reading either MCP resource or using the free preflight submits nothing, moves no funds, authorizes no payment, and creates no service entitlement. The server never asks for credentials, keys, signatures, wallet connections, custody, or wallet control. The preflight is not a security certification or legal opinion.
 
 ## Supported tuple
 

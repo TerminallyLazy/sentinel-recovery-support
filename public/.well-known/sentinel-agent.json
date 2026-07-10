@@ -41,7 +41,15 @@
       "startCommand": "node server.mjs"
     },
     "capabilities": {
-      "tools": [],
+      "tools": [
+        {
+          "name": "preflight_agent_payment_boundary",
+          "input": "one-or-two-inline-public-documents",
+          "maxCombinedBytes": 102400,
+          "networkRequests": false,
+          "executesSuppliedContent": false
+        }
+      ],
       "resources": [
         {
           "uri": "sentinel://services/catalog",
@@ -58,7 +66,8 @@
       "movesFunds": false,
       "submitsQuoteRequest": false,
       "authorizesPayment": false,
-      "requestsCredentials": false
+      "requestsCredentials": false,
+      "connectsWallet": false
     }
   },
   "capabilities": [
@@ -78,6 +87,8 @@
       "id": "request_paid_evidence_service",
       "description": "Explain a fixed-scope public-data service or draft a request for human review.",
       "movesFunds": false,
+      "requestAuthorizesPayment": false,
+      "completeQuoteRequiredBeforePayment": true,
       "payerHumanReviewRequired": false,
       "payerAgentMaySendWithinDelegatedAuthority": true,
       "payerAgentMustFollowOwnPolicy": true,
@@ -104,6 +115,9 @@
   "safety": {
     "takesCustody": false,
     "requestsPrivateKeys": false,
+    "requestsSeedPhrases": false,
+    "requestsWalletSignatures": false,
+    "requestsWalletConnections": false,
     "guaranteesRecovery": false,
     "voluntarySupportCreatesServiceEntitlement": false,
     "rules": [

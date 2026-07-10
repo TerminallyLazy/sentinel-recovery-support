@@ -1,9 +1,16 @@
 #!/usr/bin/env node
 
-import { pathToFileURL } from "node:url";
+import { realpathSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import * as z from "zod/v4";
+
+import {
+  PreflightInputError,
+  preflightAgentPaymentBoundary,
+} from "./preflight.mjs";
 
 export const MAX_RESOURCE_BYTES = 256 * 1024;
 const FETCH_TIMEOUT_MS = 10_000;
@@ -32,7 +39,39 @@ export const RESOURCE_DEFINITIONS = Object.freeze([
 ]);
 
 const SERVER_INSTRUCTIONS =
-  "This server is read-only. It exposes Sentinel Recovery's public service catalog and quote-request contract as MCP resources. It has no tools, submits no request, moves no funds, authorizes no payment, creates no service entitlement, and never requests credentials, keys, signatures, wallet connections, custody, or wallet control. A complete written quote is required before any service payment.";
+  "This server is read-only. It exposes Sentinel Recovery's public service catalog and quote-request contract as MCP resources plus one deterministic preflight tool for inline public documents. The tool makes no network requests, executes no supplied content, submits no request, moves no funds, authorizes no payment, creates no service entitlement, and never requests credentials, keys, signatures, wallet connections, custody, or wallet control. A complete written quote is required before any service payment.";
+
+const preflightDocumentSchema = z.object({
+  name: z
+    .string()
+    .min(1)
+    .max(120)
+    .describe("A non-sensitive label for the supplied public document."),
+  mediaType: z
+    .enum(["application/json", "text/markdown", "text/plain"])
+    .default("text/plain")
+    .describe("How the inline document should be parsed."),
+  content: z
+    .string()
+    .min(1)
+    .describe("Inline public document content. URLs are not fetched."),
+});
+
+const evidenceSchema = z.object({
+  documentName: z.string().max(32),
+  locator: z.string().max(240),
+  excerpt: z.string().max(180),
+  untrustedEvidence: z.literal(true),
+});
+
+const findingSchema = z.object({
+  id: z.string(),
+  boundary: z.string(),
+  status: z.enum(["clear", "ambiguous", "missing"]),
+  evidence: evidenceSchema,
+  risk: z.string(),
+  correction: z.string(),
+});
 
 class ResourceReadError extends Error {
   constructor(message) {
@@ -206,7 +245,7 @@ export function createSentinelServer({ fetchImpl = globalThis.fetch } = {}) {
   const server = new McpServer(
     {
       name: "sentinel-recovery-mcp-server",
-      version: "0.1.0",
+      version: "0.2.0",
     },
     {
       instructions: SERVER_INSTRUCTIONS,
@@ -237,6 +276,92 @@ export function createSentinelServer({ fetchImpl = globalThis.fetch } = {}) {
     );
   }
 
+  server.registerTool(
+    "preflight_agent_payment_boundary",
+    {
+      title: "Agent Payment Boundary Preflight",
+      description:
+        "Deterministically inspect one or two inline public agent/payment documents for authority, quote, replay, receipt, wallet-secret, and integrity boundaries. This free preflight does not fetch URLs, execute content, submit a request, or move funds.",
+      inputSchema: {
+        documents: z
+          .array(preflightDocumentSchema)
+          .min(1)
+          .max(2)
+          .describe("One or two inline public documents, at most 100 KiB combined."),
+        question: z
+          .string()
+          .max(500)
+          .optional()
+          .describe("Optional non-sensitive context; it does not change the fixed checks."),
+      },
+      outputSchema: {
+        schemaVersion: z.literal("1.0"),
+        kind: z.literal("agent-payment-boundary-preflight"),
+        scope: z.object({
+          documentsAnalyzed: z.number().int().min(1).max(2),
+          combinedBytes: z.number().int().nonnegative(),
+          deterministic: z.literal(true),
+          networkRequests: z.literal(false),
+          codeExecution: z.literal(false),
+          walletAccess: z.literal(false),
+        }),
+        summary: z.object({
+          clear: z.number().int().nonnegative(),
+          ambiguous: z.number().int().nonnegative(),
+          missing: z.number().int().nonnegative(),
+        }),
+        findings: z.array(findingSchema).length(11),
+        escalation: z.object({
+          optional: z.literal(true),
+          serviceId: z.literal("agent-payment-boundary-review"),
+          priceUsd: z.literal(49),
+          sampleUrl: z.string().url(),
+          quoteRequestContractUrl: z.string().url(),
+          requestMovesFunds: z.literal(false),
+          requestAuthorizesPayment: z.literal(false),
+          completeWrittenQuoteRequired: z.literal(true),
+          payerMustFollowOwnPolicy: z.literal(true),
+        }),
+        disclaimer: z.string(),
+      },
+      annotations: {
+        title: "Agent Payment Boundary Preflight",
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false,
+      },
+    },
+    async (input) => {
+      try {
+        const structuredContent = preflightAgentPaymentBoundary(input);
+        return {
+          content: [
+            {
+              type: "text",
+              text:
+                `Agent payment-boundary preflight complete: ` +
+                `${structuredContent.summary.clear} clear, ` +
+                `${structuredContent.summary.ambiguous} ambiguous, ` +
+                `${structuredContent.summary.missing} missing. ` +
+                `Inspect structuredContent for the bounded findings. ` +
+                structuredContent.disclaimer,
+            },
+          ],
+          structuredContent,
+        };
+      } catch (error) {
+        if (error instanceof PreflightInputError) {
+          return {
+            isError: true,
+            content: [{ type: "text", text: error.message }],
+          };
+        }
+        throw error;
+      }
+    },
+  );
+
   return server;
 }
 
@@ -245,8 +370,15 @@ export async function runStdio() {
   await server.connect(new StdioServerTransport());
 }
 
-const isDirectExecution =
-  process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+let isDirectExecution = false;
+if (process.argv[1]) {
+  try {
+    isDirectExecution =
+      realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    isDirectExecution = false;
+  }
+}
 
 if (isDirectExecution) {
   runStdio().catch((error) => {

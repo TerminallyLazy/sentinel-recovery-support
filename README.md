@@ -25,18 +25,26 @@ The site exposes a human-readable funding page, `$49/$99/$199` public-data servi
 - `/agent-guide.md` — mandatory agent authority boundaries
 - `/impact.json` — historical receipt and contribution-funded-work snapshot
 - `/llms.txt` — short discovery index
-- `mcp/` — source-installable, read-only stdio MCP adapter for the live service catalog and quote-request contract; this is repository source, not a hosted Pages endpoint or published package
+- `mcp/` — source-installable, read-only stdio MCP server with a deterministic agent-payment boundary preflight plus the live service and quote-request resources; this is repository source, not a hosted Pages endpoint or published package
 
-## Local MCP resources
+## Local MCP preflight and resources
 
-The MCP adapter exposes exactly two read-only resources and no tools:
+The MCP server exposes one deterministic read-only tool:
+
+- `preflight_agent_payment_boundary` — checks one or two inline public
+  documents against 11 fixed payment-authority boundaries, without fetching
+  requester URLs, executing supplied text, submitting a request, or moving
+  funds
+
+It also exposes exactly two read-only resources:
 
 - `sentinel://services/catalog`
 - `sentinel://services/quote-request-contract`
 
-It fetches and validates the canonical live JSON contracts. It cannot submit a
-request, move funds, authorize payment, request credentials, or perform wallet
-actions.
+Only resource reads fetch the two hard-coded canonical live JSON contracts.
+The preflight runs locally on inline text and makes no network request. Neither
+path can submit a request, move funds, authorize payment, request credentials,
+connect a wallet, or perform wallet actions.
 
 Install and verify it from the repository root:
 

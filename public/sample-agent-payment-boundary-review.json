@@ -3,7 +3,7 @@
   "kind": "agent-payment-boundary-review",
   "demonstration": true,
   "securityCertification": false,
-  "reviewedAtUtc": "2026-07-10T03:54:00Z",
+  "reviewedAtUtc": "2026-07-10T06:43:22Z",
   "reviewSubject": {
     "name": "Sentinel Recovery Support self-review",
     "ownedByReviewer": true,
@@ -68,50 +68,50 @@
       "boundary": "Autonomous payment eligibility is scoped to a specific quote",
       "evidence": {
         "documentUrl": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
-        "jsonPointer": "/authorization/autonomousAgentPaymentAllowed"
+        "jsonPointer": "/authorization/autonomousPayment"
       },
-      "status": "ambiguous",
-      "risk": "Medium. A global true value can be misread as blanket authority even though the surrounding fields defer to the payer's policy.",
-      "correction": "Replace the global flag with a rule that requires the payer policy to approve the quoted service ID, asset, amount, recipient, chain, payment reference, and expiry."
+      "status": "clear",
+      "risk": "Low. Autonomous payment eligibility requires a complete unexpired quote plus the payer policy's approval of the exact quote tuple, and the metadata explicitly expands no authority.",
+      "correction": "Keep payment eligibility bound to the complete unexpired quote and the payer's exact policy approval."
     },
     {
       "id": "ABR-006",
-      "boundary": "Quote identity is replay-resistant and idempotent",
+      "boundary": "Quote and receipt identities are replay-resistant and idempotent",
       "evidence": {
         "documentUrl": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
-        "jsonPointer": "/quote/requiredFields"
+        "jsonPointer": "/reconciliation"
       },
-      "status": "missing",
-      "risk": "Medium. A quote ID and payment reference are required, but their uniqueness, format, and replay handling are not defined.",
-      "correction": "Define quote ID and payment-reference formats, require one-time reconciliation, and publish duplicate, late, partial, and overpayment handling."
+      "status": "clear",
+      "risk": "Low. Quote and payment-reference identifiers are unique immutable UUIDs, the payment reference is single-use, and native or ERC-20 receipt identities are unique across quotes before reconciliation.",
+      "correction": "Preserve the identifier rules, bind each on-chain receipt identity to at most one quote, and never auto-credit duplicates."
     },
     {
       "id": "ABR-007",
       "boundary": "Payment metadata has machine-verifiable freshness and integrity",
       "evidence": {
         "documentUrl": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
-        "jsonPointer": "/schemaVersion"
+        "jsonPointer": "/integrity"
       },
-      "status": "missing",
-      "risk": "Medium. HTTPS and a canonical URL help discovery, but the document has no publication timestamp, content digest, or signed version binding.",
-      "correction": "Add publishedAt, a canonical content digest, and an optional signature or repository commit reference that a payer can pin before acting."
+      "status": "clear",
+      "risk": "Low. The contract publishes its update time, raw-byte SHA-256 sidecar, canonical URL, and immutable source history for independent pinning.",
+      "correction": "Regenerate the digest sidecar for every contract change and verify it before relying on cached metadata."
     },
     {
       "id": "ABR-008",
       "boundary": "Receipt verification has an explicit failure-state model",
       "evidence": {
         "documentUrl": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
-        "jsonPointer": "/verification/returnTransactionHashWithQuoteIdForManualReceiptVerification"
+        "jsonPointer": "/reconciliation/receiptStates"
       },
-      "status": "ambiguous",
-      "risk": "Medium. Manual verification is required, but timeout, reorg, wrong-asset, wrong-chain, and insufficient-amount states are not enumerated.",
-      "correction": "Publish deterministic pending, verified, rejected, and manual-review states with exact reasons and the block-confirmation rule."
+      "status": "clear",
+      "risk": "Low. Pending, verified, rejected, and manual-review states publish explicit reason codes, while exceptional receipts cannot automatically start work or expand entitlement.",
+      "correction": "Keep late, duplicate, partial, excess, reorg, and conflicting evidence on the manual-review path."
     }
   ],
-  "priorityCorrections": [
-    "Scope autonomous payment permission to the complete written quote and the payer's own policy decision.",
-    "Define quote replay, duplicate, late, partial, and overpayment handling.",
-    "Add version freshness and integrity fields plus deterministic receipt-verification states."
+  "maintenanceChecks": [
+    "Keep autonomous payment eligibility bound to the complete unexpired quote and the payer's own policy.",
+    "Regenerate the raw-byte SHA-256 sidecar whenever the payment contract changes.",
+    "Preserve unique on-chain receipt identity, deterministic receipt states, and manual review for duplicate, late, partial, or excess payments."
   ],
   "disclaimer": "This is a public format demonstration performed on Sentinel's own documents. It is not a security certification, legal opinion, wallet audit, or guarantee that an agent or payment implementation is safe."
 }
