@@ -1,7 +1,7 @@
 {
   "name": "sentinel-recovery-mcp",
-  "version": "0.2.0",
-  "description": "Deterministic agent payment-boundary preflight plus read-only Sentinel Recovery service resources.",
+  "version": "0.3.0",
+  "description": "Deterministic agent-payment and x402 PaymentRequired preflights plus read-only Sentinel Recovery service resources.",
   "type": "module",
   "bin": {
     "sentinel-recovery-mcp": "server.mjs"
@@ -9,7 +9,8 @@
   "files": [
     "README.md",
     "preflight.mjs",
-    "server.mjs"
+    "server.mjs",
+    "x402-payment-required.mjs"
   ],
   "scripts": {
     "start": "node server.mjs",
@@ -35,6 +36,8 @@
     "model-context-protocol",
     "ai-agents",
     "ethereum",
+    "x402",
+    "eip-3009",
     "payment-boundaries"
   ],
   "license": "UNLICENSED",

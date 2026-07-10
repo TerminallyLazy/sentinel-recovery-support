@@ -1,18 +1,19 @@
-# Sentinel Agent Payment Boundary Preflight
+# Sentinel Payment Preflights
 
-Read-only stdio MCP server with a deterministic free preflight for public agent
-and payment documents, plus Sentinel Recovery's public service catalog and
+Read-only stdio MCP server with two deterministic free preflights for public
+payment metadata, plus Sentinel Recovery's public service catalog and
 quote-request contract.
 
-Version `0.2.0` is published as a checksummed MCPB on the
-[GitHub Release](https://github.com/TerminallyLazy/sentinel-recovery-support/releases/tag/v0.2.0).
-It is not published to npm. The official MCP Registry lists version `0.2.0` as
-`io.github.TerminallyLazy/sentinel-recovery-services`; verify the exact
-[Registry record](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.TerminallyLazy%2Fsentinel-recovery-services/versions/0.2.0)
-before relying on availability. The GitHub Pages site is static and is not a
-remote MCP endpoint.
+Source version `0.3.0` adds a pinned x402 v2 exact-EVM EIP-3009 safety profile.
+Checksummed versioned MCPB artifacts are published on the
+[GitHub Releases page](https://github.com/TerminallyLazy/sentinel-recovery-support/releases).
+It is not published to npm. The official MCP Registry name is
+`io.github.TerminallyLazy/sentinel-recovery-services`; verify the current
+`mcp/server.json`, release checksum, and Registry record before relying on a
+published version. The GitHub Pages site is static and is not a remote MCP
+endpoint.
 
-## Tool
+## Tools
 
 - `preflight_agent_payment_boundary` analyzes one or two inline public JSON,
   Markdown, or text documents, with a 100 KiB combined limit.
@@ -33,6 +34,17 @@ remote MCP endpoint.
   External digest URLs remain
   `ambiguous` because the offline preflight does not fetch or trust them; the
   full review can verify supplied integrity evidence separately.
+- `preflight_x402_v2_payment_required` analyzes exactly one decoded inline JSON
+  x402 v2 `PaymentRequired` object using nine fixed checks. It accepts only the
+  pinned closed-world Sentinel profile: `exact`, canonical `eip155:<chain-id>`,
+  EIP-3009 transfer metadata, 1–64 unique complete alternatives, positive
+  uint256 atomic amounts, and a 1–86,400 second timeout.
+- The x402 profile is intentionally stricter than core x402. A structurally
+  clear result does not prove that a chain exists, a token behaves as claimed,
+  an EIP-712 domain is correct, a recipient controls an address, payer policy
+  authorizes a payment, a signature is valid, settlement occurred, or a receipt
+  exists. Permit2, ERC-7710, nonempty extensions, and other unmodeled content are
+  reported as unsupported or ambiguous, not silently accepted.
 
 ## Resources
 
@@ -78,7 +90,7 @@ protocol messages to stdout; startup failures go to stderr.
 ## Network and validation boundaries
 
 - Only the two hard-coded canonical HTTPS URLs are fetched.
-- The preflight tool accepts inline content only and makes no network requests.
+- Both preflight tools accept inline content only and make no network requests.
 - JSON with duplicate object keys is rejected before evaluation; recognized
   fields and containers must match their bounded types and value domains.
 - Requests use `GET`, a ten-second timeout, and a 256 KiB response cap.

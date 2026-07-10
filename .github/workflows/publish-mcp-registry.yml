@@ -28,7 +28,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          bundle="$RUNNER_TEMP/sentinel-agent-payment-boundary-v0.2.0.mcpb"
+          bundle="$RUNNER_TEMP/sentinel-registry-package.mcpb"
           bundle_url="$(jq -r '.packages[0].identifier' mcp/server.json)"
           expected_sha="$(jq -r '.packages[0].fileSha256' mcp/server.json)"
           curl --fail --location --silent --show-error "$bundle_url" --output "$bundle"

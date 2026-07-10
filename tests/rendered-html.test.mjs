@@ -266,26 +266,28 @@ test("publishes a source-installable deterministic MCP preflight", async () => {
     },
   });
   assert.equal(mcpPackage.name, "sentinel-recovery-mcp");
-  assert.equal(mcpPackage.version, "0.2.0");
+  assert.equal(mcpPackage.version, "0.3.0");
   assert.equal(
     mcpPackage.mcpName,
     "io.github.terminallylazy/sentinel-recovery-services",
   );
   assert.equal(mcpPackage.license, "UNLICENSED");
+  assert.ok(mcpPackage.files.includes("x402-payment-required.mjs"));
   assert.equal(mcpBundle.manifest_version, "0.3");
-  assert.equal(mcpBundle.version, "0.2.0");
+  assert.equal(mcpBundle.version, "0.3.0");
   assert.deepEqual(
     mcpBundle.tools.map(({ name }) => name),
-    ["preflight_agent_payment_boundary"],
+    [
+      "preflight_agent_payment_boundary",
+      "preflight_x402_v2_payment_required",
+    ],
   );
   assert.match(mcpReadme, /GitHub Release/i);
+  assert.ok(mcpReadme.includes(registryName));
+  assert.ok(readme.includes(registryName));
+  assert.ok(readme.includes(registryVersionUrl));
   for (const document of [mcpReadme, readme]) {
-    assert.ok(document.includes(registryName));
-    assert.ok(document.includes(registryVersionUrl));
-    assert.doesNotMatch(
-      document,
-      /Registry availability[\s\S]{0,120}unverified/i,
-    );
+    assert.doesNotMatch(document, /Registry availability[\s\S]{0,120}unverified/i);
   }
   assert.match(mcpReadme, /11 fixed checks/i);
   assert.match(mcpReadme, /sentinel:\/\/services\/catalog/);
@@ -341,6 +343,7 @@ test("publishes checksummed MCP release metadata through GitHub OIDC", async () 
   assert.match(workflow, /mcp-publisher" validate mcp\/server\.json/);
   assert.match(workflow, /mcp-publisher" login github-oidc/);
   assert.match(workflow, /mcp-publisher" publish mcp\/server\.json/);
+  assert.doesNotMatch(workflow, /sentinel-agent-payment-boundary-v0\.2\.0\.mcpb/);
 });
 
 test("preflights the canonical agent and payment contracts conservatively", async () => {

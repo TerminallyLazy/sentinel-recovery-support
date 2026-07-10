@@ -11,6 +11,7 @@ import {
   PreflightInputError,
   preflightAgentPaymentBoundary,
 } from "./preflight.mjs";
+import { preflightX402V2PaymentRequired } from "./x402-payment-required.mjs";
 
 export const MAX_RESOURCE_BYTES = 256 * 1024;
 const FETCH_TIMEOUT_MS = 10_000;
@@ -39,7 +40,7 @@ export const RESOURCE_DEFINITIONS = Object.freeze([
 ]);
 
 const SERVER_INSTRUCTIONS =
-  "This server is read-only. It exposes Sentinel Recovery's public service catalog and quote-request contract as MCP resources plus one deterministic preflight tool for inline public documents. The tool makes no network requests, executes no supplied content, submits no request, moves no funds, authorizes no payment, creates no service entitlement, and never requests credentials, keys, signatures, wallet connections, custody, or wallet control. A complete written quote is required before any service payment.";
+  "This server is read-only. It exposes Sentinel Recovery's public service catalog and quote-request contract as MCP resources plus two deterministic preflight tools for inline public documents. Each tool makes no network requests, executes no supplied content, submits no request, moves no funds, authorizes no payment, creates no service entitlement, and never requests credentials, keys, signatures, wallet connections, custody, or wallet control. A complete written quote is required before any service payment.";
 
 const preflightDocumentSchema = z.object({
   name: z
@@ -245,7 +246,7 @@ export function createSentinelServer({ fetchImpl = globalThis.fetch } = {}) {
   const server = new McpServer(
     {
       name: "sentinel-recovery-mcp-server",
-      version: "0.2.0",
+      version: "0.3.0",
     },
     {
       instructions: SERVER_INSTRUCTIONS,
@@ -341,6 +342,111 @@ export function createSentinelServer({ fetchImpl = globalThis.fetch } = {}) {
               type: "text",
               text:
                 `Agent payment-boundary preflight complete: ` +
+                `${structuredContent.summary.clear} clear, ` +
+                `${structuredContent.summary.ambiguous} ambiguous, ` +
+                `${structuredContent.summary.missing} missing. ` +
+                `Inspect structuredContent for the bounded findings. ` +
+                structuredContent.disclaimer,
+            },
+          ],
+          structuredContent,
+        };
+      } catch (error) {
+        if (error instanceof PreflightInputError) {
+          return {
+            isError: true,
+            content: [{ type: "text", text: error.message }],
+          };
+        }
+        throw error;
+      }
+    },
+  );
+
+  server.registerTool(
+    "preflight_x402_v2_payment_required",
+    {
+      title: "x402 v2 PaymentRequired EIP-3009 Preflight",
+      description:
+        "Deterministically inspect one decoded inline x402 v2 PaymentRequired JSON document under a closed-world exact-EVM EIP-3009 Sentinel safety profile. This free preflight does not fetch URLs, execute content, verify signatures or settlement, connect a wallet, or move funds.",
+      inputSchema: {
+        document: z.object({
+          name: z
+            .string()
+            .min(1)
+            .max(120)
+            .describe("A non-sensitive label for the supplied public document."),
+          content: z
+            .string()
+            .min(1)
+            .describe("Decoded inline PaymentRequired JSON. URLs are not fetched."),
+        }),
+      },
+      outputSchema: {
+        schemaVersion: z.literal("1.0"),
+        kind: z.literal("x402-v2-payment-required-preflight"),
+        scope: z.object({
+          documentsAnalyzed: z.literal(1),
+          combinedBytes: z.number().int().nonnegative(),
+          deterministic: z.literal(true),
+          networkRequests: z.literal(false),
+          codeExecution: z.literal(false),
+          walletAccess: z.literal(false),
+          decodedJsonOnly: z.literal(true),
+          profile: z.literal("x402-v2-exact-evm-eip3009-sentinel-safe"),
+          specificationCommit: z.literal(
+            "8b1abaeaef282e6307a2936b102c6d9223e61802",
+          ),
+        }),
+        summary: z.object({
+          clear: z.number().int().nonnegative(),
+          ambiguous: z.number().int().nonnegative(),
+          missing: z.number().int().nonnegative(),
+        }),
+        findings: z.array(findingSchema).length(9),
+        limitations: z.object({
+          paymentRequiredOnly: z.literal(true),
+          payerPolicyEvaluated: z.literal(false),
+          paymentPayloadVerified: z.literal(false),
+          signaturesVerified: z.literal(false),
+          settlementVerified: z.literal(false),
+          receiptVerified: z.literal(false),
+          networkExistenceVerified: z.literal(false),
+          assetContractBehaviorVerified: z.literal(false),
+          eip712DomainVerified: z.literal(false),
+          tokenOrRecipientOwnershipVerified: z.literal(false),
+          implementationTested: z.literal(false),
+        }),
+        escalation: z.object({
+          optional: z.literal(true),
+          serviceId: z.literal("agent-payment-boundary-review"),
+          priceUsd: z.literal(49),
+          sampleUrl: z.string().url(),
+          quoteRequestContractUrl: z.string().url(),
+          requestMovesFunds: z.literal(false),
+          requestAuthorizesPayment: z.literal(false),
+          completeWrittenQuoteRequired: z.literal(true),
+          payerMustFollowOwnPolicy: z.literal(true),
+        }),
+        disclaimer: z.string(),
+      },
+      annotations: {
+        title: "x402 v2 PaymentRequired EIP-3009 Preflight",
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false,
+      },
+    },
+    async (input) => {
+      try {
+        const structuredContent = preflightX402V2PaymentRequired(input);
+        return {
+          content: [
+            {
+              type: "text",
+              text:
+                `x402 v2 PaymentRequired preflight complete: ` +
                 `${structuredContent.summary.clear} clear, ` +
                 `${structuredContent.summary.ambiguous} ambiguous, ` +
                 `${structuredContent.summary.missing} missing. ` +
