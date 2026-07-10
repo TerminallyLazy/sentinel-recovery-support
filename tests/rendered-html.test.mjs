@@ -153,6 +153,7 @@ test("publishes canonical GitHub Pages interfaces for agents", async () => {
     support: `${siteBase}support.json`,
     supportIntent: `${siteBase}support-intent.json`,
     services: `${siteBase}services.json`,
+    sampleEvidencePreview: `${siteBase}sample-evidence-preview.json`,
     servicePayment: `${siteBase}service-payment.json`,
     privacy: `${siteBase}privacy.json`,
     impactReceipts: `${siteBase}impact.json`,
@@ -280,7 +281,7 @@ test("publishes a fixed-scope paid evidence funnel", async () => {
   assert.match(html, /Evidence Preview/i);
   assert.match(html, /Trace Snapshot/i);
   assert.match(html, /one direct hop,? and up to 25 outbound transfers/i);
-  assert.match(html, /block number and UTC timestamp/i);
+  assert.match(html, /block hash and number with UTC timestamp/i);
   assert.match(
     html,
     /mailto:sentinel@genesysx\.org\?subject=Sentinel%20Evidence%20Preview/i,
@@ -326,6 +327,55 @@ test("publishes a fixed-scope paid evidence funnel", async () => {
   const pageSource = await readFile(new URL("app/page.tsx", root), "utf8");
   assert.match(pageSource, /import servicesCatalog from "\.\.\/public\/services\.json"/);
   assert.doesNotMatch(pageSource, /const paidServices\s*=\s*\[/);
+});
+
+test("publishes an inspectable Evidence Preview sample before payment", async () => {
+  const [response, sample, services, markdown] = await Promise.all([
+    render(),
+    readJson("public/sample-evidence-preview.json"),
+    readJson("public/services.json"),
+    readFile(new URL("public/sample-evidence-preview.md", root), "utf8"),
+  ]);
+  const html = await response.text();
+
+  assert.match(html, /See the evidence before you pay/i);
+  assert.match(html, /href="#sample-preview"[^>]*>View sample Evidence Preview<\/a>/i);
+  assert.match(
+    html,
+    /0x9cd477a715e8af4b3d10cc74abc578d395e86c7d3c0747157b1fc14d975b44bf/i,
+  );
+  assert.ok(sample);
+  assert.equal(sample.demonstration, true);
+  assert.equal(sample.observation.network, "ethereum-mainnet");
+  assert.equal(sample.observation.chainId, 1);
+  assert.equal(sample.transaction.status, "success");
+  assert.equal(sample.observation.blockNumber, 25_498_695);
+  assert.equal(
+    sample.recipientState.observedAtBlockNumber,
+    sample.observation.blockNumber,
+  );
+  assert.equal(
+    sample.recipientState.observedAtBlockHash,
+    sample.observation.blockHash,
+  );
+  assert.equal(sample.recipientState.bytecodeObservation, "no-bytecode-observed");
+  assert.deepEqual(sample.recipientState.stateRead, {
+    balanceMethod: "eth_getBalance",
+    codeMethod: "eth_getCode",
+    blockParameter: {
+      blockHash: sample.observation.blockHash,
+      requireCanonical: true,
+    },
+  });
+  assert.match(sample.sources.block, new RegExp(sample.observation.blockHash));
+  assert.match(sample.disclaimer, /not a customer case/i);
+  assert.match(sample.recommendedNextStep, /No further paid work is recommended/i);
+  assert.ok(sample.explicitUnknowns.length >= 4);
+  assert.doesNotMatch(JSON.stringify(sample), /@|confidence|recoveryProbability/i);
+  assert.match(markdown, /# Sentinel Evidence Preview/);
+  assert.match(markdown, /## Explicit unknowns/);
+  const preview = services.offerings.find(({ id }) => id === "evidence-preview");
+  assert.equal(preview.sampleUrl, `${siteBase}sample-evidence-preview.json`);
 });
 
 test("publishes independently verifiable paid-service and privacy contracts", async () => {

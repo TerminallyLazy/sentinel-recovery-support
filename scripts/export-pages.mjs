@@ -39,6 +39,8 @@ for (const prefix of [
   "/support.json",
   "/support-intent.json",
   "/services.json",
+  "/sample-evidence-preview.json",
+  "/sample-evidence-preview.md",
   "/service-payment.json",
   "/privacy.json",
   "/impact.json",
@@ -66,6 +68,8 @@ for (const required of [
   `${basePath}/agent-guide.md`,
   `${basePath}/support-intent.json`,
   `${basePath}/services.json`,
+  `${basePath}/sample-evidence-preview.json`,
+  `${basePath}/sample-evidence-preview.md`,
   `${basePath}/service-payment.json`,
   `${basePath}/privacy.json`,
   `${basePath}/impact.json`,
@@ -82,6 +86,7 @@ for (const requiredJson of [
   "support.json",
   "support-intent.json",
   "services.json",
+  "sample-evidence-preview.json",
   "service-payment.json",
   "privacy.json",
   "impact.json",
@@ -97,7 +102,7 @@ for (const requiredJson of [
   }
 }
 
-for (const requiredText of ["agent-guide.md", "llms.txt", "robots.txt"]) {
+for (const requiredText of ["agent-guide.md", "llms.txt", "sample-evidence-preview.md", "robots.txt"]) {
   await readFile(path.join(output, requiredText), "utf8");
 }
 
