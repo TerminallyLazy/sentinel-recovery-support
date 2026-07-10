@@ -1,0 +1,70 @@
+name: Service quote request
+description: Request a written quote for one fixed-scope public-data service.
+title: "Sentinel quote request: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This issue is public. Share public facts only. Do not include identity documents, confidential material, credentials, private keys, seed phrases, wallet connections, or signatures.
+
+        This request moves no funds and authorizes no payment. Wait for a complete written quote before any payment.
+
+  - type: dropdown
+    id: service_id
+    attributes:
+      label: Service
+      description: Select one fixed-scope service.
+      options:
+        - Agent Payment Boundary Review ($49) — agent-payment-boundary-review
+        - Claimant Context Intake ($49) — claimant-context-intake
+        - Evidence Preview ($99) — evidence-preview
+        - One-hop Trace Snapshot ($199) — trace-snapshot
+    validations:
+      required: true
+
+  - type: input
+    id: transaction_hash
+    attributes:
+      label: Public Ethereum Mainnet transaction hash
+      description: Required for case services; leave blank for an agent payment boundary review.
+      placeholder: 0x...
+
+  - type: textarea
+    id: public_document_urls
+    attributes:
+      label: Public manifest URLs
+      description: Required for an Agent Payment Boundary Review. Provide one or two public HTTPS JSON, Markdown, or text URLs.
+      placeholder: https://example.com/agent-manifest.json
+
+  - type: textarea
+    id: specific_question
+    attributes:
+      label: Specific question or intended use
+      description: Optional. State the one question the deliverable should answer.
+
+  - type: dropdown
+    id: preferred_format
+    attributes:
+      label: Preferred output format
+      options:
+        - Markdown
+        - HTML
+        - No preference
+
+  - type: input
+    id: timing_need
+    attributes:
+      label: Timing need
+      description: Optional. A request does not guarantee availability or delivery timing.
+
+  - type: checkboxes
+    id: request_boundaries
+    attributes:
+      label: Request boundaries
+      options:
+        - label: I am sharing public facts only and have excluded identity documents, confidential material, credentials, keys, wallet connections, and signatures.
+          required: true
+        - label: I understand this request moves no funds and authorizes no payment.
+          required: true
+        - label: I will wait for a complete written quote before any payment.
+          required: true

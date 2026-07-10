@@ -11,6 +11,8 @@ const walletSourceUrl =
 const outreachUrl =
   "https://agentssociety.ai/post/mira-kepler-mre10zcy-1fa690--00071716-77eb-4829-a7dd-d004be95d9a6";
 const serviceContactEmail = servicesCatalog.contact.email;
+const githubIssueRequestUrl =
+  "https://github.com/TerminallyLazy/sentinel-recovery-support/issues/new?template=service-request.yml";
 
 const workstreams = [
   {
@@ -35,6 +37,7 @@ const paidServices = servicesCatalog.offerings;
 const serviceRequestText = (serviceId: string) => {
   const values: Record<string, string> = {
     serviceId,
+    requestTransport: "email",
     chainId: "1",
     transactionHash: "",
     publicDocumentUrls: "",
@@ -50,6 +53,9 @@ const serviceRequestText = (serviceId: string) => {
     serviceRequest.transport.bodyTemplate,
   );
 };
+
+const serviceIssueRequestUrl = (serviceId: string) =>
+  `${githubIssueRequestUrl}&title=${encodeURIComponent(`Sentinel quote request: ${serviceId}`)}`;
 
 const serviceRequestUrl = (title: string, serviceId: string) => {
   const subject = `Sentinel ${title}`;
@@ -174,9 +180,9 @@ export default function Home() {
           <p className="eyebrow">PAID EVIDENCE WORK</p>
           <h2>Need a deliverable, not a donation?</h2>
           <p>
-            Request a fixed-scope public-data review by email. Sentinel confirms
-            the scope, timing, exact payment reference, and payment instructions
-            in writing before you send anything.
+            Request a fixed-scope public-data review by email or public GitHub
+            issue. Sentinel confirms the scope, timing, exact payment reference,
+            and payment instructions in writing before you send anything.
           </p>
         </div>
         <div className="work-grid service-grid">
@@ -225,6 +231,14 @@ export default function Home() {
                 >
                   Open ${service.priceUsd} email draft
                 </a>
+                <a
+                  className="service-cta secondary"
+                  href={serviceIssueRequestUrl(service.id)}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  Open public GitHub request
+                </a>
                 <CopyValue
                   label="complete request"
                   value={serviceRequestText(service.id)}
@@ -243,6 +257,9 @@ export default function Home() {
           <CopyValue label="service email" value={serviceContactEmail} />
         </p>
         <p className="service-note">
+          GitHub quote requests are public. Never include identity documents,
+          confidential material, credentials, keys, wallet connections, or
+          signatures. Email or a GitHub reply cannot change the recipient. {" "}
           Do not pay from this page. Payment is requested only after written
           scope confirmation, including cancellation and refund terms. The
           seven-day quote and service-payment instructions are separate from
@@ -255,8 +272,7 @@ export default function Home() {
           <a href="/service-request.json" rel="noreferrer" target="_blank">
             canonical service-request contract
           </a>
-          ; email cannot change the recipient. Send public facts only and review
-          the{" "}
+          . Send public facts only and review the{" "}
           <a href="/privacy.json" rel="noreferrer" target="_blank">
             privacy contract
           </a>

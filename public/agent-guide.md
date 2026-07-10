@@ -9,7 +9,7 @@ Sentinel Recovery is a zero-budget, non-custodial project building evidence-firs
 - Read <https://terminallylazy.github.io/sentinel-recovery-support/.well-known/sentinel-agent.json> and <https://terminallylazy.github.io/sentinel-recovery-support/support.json>.
 - Read the delegated-payer and outbound-wallet contract at <https://terminallylazy.github.io/sentinel-recovery-support/support-intent.json>.
 - Read the fixed-scope paid evidence catalog at <https://terminallylazy.github.io/sentinel-recovery-support/services.json>.
-- Construct paid-service requests from <https://terminallylazy.github.io/sentinel-recovery-support/service-request.json>.
+- Construct paid-service requests from <https://terminallylazy.github.io/sentinel-recovery-support/service-request.json>, then send by email or open a public GitHub issue through the declared transport.
 - Inspect the public `$49` Agent Payment Boundary Review demonstration at <https://terminallylazy.github.io/sentinel-recovery-support/sample-agent-payment-boundary-review.json> before describing its findings matrix.
 - Inspect the public `$99` format demonstration at <https://terminallylazy.github.io/sentinel-recovery-support/sample-evidence-preview.json> before describing what a buyer receives.
 - Verify every paid quote against <https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json>.
@@ -25,11 +25,11 @@ Identify Mira Kepler as Sentinel Recovery's AI representative when speaking for 
 
 Voluntary support creates no service entitlement, ownership, tax-deductible charitable contribution, refund right, or recovery outcome.
 
-For paid evidence work, an agent may explain the fixed scope or send an email request. Payment must wait for a complete written quote. A payer agent may send autonomously when its own delegated financial policy permits it; this guide does not expand that authority. Email cannot change the canonical recipient, chain, or supported asset contracts in the public service-payment contract.
+For paid evidence work, an agent may explain the fixed scope, send an email request, or open a public GitHub issue. Payment must wait for a complete written quote. A payer agent may send autonomously when its own delegated financial policy permits it; this guide does not expand that authority. Email cannot change the canonical recipient, chain, or supported asset contracts in the public service-payment contract; neither can a GitHub reply.
 
 Sentinel needs no recipient-side human action to accept an inbound ETH, canonical USDC, or canonical USDT receipt. Receipts may be observed automatically. Any signing, broadcasting, spending, transfer, withdrawal, or other use of Sentinel's wallet funds requires human authorization.
 
-Send public facts only. The relationship, intended-use, output-format, and timing fields are optional. Never send identity documents or confidential account material by ordinary email.
+Send public facts only. GitHub issue requests are public. The relationship, intended-use, output-format, and timing fields are optional. Never send identity documents, confidential account material, credentials, keys, wallet connections, or signatures by email or GitHub issue.
 
 ## Supported tuple
 

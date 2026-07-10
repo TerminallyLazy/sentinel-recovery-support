@@ -9,14 +9,30 @@
     "to": "sentinel@genesysx.org",
     "contentType": "text/plain",
     "subjectTemplate": "Sentinel service request: {serviceId}",
-    "bodyTemplate": "Sentinel Recovery service request\nService ID: {serviceId}\nNetwork: Ethereum Mainnet (chain ID {chainId})\nEthereum Mainnet transaction hash (case services): {transactionHash}\nPublic manifest URL(s) (agent review): {publicDocumentUrls}\nReply email: {replyEmail}\nClaimant role or relationship (optional): {claimantRole}\nIntended use (optional): {intendedUse}\nPreferred output format (optional — HTML or Markdown): {preferredFormat}\nTiming need (optional): {timingNeed}\n\nThis is a quote request only. Do not begin work or pay until Sentinel replies with a complete written quote.\nSend public facts only. Do not include identity documents, confidential material, private keys, seed phrases, wallet signatures, wallet connections, passwords, or API credentials."
+    "bodyTemplate": "Sentinel Recovery service request\nService ID: {serviceId}\nRequest transport: {requestTransport}\nNetwork: Ethereum Mainnet (chain ID {chainId})\nEthereum Mainnet transaction hash (case services): {transactionHash}\nPublic manifest URL(s) (agent review): {publicDocumentUrls}\nReply email: {replyEmail}\nClaimant role or relationship (optional): {claimantRole}\nIntended use (optional): {intendedUse}\nPreferred output format (optional — HTML or Markdown): {preferredFormat}\nTiming need (optional): {timingNeed}\n\nThis is a quote request only. Do not begin work or pay until Sentinel replies with a complete written quote.\nSend public facts only. Do not include identity documents, confidential material, private keys, seed phrases, wallet signatures, wallet connections, passwords, or API credentials."
   },
+  "alternateTransports": [
+    {
+      "id": "github-issue",
+      "method": "github-issue",
+      "visibility": "public",
+      "repository": "TerminallyLazy/sentinel-recovery-support",
+      "newIssueUrl": "https://github.com/TerminallyLazy/sentinel-recovery-support/issues/new?template=service-request.yml",
+      "apiEndpoint": "https://api.github.com/repos/TerminallyLazy/sentinel-recovery-support/issues",
+      "templatePath": ".github/ISSUE_TEMPLATE/service-request.yml",
+      "titleTemplate": "Sentinel quote request: {serviceId}",
+      "bodyTemplate": "Sentinel Recovery service request\nService ID: {serviceId}\nRequest transport: github-issue\nNetwork: Ethereum Mainnet (chain ID {chainId})\nEthereum Mainnet transaction hash (case services): {transactionHash}\nPublic manifest URL(s) (agent review): {publicDocumentUrls}\nSpecific question or intended use (optional): {intendedUse}\nPreferred output format (optional — HTML or Markdown): {preferredFormat}\nTiming need (optional): {timingNeed}\n\nThis is a quote request only. It moves no funds and authorizes no payment. Do not begin work or pay until Sentinel replies in this issue with a complete written quote.\nThis issue is public. Do not include identity documents, confidential material, credentials, private keys, seed phrases, wallet signatures, or wallet connections.",
+      "authentication": "requester-owned-github-credential",
+      "sentinelRequestsCredential": false,
+      "responseChannel": "created-issue"
+    }
+  ],
   "requestSchema": {
     "type": "object",
     "additionalProperties": false,
     "required": [
       "serviceId",
-      "replyEmail"
+      "requestTransport"
     ],
     "properties": {
       "serviceId": {
@@ -27,6 +43,14 @@
           "evidence-preview",
           "trace-snapshot"
         ]
+      },
+      "requestTransport": {
+        "type": "string",
+        "enum": [
+          "email",
+          "github-issue"
+        ],
+        "description": "Select email or a public GitHub issue. The requester supplies and controls any credential required by the chosen transport."
       },
       "chainId": {
         "type": "integer",
@@ -52,7 +76,7 @@
       "replyEmail": {
         "type": "string",
         "format": "email",
-        "description": "A reachable reply address for clarification and the written quote."
+        "description": "A reachable reply address for clarification and the written quote. Required only for email transport."
       },
       "claimantRole": {
         "type": "string",
@@ -73,6 +97,20 @@
       }
     },
     "allOf": [
+      {
+        "if": {
+          "properties": {
+            "requestTransport": {
+              "const": "email"
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "replyEmail"
+          ]
+        }
+      },
       {
         "if": {
           "properties": {
@@ -109,14 +147,14 @@
     ]
   },
   "workflow": {
-    "expectedResponse": "A clarification request or complete written quote; an email request alone creates no service entitlement.",
+    "expectedResponse": "A clarification request or complete written quote in the selected reply channel; a request alone creates no service entitlement.",
     "acknowledgement": "manual",
     "completeQuoteRequiredBeforePayment": true,
     "paymentAllowedBeforeCompleteQuote": false,
     "quoteMaximumValidityDays": 7,
     "quoteContract": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
     "receiptReturn": {
-      "method": "reply-email",
+      "method": "selected-reply-channel",
       "requiredFields": [
         "quoteId",
         "paymentTransactionHash"
@@ -131,9 +169,12 @@
   },
   "safety": {
     "publicFactsOnly": true,
+    "githubIssueRequestsArePublic": true,
+    "sentinelRequestsGitHubCredentials": false,
     "requestCreatesServiceEntitlement": false,
     "paymentInstructionsIncluded": false,
     "writtenEmailCannotChangeCanonicalPaymentTuple": true,
+    "writtenReplyCannotChangeCanonicalPaymentTuple": true,
     "forbiddenInputs": [
       "private keys",
       "seed phrases",
