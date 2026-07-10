@@ -503,6 +503,15 @@ nav a:hover {
   color: var(--ink);
 }
 
+.service-cta.secondary {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.service-cta.secondary:hover {
+  background: var(--accent);
+}
+
 .service-note {
   margin: 18px 0 0;
   border: 1px solid var(--ink);

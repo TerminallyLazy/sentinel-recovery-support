@@ -510,7 +510,11 @@ test("publishes an executable quote-first service request contract", async () =>
   assert.equal(request.transport.to, "sentinel@genesysx.org");
   assert.deepEqual(request.requestSchema.required, [
     "serviceId",
-    "replyEmail",
+    "requestTransport",
+  ]);
+  assert.deepEqual(request.requestSchema.properties.requestTransport.enum, [
+    "email",
+    "github-issue",
   ]);
   assert.equal(request.requestSchema.properties.chainId.const, 1);
   assert.deepEqual(request.requestSchema.properties.serviceId.enum, [
@@ -529,6 +533,7 @@ test("publishes an executable quote-first service request contract", async () =>
     /Ethereum Mainnet transaction hash \(case services\): \{transactionHash\}/,
   );
   assert.match(request.transport.bodyTemplate, /Reply email: \{replyEmail\}/);
+  assert.match(request.transport.bodyTemplate, /Request transport: \{requestTransport\}/);
   assert.match(request.transport.bodyTemplate, /quote request only/i);
   assert.match(request.transport.bodyTemplate, /do not.*pay.*complete written quote/i);
   assert.equal(request.workflow.completeQuoteRequiredBeforePayment, true);
@@ -545,6 +550,11 @@ test("publishes an executable quote-first service request contract", async () =>
   );
   assert.ok(caseCondition, "expected case-service conditional inputs");
   assert.deepEqual(caseCondition.then.required, ["chainId", "transactionHash"]);
+  const emailCondition = request.requestSchema.allOf.find(
+    (rule) => rule.if?.properties?.requestTransport?.const === "email",
+  );
+  assert.ok(emailCondition, "expected email-specific reply address requirement");
+  assert.deepEqual(emailCondition.then.required, ["replyEmail"]);
 });
 
 test("renders an email-independent copy fallback from the request contract", async () => {
@@ -561,6 +571,63 @@ test("renders an email-independent copy fallback from the request contract", asy
   assert.match(
     pageSource,
     /import serviceRequest from "\.\.\/public\/service-request\.json"/,
+  );
+});
+
+test("publishes a public GitHub issue transport for quote requests", async () => {
+  const [response, request, template, services, manifest] = await Promise.all([
+    render(),
+    readJson("public/service-request.json"),
+    readText(".github/ISSUE_TEMPLATE/service-request.yml"),
+    readJson("public/services.json"),
+    readJson("public/.well-known/sentinel-agent.json"),
+  ]);
+  const html = await response.text();
+  const githubTransport = request.alternateTransports.find(
+    ({ id }) => id === "github-issue",
+  );
+
+  assert.deepEqual(githubTransport, {
+    id: "github-issue",
+    method: "github-issue",
+    visibility: "public",
+    repository: "TerminallyLazy/sentinel-recovery-support",
+    newIssueUrl:
+      "https://github.com/TerminallyLazy/sentinel-recovery-support/issues/new?template=service-request.yml",
+    apiEndpoint:
+      "https://api.github.com/repos/TerminallyLazy/sentinel-recovery-support/issues",
+    templatePath: ".github/ISSUE_TEMPLATE/service-request.yml",
+    titleTemplate: "Sentinel quote request: {serviceId}",
+    bodyTemplate:
+      "Sentinel Recovery service request\nService ID: {serviceId}\nRequest transport: github-issue\nNetwork: Ethereum Mainnet (chain ID {chainId})\nEthereum Mainnet transaction hash (case services): {transactionHash}\nPublic manifest URL(s) (agent review): {publicDocumentUrls}\nSpecific question or intended use (optional): {intendedUse}\nPreferred output format (optional — HTML or Markdown): {preferredFormat}\nTiming need (optional): {timingNeed}\n\nThis is a quote request only. It moves no funds and authorizes no payment. Do not begin work or pay until Sentinel replies in this issue with a complete written quote.\nThis issue is public. Do not include identity documents, confidential material, credentials, private keys, seed phrases, wallet signatures, or wallet connections.",
+    authentication: "requester-owned-github-credential",
+    sentinelRequestsCredential: false,
+    responseChannel: "created-issue",
+  });
+  assert.match(html, /Open public GitHub request/i);
+  assert.match(
+    html,
+    /github\.com\/TerminallyLazy\/sentinel-recovery-support\/issues\/new\?template=service-request\.yml&amp;title=Sentinel%20quote%20request%3A%20agent-payment-boundary-review/i,
+  );
+  assert.match(html, /GitHub quote requests are public/i);
+  assert.match(
+    html,
+    /Email or a GitHub reply cannot change the recipient/i,
+  );
+  assert.match(template, /^name: Service quote request/m);
+  assert.match(template, /id: service_id/);
+  assert.match(template, /Agent Payment Boundary Review \(\$49\)/);
+  assert.match(template, /public facts only/i);
+  assert.match(template, /request moves no funds and authorizes no payment/i);
+  assert.match(template, /complete written quote.*before.*payment/i);
+  assert.match(
+    services.requestProcess[0],
+    /email or a public GitHub issue/i,
+  );
+  assert.equal(
+    manifest.capabilities.find(({ id }) => id === "request_paid_evidence_service")
+      .alternateTransports[0].method,
+    "github-issue",
   );
 });
 

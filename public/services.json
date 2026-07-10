@@ -117,7 +117,7 @@
     }
   ],
   "requestProcess": [
-    "A human or payer agent operating within its own delegated policy sends an email request with the selected offering's required public inputs and any optional context.",
+    "A human or payer agent operating within its own delegated policy sends an email or a public GitHub issue with the selected offering's required public inputs and any optional context.",
     "Sentinel confirms scope, timing, exact payment reference, and payment instructions in writing.",
     "The requester decides whether to pay only after verifying the complete quote and canonical service-payment contract.",
     "Sentinel prepares only the confirmed evidence deliverable."
@@ -131,7 +131,8 @@
     "quoteExpiresAfterDays": 7,
     "voluntarySupportMetadataIsNotServicePaymentInstructions": true,
     "canonicalPaymentContract": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
-    "writtenEmailCannotChangeRecipient": true
+    "writtenEmailCannotChangeRecipient": true,
+    "writtenGitHubReplyCannotChangeRecipient": true
   },
   "safety": {
     "requestsKeysOrSeedPhrases": false,

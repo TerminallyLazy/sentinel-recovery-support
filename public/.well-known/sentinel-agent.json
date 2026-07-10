@@ -57,6 +57,13 @@
         "method": "email",
         "to": "sentinel@genesysx.org"
       },
+      "alternateTransports": [
+        {
+          "method": "github-issue",
+          "visibility": "public",
+          "newIssueUrl": "https://github.com/TerminallyLazy/sentinel-recovery-support/issues/new?template=service-request.yml"
+        }
+      ],
       "inputSchema": "https://terminallylazy.github.io/sentinel-recovery-support/service-request.json#/requestSchema",
       "expectedResponse": "clarification-or-complete-quote",
       "canonicalPaymentContract": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json"
