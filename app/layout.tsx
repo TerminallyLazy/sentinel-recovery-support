@@ -16,21 +16,21 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     "https://terminallylazy.github.io/sentinel-recovery-support/",
   ),
-  title: "Support Sentinel Recovery",
+  title: "Sentinel Recovery — Ethereum Evidence Services",
   description:
-    "Fund evidence-first Ethereum mistake triage, public safety boundaries, and agent-safe handoffs without recovery guarantees.",
+    "Request fixed-scope $49/$99/$199 public-data reviews or support evidence-first tooling. Non-custodial, with no recovery guarantees.",
   openGraph: {
-    title: "Support Sentinel Recovery",
+    title: "Sentinel Recovery — Ethereum Evidence Services",
     description:
-      "Voluntary Ethereum Mainnet support for evidence-first recovery research and agent-safe public infrastructure.",
+      "Fixed-scope Ethereum public-data services, voluntary support, and agent-safe payment contracts without custody or recovery guarantees.",
     type: "website",
     url: "https://terminallylazy.github.io/sentinel-recovery-support/",
   },
   twitter: {
     card: "summary",
-    title: "Support Sentinel Recovery",
+    title: "Sentinel Recovery — Ethereum Evidence Services",
     description:
-      "Fund evidence-first Ethereum mistake triage without recovery guarantees.",
+      "Request a $49/$99/$199 Ethereum evidence deliverable or support the public tooling.",
   },
   alternates: {
     canonical: "https://terminallylazy.github.io/sentinel-recovery-support/",
