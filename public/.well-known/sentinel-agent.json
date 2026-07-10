@@ -31,8 +31,20 @@
   },
   "mcp": {
     "transport": "stdio",
-    "distributionStatus": "source-only",
+    "distributionStatus": "github-release",
     "remoteEndpointAvailable": false,
+    "release": {
+      "version": "0.2.0",
+      "tag": "v0.2.0",
+      "bundleUrl": "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.2.0/sentinel-agent-payment-boundary-v0.2.0.mcpb",
+      "checksumUrl": "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.2.0/sentinel-agent-payment-boundary-v0.2.0.mcpb.sha256",
+      "sha256": "5712fa93ac1a56023927e44a6efbf23594db07425933d588f032982178eef1cf"
+    },
+    "registry": {
+      "name": "io.github.terminallylazy/sentinel-recovery-services",
+      "publicationStatus": "pending-verification",
+      "serverJsonUrl": "https://raw.githubusercontent.com/TerminallyLazy/sentinel-recovery-support/main/mcp/server.json"
+    },
     "source": {
       "repository": "https://github.com/TerminallyLazy/sentinel-recovery-support",
       "path": "mcp",

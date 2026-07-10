@@ -4,9 +4,12 @@ Read-only stdio MCP server with a deterministic free preflight for public agent
 and payment documents, plus Sentinel Recovery's public service catalog and
 quote-request contract.
 
-This source-only package is not published to npm or the MCP Registry yet. Run it from a
-verified repository checkout or a verified release bundle. The GitHub Pages
-site is static and is not a remote MCP endpoint.
+Version `0.2.0` is published as a checksummed MCPB on the
+[GitHub Release](https://github.com/TerminallyLazy/sentinel-recovery-support/releases/tag/v0.2.0).
+It is not published to npm. Registry metadata is present in `server.json`, but
+Registry availability remains unverified until the public Registry API returns
+the exact namespace and version. The GitHub Pages site is static and is not a
+remote MCP endpoint.
 
 ## Tool
 
