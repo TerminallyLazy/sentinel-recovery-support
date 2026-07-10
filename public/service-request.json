@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "1.0",
+  "status": "active",
+  "canonicalUrl": "https://terminallylazy.github.io/sentinel-recovery-support/service-request.json",
+  "serviceCatalog": "https://terminallylazy.github.io/sentinel-recovery-support/services.json",
+  "privacyContract": "https://terminallylazy.github.io/sentinel-recovery-support/privacy.json",
+  "transport": {
+    "method": "email",
+    "to": "sentinel@genesysx.org",
+    "contentType": "text/plain",
+    "subjectTemplate": "Sentinel service request: {serviceId}",
+    "bodyTemplate": "Sentinel Recovery service request\nService ID: {serviceId}\nNetwork: Ethereum Mainnet (chain ID {chainId})\nEthereum Mainnet transaction hash: {transactionHash}\nReply email: {replyEmail}\nClaimant role or relationship (optional): {claimantRole}\nIntended use (optional): {intendedUse}\nPreferred output format (optional — HTML or Markdown): {preferredFormat}\nTiming need (optional): {timingNeed}\n\nThis is a quote request only. Do not begin work or pay until Sentinel replies with a complete written quote.\nSend public facts only. Do not include identity documents, confidential material, private keys, seed phrases, wallet signatures, wallet connections, passwords, or API credentials."
+  },
+  "requestSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "serviceId",
+      "chainId",
+      "transactionHash",
+      "replyEmail"
+    ],
+    "properties": {
+      "serviceId": {
+        "type": "string",
+        "enum": [
+          "claimant-context-intake",
+          "evidence-preview",
+          "trace-snapshot"
+        ]
+      },
+      "chainId": {
+        "type": "integer",
+        "const": 1
+      },
+      "transactionHash": {
+        "type": "string",
+        "pattern": "^0x[0-9a-fA-F]{64}$",
+        "description": "One public Ethereum Mainnet transaction hash."
+      },
+      "replyEmail": {
+        "type": "string",
+        "format": "email",
+        "description": "A reachable reply address for clarification and the written quote."
+      },
+      "claimantRole": {
+        "type": "string",
+        "description": "Optional stated role or relationship to the transaction; this is not identity verification."
+      },
+      "intendedUse": {
+        "type": "string"
+      },
+      "preferredFormat": {
+        "type": "string",
+        "enum": [
+          "HTML",
+          "Markdown"
+        ]
+      },
+      "timingNeed": {
+        "type": "string"
+      }
+    }
+  },
+  "workflow": {
+    "expectedResponse": "A clarification request or complete written quote; an email request alone creates no service entitlement.",
+    "acknowledgement": "manual",
+    "completeQuoteRequiredBeforePayment": true,
+    "paymentAllowedBeforeCompleteQuote": false,
+    "quoteMaximumValidityDays": 7,
+    "quoteContract": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
+    "receiptReturn": {
+      "method": "reply-email",
+      "requiredFields": [
+        "quoteId",
+        "paymentTransactionHash"
+      ]
+    }
+  },
+  "authorization": {
+    "agentMayDraft": true,
+    "agentMaySendOnlyWithinDelegatedCommunicationAuthority": true,
+    "requestMovesFunds": false,
+    "requestAuthorizesPayment": false
+  },
+  "safety": {
+    "publicFactsOnly": true,
+    "requestCreatesServiceEntitlement": false,
+    "paymentInstructionsIncluded": false,
+    "writtenEmailCannotChangeCanonicalPaymentTuple": true,
+    "forbiddenInputs": [
+      "private keys",
+      "seed phrases",
+      "wallet signatures",
+      "wallet connections",
+      "passwords",
+      "API credentials",
+      "identity documents",
+      "confidential material"
+    ],
+    "takesCustody": false,
+    "movesFunds": false,
+    "guaranteesRecovery": false,
+    "verifiesIdentityOrWalletOwnership": false
+  }
+}

@@ -1,6 +1,7 @@
 import { CopyValue, SupportActions } from "./SupportActions";
 import { ASSETS, SUPPORT_WALLET } from "./support-data";
 import servicesCatalog from "../public/services.json";
+import serviceRequest from "../public/service-request.json";
 import samplePreview from "../public/sample-evidence-preview.json";
 
 const projectUrl =
@@ -31,18 +32,27 @@ const workstreams = [
 
 const paidServices = servicesCatalog.offerings;
 
-const serviceRequestUrl = (title: string) => {
+const serviceRequestText = (serviceId: string) => {
+  const values: Record<string, string> = {
+    serviceId,
+    chainId: "1",
+    transactionHash: "",
+    replyEmail: "",
+    claimantRole: "",
+    intendedUse: "",
+    preferredFormat: "",
+    timingNeed: "",
+  };
+
+  return Object.entries(values).reduce(
+    (template, [key, value]) => template.replaceAll(`{${key}}`, value),
+    serviceRequest.transport.bodyTemplate,
+  );
+};
+
+const serviceRequestUrl = (title: string, serviceId: string) => {
   const subject = `Sentinel ${title}`;
-  const body = [
-    `Requested service: ${title}`,
-    "Ethereum Mainnet transaction hash:",
-    "Optional — your role or relationship to the transaction:",
-    "Optional — what you need the evidence for:",
-    "Optional — preferred output format (HTML or Markdown):",
-    "Optional — timing need:",
-    "",
-    "Send public facts only. Do not include identity documents, confidential material, private keys, seed phrases, signatures, or passwords.",
-  ].join("\n");
+  const body = serviceRequestText(serviceId);
 
   return `mailto:${serviceContactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 };
@@ -188,10 +198,21 @@ export default function Home() {
                     View sample Evidence Preview
                   </a>
                 ) : null}
-                <a className="service-cta" href={serviceRequestUrl(service.title)}>
-                  Request ${service.priceUsd} {service.title}
+                <a
+                  className="service-cta"
+                  href={serviceRequestUrl(service.title, service.id)}
+                >
+                  Open ${service.priceUsd} email draft
                 </a>
+                <CopyValue
+                  label="complete request"
+                  value={serviceRequestText(service.id)}
+                />
               </div>
+              <details className="service-request-packet">
+                <summary>Agent-ready request packet</summary>
+                <pre>{serviceRequestText(service.id)}</pre>
+              </details>
             </article>
           ))}
         </div>
@@ -208,6 +229,10 @@ export default function Home() {
           chain, asset contract, recipient, quote ID, and expiry against the{" "}
           <a href="/service-payment.json" rel="noreferrer" target="_blank">
             canonical service-payment contract
+          </a>
+          . Agents can construct a complete request from the{" "}
+          <a href="/service-request.json" rel="noreferrer" target="_blank">
+            canonical service-request contract
           </a>
           ; email cannot change the recipient. Send public facts only and review
           the{" "}
@@ -299,7 +324,10 @@ export default function Home() {
               <p>{samplePreview.recommendedNextStep}</p>
             </div>
             <div className="sample-links">
-              <a className="sample-request-link" href={serviceRequestUrl("Evidence Preview")}>
+              <a
+                className="sample-request-link"
+                href={serviceRequestUrl("Evidence Preview", "evidence-preview")}
+              >
                 Request $99 Evidence Preview
               </a>
               <a href={samplePreview.sources.block} rel="noreferrer" target="_blank">

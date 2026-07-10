@@ -10,6 +10,7 @@
     "support": "https://terminallylazy.github.io/sentinel-recovery-support/support.json",
     "supportIntent": "https://terminallylazy.github.io/sentinel-recovery-support/support-intent.json",
     "services": "https://terminallylazy.github.io/sentinel-recovery-support/services.json",
+    "serviceRequest": "https://terminallylazy.github.io/sentinel-recovery-support/service-request.json",
     "sampleEvidencePreview": "https://terminallylazy.github.io/sentinel-recovery-support/sample-evidence-preview.json",
     "servicePayment": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
     "privacy": "https://terminallylazy.github.io/sentinel-recovery-support/privacy.json",
@@ -50,6 +51,13 @@
       "recipientHumanAcceptanceRequired": false,
       "inboundReceiptMayBeObservedAutomatically": true,
       "outboundWalletActionRequiresHumanAuthorization": true,
+      "requestContract": "https://terminallylazy.github.io/sentinel-recovery-support/service-request.json",
+      "transport": {
+        "method": "email",
+        "to": "sentinel@genesysx.org"
+      },
+      "inputSchema": "https://terminallylazy.github.io/sentinel-recovery-support/service-request.json#/requestSchema",
+      "expectedResponse": "clarification-or-complete-quote",
       "canonicalPaymentContract": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json"
     }
   ],

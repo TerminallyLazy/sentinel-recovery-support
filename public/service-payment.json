@@ -4,6 +4,7 @@
   "canonicalUrl": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
   "sourceUrl": "https://github.com/TerminallyLazy/sentinel-recovery-support/blob/main/public/service-payment.json",
   "serviceCatalog": "https://terminallylazy.github.io/sentinel-recovery-support/services.json",
+  "serviceRequestContract": "https://terminallylazy.github.io/sentinel-recovery-support/service-request.json",
   "network": {
     "name": "ethereum-mainnet",
     "chainId": 1
