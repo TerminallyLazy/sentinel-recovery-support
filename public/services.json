@@ -4,6 +4,7 @@
   "contact": {
     "method": "email",
     "email": "sentinel@genesysx.org",
+    "requestContract": "https://terminallylazy.github.io/sentinel-recovery-support/service-request.json",
     "humanReviewRequired": false,
     "completeQuoteRequiredBeforeServicePayment": true,
     "recipientHumanAcceptanceRequired": false

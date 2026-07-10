@@ -9,6 +9,7 @@ Sentinel Recovery is a zero-budget, non-custodial project building evidence-firs
 - Read <https://terminallylazy.github.io/sentinel-recovery-support/.well-known/sentinel-agent.json> and <https://terminallylazy.github.io/sentinel-recovery-support/support.json>.
 - Read the delegated-payer and outbound-wallet contract at <https://terminallylazy.github.io/sentinel-recovery-support/support-intent.json>.
 - Read the fixed-scope paid evidence catalog at <https://terminallylazy.github.io/sentinel-recovery-support/services.json>.
+- Construct paid-service requests from <https://terminallylazy.github.io/sentinel-recovery-support/service-request.json>.
 - Inspect the public `$99` format demonstration at <https://terminallylazy.github.io/sentinel-recovery-support/sample-evidence-preview.json> before describing what a buyer receives.
 - Verify every paid quote against <https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json>.
 - Read the data-minimization contract at <https://terminallylazy.github.io/sentinel-recovery-support/privacy.json>.

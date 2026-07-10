@@ -153,6 +153,7 @@ test("publishes canonical GitHub Pages interfaces for agents", async () => {
     support: `${siteBase}support.json`,
     supportIntent: `${siteBase}support-intent.json`,
     services: `${siteBase}services.json`,
+    serviceRequest: `${siteBase}service-request.json`,
     sampleEvidencePreview: `${siteBase}sample-evidence-preview.json`,
     servicePayment: `${siteBase}service-payment.json`,
     privacy: `${siteBase}privacy.json`,
@@ -162,6 +163,42 @@ test("publishes canonical GitHub Pages interfaces for agents", async () => {
   assert.match(llms, new RegExp(`${siteBase}support-intent\\.json`));
   assert.doesNotMatch(guide, /\]\(\/(?:\.well-known|agent-guide|llms|support)/);
   assert.doesNotMatch(llms, /\]\(\/(?:\.well-known|agent-guide|llms|support)/);
+});
+
+test("advertises an actionable paid-service request capability", async () => {
+  const manifest = await readJson("public/.well-known/sentinel-agent.json");
+  const capability = manifest.capabilities.find(
+    ({ id }) => id === "request_paid_evidence_service",
+  );
+
+  assert.ok(capability, "expected the paid-service request capability");
+  assert.equal(capability.requestContract, `${siteBase}service-request.json`);
+  assert.deepEqual(capability.transport, {
+    method: "email",
+    to: "sentinel@genesysx.org",
+  });
+  assert.equal(
+    capability.inputSchema,
+    `${siteBase}service-request.json#/requestSchema`,
+  );
+  assert.equal(capability.expectedResponse, "clarification-or-complete-quote");
+});
+
+test("publishes one canonical service-request URL across agent interfaces", async () => {
+  const [services, payment, guide, llms, readme] = await Promise.all([
+    readJson("public/services.json"),
+    readJson("public/service-payment.json"),
+    readFile(new URL("public/agent-guide.md", root), "utf8"),
+    readFile(new URL("public/llms.txt", root), "utf8"),
+    readFile(new URL("README.md", root), "utf8"),
+  ]);
+  const requestUrl = `${siteBase}service-request.json`;
+
+  assert.equal(services.contact.requestContract, requestUrl);
+  assert.equal(payment.serviceRequestContract, requestUrl);
+  assert.match(guide, new RegExp(requestUrl.replaceAll(".", "\\.")));
+  assert.match(llms, new RegExp(requestUrl.replaceAll(".", "\\.")));
+  assert.match(readme, new RegExp(requestUrl.replaceAll(".", "\\.")));
 });
 
 test("publishes a delegated-payer support intent with human-only outbound use", async () => {
@@ -329,6 +366,83 @@ test("publishes a fixed-scope paid evidence funnel", async () => {
   assert.doesNotMatch(pageSource, /const paidServices\s*=\s*\[/);
 });
 
+test("publishes an executable quote-first service request contract", async () => {
+  const request = await readJson("public/service-request.json");
+
+  assert.ok(request, "expected public/service-request.json to exist");
+  assert.equal(request.transport.method, "email");
+  assert.equal(request.transport.to, "sentinel@genesysx.org");
+  assert.deepEqual(request.requestSchema.required, [
+    "serviceId",
+    "chainId",
+    "transactionHash",
+    "replyEmail",
+  ]);
+  assert.equal(request.requestSchema.properties.chainId.const, 1);
+  assert.deepEqual(request.requestSchema.properties.serviceId.enum, [
+    "claimant-context-intake",
+    "evidence-preview",
+    "trace-snapshot",
+  ]);
+  assert.equal(
+    request.requestSchema.properties.transactionHash.pattern,
+    "^0x[0-9a-fA-F]{64}$",
+  );
+  assert.match(request.transport.bodyTemplate, /Service ID: \{serviceId\}/);
+  assert.match(
+    request.transport.bodyTemplate,
+    /Ethereum Mainnet transaction hash: \{transactionHash\}/,
+  );
+  assert.match(request.transport.bodyTemplate, /Reply email: \{replyEmail\}/);
+  assert.match(request.transport.bodyTemplate, /quote request only/i);
+  assert.match(request.transport.bodyTemplate, /do not.*pay.*complete written quote/i);
+  assert.equal(request.workflow.completeQuoteRequiredBeforePayment, true);
+  assert.equal(request.workflow.paymentAllowedBeforeCompleteQuote, false);
+  assert.equal(
+    request.workflow.quoteContract,
+    `${siteBase}service-payment.json`,
+  );
+  assert.equal(request.safety.publicFactsOnly, true);
+  assert.ok(request.safety.forbiddenInputs.includes("private keys"));
+  assert.ok(request.safety.forbiddenInputs.includes("wallet signatures"));
+});
+
+test("renders an email-independent copy fallback from the request contract", async () => {
+  const response = await render();
+  const html = await response.text();
+
+  assert.match(html, /Copy complete request/i);
+  assert.match(html, /Agent-ready request packet/i);
+  assert.match(html, /Service ID: evidence-preview/i);
+  assert.match(html, /Reply email:/i);
+  assert.match(html, /href="\/service-request\.json"/i);
+
+  const pageSource = await readFile(new URL("app/page.tsx", root), "utf8");
+  assert.match(
+    pageSource,
+    /import serviceRequest from "\.\.\/public\/service-request\.json"/,
+  );
+});
+
+test("keeps a service request non-financial until a complete quote", async () => {
+  const request = await readJson("public/service-request.json");
+
+  assert.ok(request.authorization, "expected explicit request authorization");
+  assert.equal(request.authorization.agentMayDraft, true);
+  assert.equal(
+    request.authorization.agentMaySendOnlyWithinDelegatedCommunicationAuthority,
+    true,
+  );
+  assert.equal(request.authorization.requestMovesFunds, false);
+  assert.equal(request.authorization.requestAuthorizesPayment, false);
+  assert.equal(request.safety.requestCreatesServiceEntitlement, false);
+  assert.equal(request.safety.paymentInstructionsIncluded, false);
+  assert.equal(
+    request.safety.writtenEmailCannotChangeCanonicalPaymentTuple,
+    true,
+  );
+});
+
 test("publishes an inspectable Evidence Preview sample before payment", async () => {
   const [response, sample, services, markdown] = await Promise.all([
     render(),
@@ -349,7 +463,7 @@ test("publishes an inspectable Evidence Preview sample before payment", async ()
   const pageSource = await readFile(new URL("app/page.tsx", root), "utf8");
   assert.match(
     pageSource,
-    /className="sample-request-link" href=\{serviceRequestUrl\("Evidence Preview"\)\}/,
+    /className="sample-request-link"\s+href=\{serviceRequestUrl\("Evidence Preview", "evidence-preview"\)\}/,
   );
   assert.ok(sample);
   assert.equal(sample.demonstration, true);
@@ -460,6 +574,7 @@ test("gates Pages deployment and avoids a generated Pages Router directory", asy
   assert.match(workflow, /--directory \.pages-artifact/);
   assert.match(exportScript, /path\.join\(root, "\.pages-artifact"\)/);
   assert.match(exportScript, /JSON\.parse/);
+  assert.match(exportScript, /service-request\.json/);
   assert.match(cleanScript, /\.pages-artifact/);
   assert.match(gitignore, /^\/\.pages-artifact\/$/m);
 });
