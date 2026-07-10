@@ -9,6 +9,10 @@ const root = new URL("../", import.meta.url);
 const siteBase =
   "https://terminallylazy.github.io/sentinel-recovery-support/";
 const supportWallet = "0x91bdE13382c3Ee082EE42a147DF54f6A6129a412";
+const registryName =
+  "io.github.TerminallyLazy/sentinel-recovery-services";
+const registryVersionUrl =
+  "https://registry.modelcontextprotocol.io/v0.1/servers/io.github.TerminallyLazy%2Fsentinel-recovery-services/versions/0.2.0";
 
 async function readJson(path) {
   try {
@@ -177,6 +181,14 @@ test("publishes canonical GitHub Pages interfaces for agents", async () => {
   });
   assert.match(guide, new RegExp(`${siteBase}support\\.json`));
   assert.match(llms, new RegExp(`${siteBase}support-intent\\.json`));
+  for (const document of [guide, llms]) {
+    assert.ok(document.includes(registryName));
+    assert.ok(document.includes(registryVersionUrl));
+    assert.doesNotMatch(
+      document,
+      /Registry availability[\s\S]{0,120}unverified/i,
+    );
+  }
   assert.doesNotMatch(guide, /\]\(\/(?:\.well-known|agent-guide|llms|support)/);
   assert.doesNotMatch(llms, /\]\(\/(?:\.well-known|agent-guide|llms|support)/);
 });
@@ -208,8 +220,10 @@ test("publishes a source-installable deterministic MCP preflight", async () => {
         "5712fa93ac1a56023927e44a6efbf23594db07425933d588f032982178eef1cf",
     },
     registry: {
-      name: "io.github.TerminallyLazy/sentinel-recovery-services",
-      publicationStatus: "pending-verification",
+      name: registryName,
+      version: "0.2.0",
+      publicationStatus: "published",
+      versionApiUrl: registryVersionUrl,
       serverJsonUrl:
         "https://raw.githubusercontent.com/TerminallyLazy/sentinel-recovery-support/main/mcp/server.json",
     },
@@ -265,6 +279,14 @@ test("publishes a source-installable deterministic MCP preflight", async () => {
     ["preflight_agent_payment_boundary"],
   );
   assert.match(mcpReadme, /GitHub Release/i);
+  for (const document of [mcpReadme, readme]) {
+    assert.ok(document.includes(registryName));
+    assert.ok(document.includes(registryVersionUrl));
+    assert.doesNotMatch(
+      document,
+      /Registry availability[\s\S]{0,120}unverified/i,
+    );
+  }
   assert.match(mcpReadme, /11 fixed checks/i);
   assert.match(mcpReadme, /sentinel:\/\/services\/catalog/);
   assert.match(mcpReadme, /moves no funds/i);
@@ -290,7 +312,7 @@ test("publishes checksummed MCP release metadata through GitHub OIDC", async () 
   );
   assert.equal(
     server.name,
-    "io.github.TerminallyLazy/sentinel-recovery-services",
+    registryName,
   );
   assert.equal(server.version, "0.2.0");
   assert.deepEqual(server.repository, {

@@ -6,9 +6,10 @@ quote-request contract.
 
 Version `0.2.0` is published as a checksummed MCPB on the
 [GitHub Release](https://github.com/TerminallyLazy/sentinel-recovery-support/releases/tag/v0.2.0).
-It is not published to npm. Registry metadata is present in `server.json`, but
-Registry availability remains unverified until the public Registry API returns
-the exact namespace and version. The GitHub Pages site is static and is not a
+It is not published to npm. The official MCP Registry lists version `0.2.0` as
+`io.github.TerminallyLazy/sentinel-recovery-services`; verify the exact
+[Registry record](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.TerminallyLazy%2Fsentinel-recovery-services/versions/0.2.0)
+before relying on availability. The GitHub Pages site is static and is not a
 remote MCP endpoint.
 
 ## Tool

@@ -48,9 +48,10 @@ connect a wallet, or perform wallet actions.
 
 The checksummed `v0.2.0` MCPB and its SHA-256 sidecar are published on the
 [GitHub Release](https://github.com/TerminallyLazy/sentinel-recovery-support/releases/tag/v0.2.0).
-Registry metadata lives at `mcp/server.json`; treat Registry availability as
-unverified until the public Registry API returns the exact namespace and
-version.
+The official MCP Registry lists version `0.2.0` as
+`io.github.TerminallyLazy/sentinel-recovery-services`; verify the exact
+[Registry record](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.TerminallyLazy%2Fsentinel-recovery-services/versions/0.2.0)
+before relying on availability.
 
 Install and verify it from the repository root:
 
