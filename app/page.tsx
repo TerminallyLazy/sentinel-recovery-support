@@ -253,6 +253,10 @@ export default function Home() {
                 <dt>Block time</dt>
                 <dd>{samplePreview.observation.blockTimestampUtc}</dd>
               </div>
+              <div className="sample-wide">
+                <dt>Block hash</dt>
+                <dd>{samplePreview.observation.blockHash}</dd>
+              </div>
               <div>
                 <dt>Native ETH value field</dt>
                 <dd>{samplePreview.transaction.valueEth} ETH</dd>
@@ -260,6 +264,10 @@ export default function Home() {
               <div>
                 <dt>Confirmations at generation</dt>
                 <dd>{samplePreview.observation.confirmationsAtGeneration}</dd>
+              </div>
+              <div className="sample-wide">
+                <dt>Generated</dt>
+                <dd>{samplePreview.generatedAtUtc}</dd>
               </div>
               <div className="sample-wide">
                 <dt>Transaction</dt>
@@ -291,6 +299,9 @@ export default function Home() {
               <p>{samplePreview.recommendedNextStep}</p>
             </div>
             <div className="sample-links">
+              <a className="sample-request-link" href={serviceRequestUrl("Evidence Preview")}>
+                Request $99 Evidence Preview
+              </a>
               <a href={samplePreview.sources.block} rel="noreferrer" target="_blank">
                 Verify cited block
               </a>

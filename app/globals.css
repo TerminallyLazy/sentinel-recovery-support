@@ -461,6 +461,10 @@ nav a:hover {
   background: var(--paper);
 }
 
+.service-sample-link:focus-visible {
+  outline-color: var(--ink);
+}
+
 .service-cta {
   display: inline-flex;
   min-height: 46px;
@@ -656,6 +660,17 @@ nav a:hover {
 .sample-links a:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+
+.sample-links .sample-request-link {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.sample-links .sample-request-link:hover {
+  background: var(--paper);
+  color: var(--ink);
 }
 
 .terms-section {

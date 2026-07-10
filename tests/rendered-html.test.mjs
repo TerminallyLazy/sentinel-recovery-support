@@ -344,6 +344,13 @@ test("publishes an inspectable Evidence Preview sample before payment", async ()
     html,
     /0x9cd477a715e8af4b3d10cc74abc578d395e86c7d3c0747157b1fc14d975b44bf/i,
   );
+  assert.match(html, new RegExp(sample.observation.blockHash, "i"));
+  assert.match(html, new RegExp(sample.generatedAtUtc.replaceAll(".", "\\.")));
+  const pageSource = await readFile(new URL("app/page.tsx", root), "utf8");
+  assert.match(
+    pageSource,
+    /className="sample-request-link" href=\{serviceRequestUrl\("Evidence Preview"\)\}/,
+  );
   assert.ok(sample);
   assert.equal(sample.demonstration, true);
   assert.equal(sample.observation.network, "ethereum-mainnet");
