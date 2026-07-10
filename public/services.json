@@ -22,15 +22,15 @@
       "turnaroundBusinessDays": 1,
       "turnaroundLabel": "Target within 1 business day after verified payment and complete public inputs.",
       "requiredInputs": [
-        "one public HTTPS agent, payment, or support manifest URL",
-        "reachable email address"
+        "one public HTTPS input: an agent, payment, or support manifest; a static JSON, Markdown, or text document; or an unauthenticated x402 resource URL whose current HTTP 402 response supplies PaymentRequired",
+        "reachable email address only when using email transport"
       ],
       "optionalInputs": [
-        "one additional public specification URL",
+        "one additional public manifest, static document, or unauthenticated x402 resource URL",
         "target agent framework or payment protocol",
         "one specific authority or payment-boundary question"
       ],
-      "scopeLabel": "Up to two public JSON, Markdown, or text documents totaling at most 100 KB; no private repositories, credentialed endpoints, code execution, or security certification.",
+      "scopeLabel": "Up to two public HTTPS inputs totaling at most 100 KB: static JSON, Markdown, or text documents, or unauthenticated x402 resource URLs whose current HTTP 402 response supplies PaymentRequired; no private repositories, credentialed endpoints, PaymentPayload, signature headers, keys, wallet connections, code execution, or security certification.",
       "scope": {
         "maxPublicDocuments": 2,
         "maxCombinedBytes": 100000
@@ -48,7 +48,7 @@
       "verifiesIdentityOrWalletOwnership": false,
       "requiredInputs": [
         "Ethereum Mainnet transaction hash",
-        "reachable email address"
+        "reachable email address only when using email transport"
       ],
       "optionalInputs": [
         "claimant's stated role or relationship to the transaction",
@@ -74,7 +74,7 @@
       "turnaroundLabel": "Target within 2 business days after verified payment and complete public inputs.",
       "requiredInputs": [
         "Ethereum Mainnet transaction hash",
-        "reachable email address"
+        "reachable email address only when using email transport"
       ],
       "optionalInputs": [
         "claimant's stated role or relationship to the transaction",
@@ -99,7 +99,7 @@
       "turnaroundLabel": "Target within 3 business days after verified payment and complete public inputs.",
       "requiredInputs": [
         "Ethereum Mainnet transaction hash",
-        "reachable email address"
+        "reachable email address only when using email transport"
       ],
       "optionalInputs": [
         "claimant's stated role or relationship to the transaction",

@@ -5,8 +5,9 @@
   "contact": "sentinel@genesysx.org",
   "collection": {
     "required": [
-      "Ethereum Mainnet transaction hash",
-      "reply email address supplied by the sender's email client"
+      "selected service ID and request transport",
+      "one or two public HTTPS manifests, static documents, or unauthenticated x402 resource URLs for the Agent Payment Boundary Review, or one Ethereum Mainnet transaction hash for case services",
+      "reply email address only for email transport"
     ],
     "optional": [
       "stated role or relationship to the transaction",
@@ -40,6 +41,8 @@
     "sendPublicFactsOnly": true,
     "doNotSend": [
       "identity documents",
+      "PaymentPayload",
+      "signature headers",
       "private keys",
       "seed phrases",
       "wallet connections",

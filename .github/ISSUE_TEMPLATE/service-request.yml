@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        This issue is public. Share public facts only. Do not include identity documents, confidential material, credentials, private keys, seed phrases, wallet connections, or signatures.
+        This issue is public. Share public facts only. Do not include identity documents, confidential material, credentials, PaymentPayload, signature headers, private keys, seed phrases, wallet connections, or signatures.
 
         This request moves no funds and authorizes no payment. Wait for a complete written quote before any payment.
 
@@ -32,9 +32,9 @@ body:
   - type: textarea
     id: public_document_urls
     attributes:
-      label: Public manifest URLs
-      description: Required for an Agent Payment Boundary Review. Provide one or two public HTTPS JSON, Markdown, or text URLs.
-      placeholder: https://example.com/agent-manifest.json
+      label: Public manifest, document, or x402 resource URLs
+      description: Required for this review. Provide 1–2 public HTTPS documents or public unauthenticated x402 resource URLs whose current HTTP 402 supplies PaymentRequired. Do not provide credentialed endpoints.
+      placeholder: https://example.com/protected-resource
 
   - type: textarea
     id: specific_question
@@ -62,7 +62,7 @@ body:
     attributes:
       label: Request boundaries
       options:
-        - label: I am sharing public facts only and have excluded identity documents, confidential material, credentials, keys, wallet connections, and signatures.
+        - label: I am sharing public facts only and have excluded identity documents, confidential material, credentials, PaymentPayload, signature headers, keys, wallet connections, and signatures.
           required: true
         - label: I understand this request moves no funds and authorizes no payment.
           required: true

@@ -592,6 +592,14 @@ test("publishes a fixed-scope paid evidence funnel", async () => {
     services.offerings.every(({ chainId }) => chainId === 1),
     "expected every paid offering to be Ethereum Mainnet only",
   );
+  assert.ok(
+    services.offerings.every(({ requiredInputs }) =>
+      requiredInputs.includes(
+        "reachable email address only when using email transport",
+      ),
+    ),
+    "expected every paid offering to make email conditional on email transport",
+  );
   assert.equal(services.payment.sendOnlyAfterWrittenConfirmation, true);
   assert.equal(services.payment.directPaymentFromThisPageEnabled, false);
   assert.equal(
@@ -629,8 +637,8 @@ test("publishes a fixed-scope payment-boundary review for agent builders", async
   assert.ok(offer, "expected the agent payment boundary review offer");
   assert.equal(offer.priceUsd, 49);
   assert.deepEqual(offer.requiredInputs, [
-    "one public HTTPS agent, payment, or support manifest URL",
-    "reachable email address",
+    "one public HTTPS input: an agent, payment, or support manifest; a static JSON, Markdown, or text document; or an unauthenticated x402 resource URL whose current HTTP 402 response supplies PaymentRequired",
+    "reachable email address only when using email transport",
   ]);
   assert.deepEqual(offer.scope, {
     maxPublicDocuments: 2,
@@ -652,6 +660,85 @@ test("publishes a fixed-scope payment-boundary review for agent builders", async
   );
   assert.ok(agentCondition, "expected agent-review conditional inputs");
   assert.deepEqual(agentCondition.then.required, ["publicDocumentUrls"]);
+});
+
+test("accepts a public unauthenticated x402 resource as a review input", async () => {
+  const [response, services, request, privacy, template] = await Promise.all([
+    render(),
+    readJson("public/services.json"),
+    readJson("public/service-request.json"),
+    readJson("public/privacy.json"),
+    readText(".github/ISSUE_TEMPLATE/service-request.yml"),
+  ]);
+  const html = await response.text();
+  const offer = services.offerings.find(
+    ({ id }) => id === "agent-payment-boundary-review",
+  );
+  const publicInputs = request.requestSchema.properties.publicDocumentUrls;
+  const githubTransport = request.alternateTransports.find(
+    ({ id }) => id === "github-issue",
+  );
+
+  assert.match(offer.requiredInputs[0], /unauthenticated x402 resource URL/i);
+  assert.match(
+    offer.requiredInputs[0],
+    /current HTTP 402 response supplies PaymentRequired/i,
+  );
+  assert.match(offer.optionalInputs[0], /unauthenticated x402 resource URL/i);
+  assert.match(
+    offer.scopeLabel,
+    /current HTTP 402 response supplies PaymentRequired/i,
+  );
+  assert.match(offer.scopeLabel, /no .*credentialed endpoints/i);
+  assert.match(offer.scopeLabel, /PaymentPayload\b/i);
+  assert.match(offer.scopeLabel, /signature headers/i);
+  assert.match(offer.scopeLabel, /wallet connections/i);
+
+  assert.equal(publicInputs.minItems, 1);
+  assert.equal(publicInputs.maxItems, 2);
+  assert.equal(publicInputs.uniqueItems, true);
+  assert.equal(publicInputs.items.format, "uri");
+  assert.equal(publicInputs.items.pattern, "^https://");
+  assert.match(publicInputs.description, /static JSON, Markdown, or text document/i);
+  assert.match(publicInputs.description, /public unauthenticated x402 resource URL/i);
+  assert.match(
+    publicInputs.description,
+    /current HTTP 402 response supplies PaymentRequired/i,
+  );
+  assert.match(publicInputs.description, /Do not provide credentialed endpoints/i);
+  assert.ok(request.safety.forbiddenInputs.includes("PaymentPayload"));
+  assert.ok(request.safety.forbiddenInputs.includes("signature headers"));
+
+  const requiredCollection = privacy.collection.required.join(" ");
+  assert.match(requiredCollection, /x402 resource URLs/i);
+  assert.match(requiredCollection, /transaction hash for case services/i);
+  assert.match(requiredCollection, /reply email address.*email transport/i);
+  assert.ok(privacy.security.doNotSend.includes("PaymentPayload"));
+  assert.ok(privacy.security.doNotSend.includes("signature headers"));
+
+  assert.match(
+    request.transport.bodyTemplate,
+    /Public manifest, document, or x402 resource URL\(s\) \(agent review\)/i,
+  );
+  assert.match(request.transport.bodyTemplate, /PaymentPayload\b/i);
+  assert.match(request.transport.bodyTemplate, /signature headers/i);
+  assert.match(
+    githubTransport.bodyTemplate,
+    /Public manifest, document, or x402 resource URL\(s\) \(agent review\)/i,
+  );
+  assert.match(
+    template,
+    /label: Public manifest, document, or x402 resource URLs/i,
+  );
+  assert.match(template, /public unauthenticated x402 resource URL/i);
+  assert.match(template, /Do not provide credentialed endpoints/i);
+  assert.match(template, /PaymentPayload\b/i);
+  assert.match(template, /signature headers/i);
+
+  assert.match(
+    html.replace(/<[^>]*>/g, ""),
+    /current HTTP 402 response supplies PaymentRequired/i,
+  );
 });
 
 test("publishes an inspectable Agent Payment Boundary Review sample before payment", async () => {
@@ -839,7 +926,7 @@ test("publishes a public GitHub issue transport for quote requests", async () =>
     templatePath: ".github/ISSUE_TEMPLATE/service-request.yml",
     titleTemplate: "Sentinel quote request: {serviceId}",
     bodyTemplate:
-      "Sentinel Recovery service request\nService ID: {serviceId}\nRequest transport: github-issue\nNetwork: Ethereum Mainnet (chain ID {chainId})\nEthereum Mainnet transaction hash (case services): {transactionHash}\nPublic manifest URL(s) (agent review): {publicDocumentUrls}\nSpecific question or intended use (optional): {intendedUse}\nPreferred output format (optional — HTML or Markdown): {preferredFormat}\nTiming need (optional): {timingNeed}\n\nThis is a quote request only. It moves no funds and authorizes no payment. Do not begin work or pay until Sentinel replies in this issue with a complete written quote.\nThis issue is public. Do not include identity documents, confidential material, credentials, private keys, seed phrases, wallet signatures, or wallet connections.",
+      "Sentinel Recovery service request\nService ID: {serviceId}\nRequest transport: github-issue\nNetwork: Ethereum Mainnet (chain ID {chainId})\nEthereum Mainnet transaction hash (case services): {transactionHash}\nPublic manifest, document, or x402 resource URL(s) (agent review): {publicDocumentUrls}\nSpecific question or intended use (optional): {intendedUse}\nPreferred output format (optional — HTML or Markdown): {preferredFormat}\nTiming need (optional): {timingNeed}\n\nThis is a quote request only. It moves no funds and authorizes no payment. Do not begin work or pay until Sentinel replies in this issue with a complete written quote.\nThis issue is public. Do not include identity documents, confidential material, credentials, PaymentPayload, signature headers, private keys, seed phrases, wallet signatures, or wallet connections.",
     authentication: "requester-owned-github-credential",
     sentinelRequestsCredential: false,
     responseChannel: "created-issue",
