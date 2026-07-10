@@ -38,6 +38,12 @@
       "recoveryGuarantee": false,
       "refundable": false
     },
-    "financialActionRequiresExplicitHumanAuthorization": true
+    "authorization": {
+      "payerAgentMaySendWithinDelegatedAuthority": true,
+      "payerAgentMustFollowOwnPolicy": true,
+      "recipientHumanAcceptanceRequired": false,
+      "inboundReceiptMayBeObservedAutomatically": true,
+      "outboundWalletActionRequiresHumanAuthorization": true
+    }
   }
 }

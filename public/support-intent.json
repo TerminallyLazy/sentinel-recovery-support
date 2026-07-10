@@ -52,7 +52,6 @@
     ]
   },
   "authorization": {
-    "autonomousExecutionAllowed": true,
     "payerAgentMaySendWithinDelegatedAuthority": true,
     "payerAgentMustFollowOwnPolicy": true,
     "recipientHumanAcceptanceRequired": false,
