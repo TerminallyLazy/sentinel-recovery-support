@@ -178,6 +178,68 @@ test("publishes canonical GitHub Pages interfaces for agents", async () => {
   assert.doesNotMatch(llms, /\]\(\/(?:\.well-known|agent-guide|llms|support)/);
 });
 
+test("publishes a source-installable read-only MCP resource adapter", async () => {
+  const [manifest, mcpPackage, mcpReadme, readme, workflow, serverSource] =
+    await Promise.all([
+      readJson("public/.well-known/sentinel-agent.json"),
+      readJson("mcp/package.json"),
+      readText("mcp/README.md"),
+      readText("README.md"),
+      readText(".github/workflows/deploy-pages.yml"),
+      readText("mcp/server.mjs"),
+    ]);
+
+  assert.deepEqual(manifest.mcp, {
+    transport: "stdio",
+    distributionStatus: "source-only",
+    remoteEndpointAvailable: false,
+    source: {
+      repository:
+        "https://github.com/TerminallyLazy/sentinel-recovery-support",
+      path: "mcp",
+      workingDirectory: "mcp",
+      installCommand: "npm ci --ignore-scripts",
+      startCommand: "node server.mjs",
+    },
+    capabilities: {
+      tools: [],
+      resources: [
+        {
+          uri: "sentinel://services/catalog",
+          sourceUrl: `${siteBase}services.json`,
+        },
+        {
+          uri: "sentinel://services/quote-request-contract",
+          sourceUrl: `${siteBase}service-request.json`,
+        },
+      ],
+    },
+    safety: {
+      readOnly: true,
+      movesFunds: false,
+      submitsQuoteRequest: false,
+      authorizesPayment: false,
+      requestsCredentials: false,
+    },
+  });
+  assert.equal(mcpPackage.name, "sentinel-recovery-mcp");
+  assert.equal(
+    mcpPackage.mcpName,
+    "io.github.terminallylazy/sentinel-recovery-services",
+  );
+  assert.equal(mcpPackage.license, "UNLICENSED");
+  assert.match(mcpReadme, /source-only/i);
+  assert.match(mcpReadme, /sentinel:\/\/services\/catalog/);
+  assert.match(mcpReadme, /moves no funds/i);
+  assert.match(readme, /npm ci --prefix mcp --ignore-scripts/);
+  assert.match(readme, /node.*mcp\/server\.mjs/);
+  assert.match(workflow, /npm ci --prefix mcp --ignore-scripts/);
+  assert.match(workflow, /npm test --prefix mcp/);
+  assert.match(workflow, /npm audit --prefix mcp --audit-level=high/);
+  assert.match(workflow, /npm run pack:check --prefix mcp/);
+  assert.doesNotMatch(serverSource, /registerTool/);
+});
+
 test("advertises an actionable paid-service request capability", async () => {
   const manifest = await readJson("public/.well-known/sentinel-agent.json");
   const capability = manifest.capabilities.find(

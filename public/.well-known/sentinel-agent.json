@@ -29,6 +29,38 @@
       "outboundUseOfFundsRequiresHumanAuthorization": true
     }
   },
+  "mcp": {
+    "transport": "stdio",
+    "distributionStatus": "source-only",
+    "remoteEndpointAvailable": false,
+    "source": {
+      "repository": "https://github.com/TerminallyLazy/sentinel-recovery-support",
+      "path": "mcp",
+      "workingDirectory": "mcp",
+      "installCommand": "npm ci --ignore-scripts",
+      "startCommand": "node server.mjs"
+    },
+    "capabilities": {
+      "tools": [],
+      "resources": [
+        {
+          "uri": "sentinel://services/catalog",
+          "sourceUrl": "https://terminallylazy.github.io/sentinel-recovery-support/services.json"
+        },
+        {
+          "uri": "sentinel://services/quote-request-contract",
+          "sourceUrl": "https://terminallylazy.github.io/sentinel-recovery-support/service-request.json"
+        }
+      ]
+    },
+    "safety": {
+      "readOnly": true,
+      "movesFunds": false,
+      "submitsQuoteRequest": false,
+      "authorizesPayment": false,
+      "requestsCredentials": false
+    }
+  },
   "capabilities": [
     {
       "id": "surface_support_option",
