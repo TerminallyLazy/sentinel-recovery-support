@@ -1,0 +1,43 @@
+{
+  "name": "sentinel-recovery-mcp",
+  "version": "0.1.0",
+  "description": "Read-only MCP resources for Sentinel Recovery's public service and quote-request contracts.",
+  "type": "module",
+  "bin": {
+    "sentinel-recovery-mcp": "server.mjs"
+  },
+  "files": [
+    "README.md",
+    "server.mjs"
+  ],
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test server.test.mjs",
+    "pack:check": "npm pack --dry-run"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "mcpName": "io.github.terminallylazy/sentinel-recovery-services",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TerminallyLazy/sentinel-recovery-support.git",
+    "directory": "mcp"
+  },
+  "homepage": "https://terminallylazy.github.io/sentinel-recovery-support/",
+  "bugs": {
+    "url": "https://github.com/TerminallyLazy/sentinel-recovery-support/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ai-agents",
+    "ethereum",
+    "payment-boundaries"
+  ],
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "zod": "4.4.3"
+  }
+}

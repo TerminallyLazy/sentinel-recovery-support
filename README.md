@@ -25,6 +25,45 @@ The site exposes a human-readable funding page, `$49/$99/$199` public-data servi
 - `/agent-guide.md` — mandatory agent authority boundaries
 - `/impact.json` — historical receipt and contribution-funded-work snapshot
 - `/llms.txt` — short discovery index
+- `mcp/` — source-installable, read-only stdio MCP adapter for the live service catalog and quote-request contract; this is repository source, not a hosted Pages endpoint or published package
+
+## Local MCP resources
+
+The MCP adapter exposes exactly two read-only resources and no tools:
+
+- `sentinel://services/catalog`
+- `sentinel://services/quote-request-contract`
+
+It fetches and validates the canonical live JSON contracts. It cannot submit a
+request, move funds, authorize payment, request credentials, or perform wallet
+actions.
+
+Install and verify it from the repository root:
+
+```bash
+npm ci --prefix mcp --ignore-scripts
+npm test --prefix mcp
+npm audit --prefix mcp --audit-level=high
+npm run pack:check --prefix mcp
+```
+
+Configure an MCP client to launch the source checkout over stdio, replacing the
+path with the absolute path on that machine:
+
+```json
+{
+  "mcpServers": {
+    "sentinel-recovery-services": {
+      "command": "node",
+      "args": ["/absolute/path/to/sentinel-recovery-support/mcp/server.mjs"]
+    }
+  }
+}
+```
+
+Direct launch uses `node mcp/server.mjs`. Do not configure the GitHub Pages URL
+as an MCP endpoint: the static site does not implement Streamable HTTP. The npm
+package is not published yet, so no `npx` installation is advertised.
 
 ## Local development
 
