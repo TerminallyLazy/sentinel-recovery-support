@@ -1,8 +1,15 @@
 {
   "schemaVersion": "1.0",
   "status": "active",
+  "publishedAt": "2026-07-10T06:43:22Z",
   "canonicalUrl": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
   "sourceUrl": "https://github.com/TerminallyLazy/sentinel-recovery-support/blob/main/public/service-payment.json",
+  "integrity": {
+    "algorithm": "sha256",
+    "representation": "raw-file-bytes",
+    "digestUrl": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json.sha256",
+    "sourceHistoryUrl": "https://github.com/TerminallyLazy/sentinel-recovery-support/commits/main/public/service-payment.json"
+  },
   "serviceCatalog": "https://terminallylazy.github.io/sentinel-recovery-support/services.json",
   "serviceRequestContract": "https://terminallylazy.github.io/sentinel-recovery-support/service-request.json",
   "network": {
@@ -51,6 +58,19 @@
       "turnaround",
       "cancellationAndRefundTerms"
     ],
+    "identifierRules": {
+      "quoteId": {
+        "format": "uuid-v4",
+        "unique": true,
+        "immutable": true
+      },
+      "paymentReference": {
+        "format": "uuid-v4",
+        "unique": true,
+        "singleUse": true,
+        "boundToQuoteId": true
+      }
+    },
     "paymentStartsWorkOnlyAfterReceiptVerification": true,
     "acceptedPaymentCreatesEntitlementToConfirmedDeliverable": true
   },
@@ -70,10 +90,91 @@
     "recipientHumanAcceptanceRequired": false,
     "inboundReceiptMayBeObservedAutomatically": true,
     "outboundWalletActionRequiresHumanAuthorization": true,
-    "autonomousAgentPaymentAllowed": true,
+    "autonomousPayment": {
+      "metadataExpandsPayerAuthority": false,
+      "allowedOnlyWhen": {
+        "completeWrittenQuotePresent": true,
+        "quoteNotExpired": true,
+        "payerPolicyApprovesExactQuote": true
+      },
+      "requiredPolicyBindings": [
+        "quoteId",
+        "serviceId",
+        "asset",
+        "amountBaseUnits",
+        "chainId",
+        "recipient",
+        "paymentReference",
+        "expiresAt"
+      ]
+    },
     "recipientAgentMaySpend": false,
     "recipientAgentMaySignOutboundTransaction": false,
     "recipientAgentMayBroadcastOutboundTransaction": false
+  },
+  "reconciliation": {
+    "idempotencyTuple": [
+      "quoteId",
+      "paymentReference",
+      "chainId",
+      "recipient",
+      "asset",
+      "amountBaseUnits"
+    ],
+    "receiptIdentity": {
+      "nativeTuple": [
+        "chainId",
+        "transactionHash"
+      ],
+      "erc20Tuple": [
+        "chainId",
+        "transactionHash",
+        "logIndex"
+      ],
+      "uniqueAcrossQuotes": true,
+      "reuseHandling": "do-not-credit; manual-review"
+    },
+    "receiptStates": {
+      "pending": {
+        "terminal": false,
+        "reasonCodes": [
+          "transaction-not-observed",
+          "confirmation-depth-not-met",
+          "provider-timeout"
+        ]
+      },
+      "verified": {
+        "terminal": true,
+        "reasonCodes": [
+          "exact-quote-tuple-confirmed"
+        ]
+      },
+      "rejected": {
+        "terminal": true,
+        "reasonCodes": [
+          "wrong-chain",
+          "wrong-recipient",
+          "unsupported-asset",
+          "reverted-transaction"
+        ]
+      },
+      "manual-review": {
+        "terminal": false,
+        "reasonCodes": [
+          "duplicate",
+          "late",
+          "partial",
+          "overpayment",
+          "reorg-or-conflicting-evidence"
+        ]
+      }
+    },
+    "exceptionHandling": {
+      "duplicate": "do-not-credit-twice; manual-review",
+      "late": "do-not-start-work; manual-review",
+      "partial": "do-not-start-work; manual-review",
+      "overpayment": "do-not-expand-entitlement; manual-review"
+    }
   },
   "warnings": [
     "Do not pay from the voluntary-support page for a paid service.",

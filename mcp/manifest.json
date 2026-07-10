@@ -1,0 +1,58 @@
+{
+  "manifest_version": "0.3",
+  "name": "sentinel-agent-payment-boundary-preflight",
+  "display_name": "Sentinel Agent Payment Boundary Preflight",
+  "version": "0.2.0",
+  "description": "Deterministically inspect public agent and payment documents for authority, quote, replay, receipt, wallet-secret, and integrity boundaries.",
+  "long_description": "A read-only, deterministic preflight for one or two inline public JSON, Markdown, or text documents. It performs fixed checks, returns cited clear/ambiguous/missing findings, executes no supplied content, fetches no requester-controlled URL, moves no funds, and expands no payer authority. An optional fixed-scope review is available only through a separate quote-first process.",
+  "author": {
+    "name": "TerminallyLazy",
+    "url": "https://github.com/TerminallyLazy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TerminallyLazy/sentinel-recovery-support.git"
+  },
+  "homepage": "https://terminallylazy.github.io/sentinel-recovery-support/",
+  "documentation": "https://github.com/TerminallyLazy/sentinel-recovery-support/tree/main/mcp",
+  "support": "https://github.com/TerminallyLazy/sentinel-recovery-support/issues",
+  "server": {
+    "type": "node",
+    "entry_point": "server.mjs",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/server.mjs"
+      ],
+      "env": {}
+    }
+  },
+  "tools": [
+    {
+      "name": "preflight_agent_payment_boundary",
+      "description": "Inspect one or two inline public documents using 11 deterministic agent-payment boundary checks. No URL fetch, code execution, wallet access, request submission, or payment."
+    }
+  ],
+  "tools_generated": false,
+  "keywords": [
+    "ai-agents",
+    "ethereum",
+    "x402",
+    "payment-boundaries",
+    "wallet-authority",
+    "security"
+  ],
+  "privacy_policies": [
+    "https://terminallylazy.github.io/sentinel-recovery-support/privacy.json"
+  ],
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ],
+    "runtimes": {
+      "node": ">=20.0.0"
+    }
+  }
+}

@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
+
+import { preflightAgentPaymentBoundary } from "../mcp/preflight.mjs";
 
 const root = new URL("../", import.meta.url);
 const siteBase =
@@ -178,11 +181,12 @@ test("publishes canonical GitHub Pages interfaces for agents", async () => {
   assert.doesNotMatch(llms, /\]\(\/(?:\.well-known|agent-guide|llms|support)/);
 });
 
-test("publishes a source-installable read-only MCP resource adapter", async () => {
-  const [manifest, mcpPackage, mcpReadme, readme, workflow, serverSource] =
+test("publishes a source-installable deterministic MCP preflight", async () => {
+  const [manifest, mcpPackage, mcpBundle, mcpReadme, readme, workflow, serverSource] =
     await Promise.all([
       readJson("public/.well-known/sentinel-agent.json"),
       readJson("mcp/package.json"),
+      readJson("mcp/manifest.json"),
       readText("mcp/README.md"),
       readText("README.md"),
       readText(".github/workflows/deploy-pages.yml"),
@@ -202,7 +206,15 @@ test("publishes a source-installable read-only MCP resource adapter", async () =
       startCommand: "node server.mjs",
     },
     capabilities: {
-      tools: [],
+      tools: [
+        {
+          name: "preflight_agent_payment_boundary",
+          input: "one-or-two-inline-public-documents",
+          maxCombinedBytes: 102400,
+          networkRequests: false,
+          executesSuppliedContent: false,
+        },
+      ],
       resources: [
         {
           uri: "sentinel://services/catalog",
@@ -220,15 +232,24 @@ test("publishes a source-installable read-only MCP resource adapter", async () =
       submitsQuoteRequest: false,
       authorizesPayment: false,
       requestsCredentials: false,
+      connectsWallet: false,
     },
   });
   assert.equal(mcpPackage.name, "sentinel-recovery-mcp");
+  assert.equal(mcpPackage.version, "0.2.0");
   assert.equal(
     mcpPackage.mcpName,
     "io.github.terminallylazy/sentinel-recovery-services",
   );
   assert.equal(mcpPackage.license, "UNLICENSED");
+  assert.equal(mcpBundle.manifest_version, "0.3");
+  assert.equal(mcpBundle.version, "0.2.0");
+  assert.deepEqual(
+    mcpBundle.tools.map(({ name }) => name),
+    ["preflight_agent_payment_boundary"],
+  );
   assert.match(mcpReadme, /source-only/i);
+  assert.match(mcpReadme, /11 fixed checks/i);
   assert.match(mcpReadme, /sentinel:\/\/services\/catalog/);
   assert.match(mcpReadme, /moves no funds/i);
   assert.match(readme, /npm ci --prefix mcp --ignore-scripts/);
@@ -237,7 +258,52 @@ test("publishes a source-installable read-only MCP resource adapter", async () =
   assert.match(workflow, /npm test --prefix mcp/);
   assert.match(workflow, /npm audit --prefix mcp --audit-level=high/);
   assert.match(workflow, /npm run pack:check --prefix mcp/);
-  assert.doesNotMatch(serverSource, /registerTool/);
+  assert.match(workflow, /npm run mcpb:validate --prefix mcp/);
+  assert.match(serverSource, /registerTool/);
+});
+
+test("preflights the canonical agent and payment contracts conservatively", async () => {
+  const paths = [
+    "public/.well-known/sentinel-agent.json",
+    "public/service-payment.json",
+  ];
+  const documents = await Promise.all(
+    paths.map(async (path) => ({
+      name: path,
+      mediaType: "application/json",
+      content: await readFile(new URL(path, root), "utf8"),
+    })),
+  );
+
+  const result = preflightAgentPaymentBoundary({ documents });
+
+  assert.deepEqual(result.summary, { clear: 0, ambiguous: 11, missing: 0 });
+  assert.deepEqual(
+    result.findings
+      .filter(({ status }) => status === "ambiguous")
+      .map(({ id }) => id),
+    [
+      "APB-001",
+      "APB-002",
+      "APB-003",
+      "APB-004",
+      "APB-005",
+      "APB-006",
+      "APB-007",
+      "APB-008",
+      "APB-009",
+      "APB-010",
+      "APB-011",
+    ],
+  );
+  assert.ok(
+    result.findings.every(
+      ({ evidence }) =>
+        /^document-[12]$/.test(evidence.documentName) &&
+        evidence.excerpt.startsWith("matched:") &&
+        evidence.excerpt.length <= 180,
+    ),
+  );
 });
 
 test("advertises an actionable paid-service request capability", async () => {
@@ -517,9 +583,19 @@ test("publishes an inspectable Agent Payment Boundary Review sample before payme
     `${siteBase}service-payment.json`,
   ]);
   assert.ok(sample.findings.length >= 6);
-  assert.ok(sample.findings.some(({ status }) => status === "clear"));
-  assert.ok(sample.findings.some(({ status }) => status === "ambiguous"));
-  assert.ok(sample.findings.some(({ status }) => status === "missing"));
+  assert.ok(sample.findings.every(({ status }) => status === "clear"));
+  assert.deepEqual(
+    sample.findings
+      .filter(({ id }) => ["ABR-005", "ABR-006", "ABR-007", "ABR-008"].includes(id))
+      .map(({ status }) => status),
+    ["clear", "clear", "clear", "clear"],
+  );
+  assert.equal("priorityCorrections" in sample, false);
+  assert.deepEqual(sample.maintenanceChecks, [
+    "Keep autonomous payment eligibility bound to the complete unexpired quote and the payer's own policy.",
+    "Regenerate the raw-byte SHA-256 sidecar whenever the payment contract changes.",
+    "Preserve unique on-chain receipt identity, deterministic receipt states, and manual review for duplicate, late, partial, or excess payments.",
+  ]);
   assert.equal(
     sample.findings.find(({ id }) => id === "ABR-003").evidence.jsonPointer,
     "/authorization",
@@ -539,8 +615,8 @@ test("publishes an inspectable Agent Payment Boundary Review sample before payme
     markdown,
     new RegExp(sample.reviewedAtUtc.replaceAll(".", "\\.")),
   );
-  assert.match(markdown, /Ambiguous/);
-  assert.match(markdown, /Missing/);
+  assert.doesNotMatch(markdown, /\| ABR-00[5-8] .*\| (?:Ambiguous|Missing) \|/);
+  assert.match(markdown, /## Maintenance checks/);
   assert.equal(offer.sampleUrl, sampleUrl);
   assert.equal(
     offer.sampleMarkdownUrl,
@@ -781,7 +857,28 @@ test("publishes independently verifiable paid-service and privacy contracts", as
   assert.equal(payment.network.chainId, 1);
   assert.equal(payment.recipient.address, supportWallet);
   assert.equal(payment.verification.writtenEmailCannotChangeRecipient, true);
-  assert.equal(payment.authorization.autonomousAgentPaymentAllowed, true);
+  assert.equal(
+    "autonomousAgentPaymentAllowed" in payment.authorization,
+    false,
+  );
+  assert.deepEqual(payment.authorization.autonomousPayment, {
+    metadataExpandsPayerAuthority: false,
+    allowedOnlyWhen: {
+      completeWrittenQuotePresent: true,
+      quoteNotExpired: true,
+      payerPolicyApprovesExactQuote: true,
+    },
+    requiredPolicyBindings: [
+      "quoteId",
+      "serviceId",
+      "asset",
+      "amountBaseUnits",
+      "chainId",
+      "recipient",
+      "paymentReference",
+      "expiresAt",
+    ],
+  });
   assert.equal(
     payment.authorization.payerAgentMaySendWithinDelegatedAuthority,
     true,
@@ -830,6 +927,79 @@ test("publishes independently verifiable paid-service and privacy contracts", as
   );
 });
 
+test("publishes deterministic quote replay and receipt reconciliation rules", async () => {
+  const payment = await readJson("public/service-payment.json");
+
+  assert.deepEqual(payment.quote.identifierRules, {
+    quoteId: {
+      format: "uuid-v4",
+      unique: true,
+      immutable: true,
+    },
+    paymentReference: {
+      format: "uuid-v4",
+      unique: true,
+      singleUse: true,
+      boundToQuoteId: true,
+    },
+  });
+  assert.deepEqual(payment.reconciliation.idempotencyTuple, [
+    "quoteId",
+    "paymentReference",
+    "chainId",
+    "recipient",
+    "asset",
+    "amountBaseUnits",
+  ]);
+  assert.deepEqual(payment.reconciliation.receiptIdentity, {
+    nativeTuple: ["chainId", "transactionHash"],
+    erc20Tuple: ["chainId", "transactionHash", "logIndex"],
+    uniqueAcrossQuotes: true,
+    reuseHandling: "do-not-credit; manual-review",
+  });
+  assert.deepEqual(Object.keys(payment.reconciliation.receiptStates), [
+    "pending",
+    "verified",
+    "rejected",
+    "manual-review",
+  ]);
+  assert.equal(
+    payment.reconciliation.exceptionHandling.duplicate,
+    "do-not-credit-twice; manual-review",
+  );
+  assert.equal(
+    payment.reconciliation.exceptionHandling.late,
+    "do-not-start-work; manual-review",
+  );
+  assert.equal(
+    payment.reconciliation.exceptionHandling.partial,
+    "do-not-start-work; manual-review",
+  );
+  assert.equal(
+    payment.reconciliation.exceptionHandling.overpayment,
+    "do-not-expand-entitlement; manual-review",
+  );
+});
+
+test("publishes a current raw-byte digest for the payment contract", async () => {
+  const paymentBytes = await readFile(
+    new URL("public/service-payment.json", root),
+  );
+  const payment = JSON.parse(paymentBytes.toString("utf8"));
+  const digest = await readText("public/service-payment.json.sha256");
+  const expectedDigest = createHash("sha256").update(paymentBytes).digest("hex");
+
+  assert.match(payment.publishedAt, /^2026-07-10T\d{2}:\d{2}:\d{2}Z$/);
+  assert.deepEqual(payment.integrity, {
+    algorithm: "sha256",
+    representation: "raw-file-bytes",
+    digestUrl: `${siteBase}service-payment.json.sha256`,
+    sourceHistoryUrl:
+      "https://github.com/TerminallyLazy/sentinel-recovery-support/commits/main/public/service-payment.json",
+  });
+  assert.equal(digest?.trim(), `${expectedDigest}  service-payment.json`);
+});
+
 test("gates Pages deployment and avoids a generated Pages Router directory", async () => {
   const [workflow, exportScript, cleanScript, gitignore] = await Promise.all([
     readFile(new URL(".github/workflows/deploy-pages.yml", root), "utf8"),
@@ -844,6 +1014,8 @@ test("gates Pages deployment and avoids a generated Pages Router directory", asy
   assert.match(exportScript, /path\.join\(root, "\.pages-artifact"\)/);
   assert.match(exportScript, /JSON\.parse/);
   assert.match(exportScript, /service-request\.json/);
+  assert.match(exportScript, /service-payment\.json\.sha256/);
+  assert.match(exportScript, /createHash\("sha256"\)/);
   assert.ok(
     (exportScript.match(/sample-agent-payment-boundary-review\.json/g) ?? [])
       .length >= 3,

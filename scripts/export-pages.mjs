@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -115,9 +116,23 @@ for (const requiredText of [
   "llms.txt",
   "sample-agent-payment-boundary-review.md",
   "sample-evidence-preview.md",
+  "service-payment.json.sha256",
   "robots.txt",
 ]) {
   await readFile(path.join(output, requiredText), "utf8");
+}
+
+const paymentBytes = await readFile(path.join(output, "service-payment.json"));
+const paymentDigest = await readFile(
+  path.join(output, "service-payment.json.sha256"),
+  "utf8",
+);
+const expectedPaymentDigest = `${createHash("sha256")
+  .update(paymentBytes)
+  .digest("hex")}  service-payment.json`;
+
+if (paymentDigest.trim() !== expectedPaymentDigest) {
+  throw new Error("Static export contains a stale service-payment SHA-256 digest");
 }
 
 console.log(`Exported GitHub Pages bundle to ${output}`);

@@ -1,19 +1,21 @@
 {
   "name": "sentinel-recovery-mcp",
-  "version": "0.1.0",
-  "description": "Read-only MCP resources for Sentinel Recovery's public service and quote-request contracts.",
+  "version": "0.2.0",
+  "description": "Deterministic agent payment-boundary preflight plus read-only Sentinel Recovery service resources.",
   "type": "module",
   "bin": {
     "sentinel-recovery-mcp": "server.mjs"
   },
   "files": [
     "README.md",
+    "preflight.mjs",
     "server.mjs"
   ],
   "scripts": {
     "start": "node server.mjs",
     "test": "node --test server.test.mjs",
-    "pack:check": "npm pack --dry-run"
+    "pack:check": "npm pack --dry-run",
+    "mcpb:validate": "npx --yes @anthropic-ai/mcpb@2.1.2 validate manifest.json"
   },
   "engines": {
     "node": ">=20"

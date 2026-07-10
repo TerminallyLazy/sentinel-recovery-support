@@ -1,0 +1,5 @@
+server.test.mjs
+* 2.*
+server.json
+*.mcpb
+*.tgz
