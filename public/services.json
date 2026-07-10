@@ -41,7 +41,8 @@
       "priceUsd": 99,
       "chainId": 1,
       "summary": "Summarize the public facts for one Ethereum Mainnet transaction.",
-      "deliverable": "One-page transaction summary, balances observed at a cited block number and UTC timestamp, public source links, explicit unknowns, and a recommended next step including stop when appropriate.",
+      "deliverable": "One-page transaction summary, recipient end-of-block balance and bytecode observation pinned to a cited block hash and number with UTC timestamp, public source links, explicit unknowns, and a recommended next step including stop when appropriate.",
+      "sampleUrl": "https://terminallylazy.github.io/sentinel-recovery-support/sample-evidence-preview.json",
       "turnaroundBusinessDays": 2,
       "turnaroundLabel": "Target within 2 business days after verified payment and complete public inputs.",
       "requiredInputs": [

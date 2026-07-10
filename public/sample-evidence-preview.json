@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0",
+  "kind": "ethereum-evidence-preview",
+  "demonstration": true,
+  "generatedAtUtc": "2026-07-10T01:19:13.458Z",
+  "observation": {
+    "network": "ethereum-mainnet",
+    "chainId": 1,
+    "blockNumber": 25498695,
+    "blockHash": "0xf91aa70ffa4a51f94116cc374824212e6c968fa2b75d0e91544808d0e4815bed",
+    "blockTimestampUtc": "2026-07-10T00:46:23.000Z",
+    "latestBlockNumberAtGeneration": 25498859,
+    "confirmationsAtGeneration": 165
+  },
+  "transaction": {
+    "hash": "0x9cd477a715e8af4b3d10cc74abc578d395e86c7d3c0747157b1fc14d975b44bf",
+    "status": "success",
+    "indexInBlock": 2,
+    "from": "0x3AD5BE1eC9E14C88D1557C634139F3a6e2bbDE8c",
+    "to": "0xe2a80391Bd84d790FE9C620a3e44159f1153D463",
+    "valueWei": "1638735993766276",
+    "valueEth": "0.001638735993766276",
+    "gasUsed": "21000",
+    "hasInputData": false
+  },
+  "recipientState": {
+    "address": "0xe2a80391Bd84d790FE9C620a3e44159f1153D463",
+    "observedAtBlockNumber": 25498695,
+    "observedAtBlockHash": "0xf91aa70ffa4a51f94116cc374824212e6c968fa2b75d0e91544808d0e4815bed",
+    "endOfBlockBalanceWei": "2764070716412764",
+    "endOfBlockBalanceEth": "0.002764070716412764",
+    "bytecodeObservation": "no-bytecode-observed",
+    "stateRead": {
+      "balanceMethod": "eth_getBalance",
+      "codeMethod": "eth_getCode",
+      "blockParameter": {
+        "blockHash": "0xf91aa70ffa4a51f94116cc374824212e6c968fa2b75d0e91544808d0e4815bed",
+        "requireCanonical": true
+      }
+    }
+  },
+  "sources": {
+    "transaction": "https://etherscan.io/tx/0x9cd477a715e8af4b3d10cc74abc578d395e86c7d3c0747157b1fc14d975b44bf",
+    "block": "https://eth.blockscout.com/block/0xf91aa70ffa4a51f94116cc374824212e6c968fa2b75d0e91544808d0e4815bed",
+    "sender": "https://etherscan.io/address/0x3AD5BE1eC9E14C88D1557C634139F3a6e2bbDE8c",
+    "recipient": "https://etherscan.io/address/0xe2a80391Bd84d790FE9C620a3e44159f1153D463"
+  },
+  "explicitUnknowns": [
+    "Control of the sender and recipient addresses is not verified.",
+    "The purpose of the transaction is unknown.",
+    "Whether the transfer was intended or mistaken is unknown.",
+    "Recovery feasibility has not been assessed.",
+    "Only the native ETH value field is reported; token logs, internal calls, and contract effects were not decoded.",
+    "Recipient balance and bytecode are end-of-block observations and may include effects from other transactions in the same block."
+  ],
+  "recommendedNextStep": "No further paid work is recommended from this demonstration alone. A claimant should first confirm relevance and provide only public context.",
+  "disclaimer": "Public format demonstration only. This is not a customer case and is not evidence of accident, ownership, wrongdoing, or recoverability."
+}

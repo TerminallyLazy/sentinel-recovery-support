@@ -1,6 +1,7 @@
 import { CopyValue, SupportActions } from "./SupportActions";
 import { ASSETS, SUPPORT_WALLET } from "./support-data";
 import servicesCatalog from "../public/services.json";
+import samplePreview from "../public/sample-evidence-preview.json";
 
 const projectUrl =
   "https://github.com/TerminallyLazy/sentinel-recovery-support/tree/main";
@@ -19,7 +20,7 @@ const workstreams = [
   {
     index: "02",
     title: "Agent-safe handoffs",
-    body: "Maintain public instructions that require human authorization before case submission or any wallet action.",
+    body: "Keep payer delegation separate from the human-only boundary on every outbound action from Sentinel's wallet.",
   },
   {
     index: "03",
@@ -128,7 +129,7 @@ export default function Home() {
           <strong>ETHEREUM / 1</strong>
         </div>
         <div>
-          <span className="status-label">WALLET ACTION</span>
+          <span className="status-label">OUTBOUND WALLET</span>
           <strong>HUMAN AUTHORIZATION</strong>
         </div>
         <div>
@@ -181,9 +182,16 @@ export default function Home() {
                 <span>DELIVERY TARGET</span>
                 <p>{service.turnaroundLabel}</p>
               </div>
-              <a className="service-cta" href={serviceRequestUrl(service.title)}>
-                Request ${service.priceUsd} {service.title}
-              </a>
+              <div className="service-actions">
+                {service.id === "evidence-preview" ? (
+                  <a className="service-sample-link" href="#sample-preview">
+                    View sample Evidence Preview
+                  </a>
+                ) : null}
+                <a className="service-cta" href={serviceRequestUrl(service.title)}>
+                  Request ${service.priceUsd} {service.title}
+                </a>
+              </div>
             </article>
           ))}
         </div>
@@ -209,6 +217,103 @@ export default function Home() {
           . Paid work never includes custody, key handling, transaction signing,
           identity attribution, legal or tax advice, or a recovery guarantee.
         </p>
+      </section>
+
+      <section className="section sample-section" id="sample-preview">
+        <div className="section-heading">
+          <p className="eyebrow">PUBLIC FORMAT DEMONSTRATION</p>
+          <h2>See the evidence before you pay.</h2>
+          <p>
+            This sample uses one ordinary public Ethereum transaction. It does
+            not claim the transfer was accidental, identify either party, or
+            imply that recovery is possible.
+          </p>
+        </div>
+
+        <div className="sample-layout">
+          <article className="sample-sheet" aria-labelledby="sample-title">
+            <div className="sample-banner">$99 EVIDENCE PREVIEW / SAMPLE</div>
+            <h3 id="sample-title">One transaction. One cited block.</h3>
+            <p className="sample-disclaimer">{samplePreview.disclaimer}</p>
+
+            <dl className="sample-facts">
+              <div>
+                <dt>Network</dt>
+                <dd>Ethereum Mainnet / {samplePreview.observation.chainId}</dd>
+              </div>
+              <div>
+                <dt>Status</dt>
+                <dd>{samplePreview.transaction.status}</dd>
+              </div>
+              <div>
+                <dt>Block</dt>
+                <dd>{samplePreview.observation.blockNumber}</dd>
+              </div>
+              <div>
+                <dt>Block time</dt>
+                <dd>{samplePreview.observation.blockTimestampUtc}</dd>
+              </div>
+              <div className="sample-wide">
+                <dt>Block hash</dt>
+                <dd>{samplePreview.observation.blockHash}</dd>
+              </div>
+              <div>
+                <dt>Native ETH value field</dt>
+                <dd>{samplePreview.transaction.valueEth} ETH</dd>
+              </div>
+              <div>
+                <dt>Confirmations at generation</dt>
+                <dd>{samplePreview.observation.confirmationsAtGeneration}</dd>
+              </div>
+              <div className="sample-wide">
+                <dt>Generated</dt>
+                <dd>{samplePreview.generatedAtUtc}</dd>
+              </div>
+              <div className="sample-wide">
+                <dt>Transaction</dt>
+                <dd>
+                  <a href={samplePreview.sources.transaction} rel="noreferrer" target="_blank">
+                    {samplePreview.transaction.hash}
+                  </a>
+                </dd>
+              </div>
+              <div className="sample-wide">
+                <dt>Recipient state at end of block {samplePreview.recipientState.observedAtBlockNumber}</dt>
+                <dd>
+                  {samplePreview.recipientState.endOfBlockBalanceEth} ETH / {samplePreview.recipientState.bytecodeObservation}
+                </dd>
+              </div>
+            </dl>
+          </article>
+
+          <aside className="sample-notes" aria-labelledby="unknowns-title">
+            <p className="eyebrow">EXPLICIT UNKNOWNS</p>
+            <h3 id="unknowns-title">What the chain cannot prove</h3>
+            <ul>
+              {samplePreview.explicitUnknowns.map((unknown) => (
+                <li key={unknown}>{unknown}</li>
+              ))}
+            </ul>
+            <div className="sample-next">
+              <span>RECOMMENDED NEXT STEP</span>
+              <p>{samplePreview.recommendedNextStep}</p>
+            </div>
+            <div className="sample-links">
+              <a className="sample-request-link" href={serviceRequestUrl("Evidence Preview")}>
+                Request $99 Evidence Preview
+              </a>
+              <a href={samplePreview.sources.block} rel="noreferrer" target="_blank">
+                Verify cited block
+              </a>
+              <a href="/sample-evidence-preview.json" rel="noreferrer" target="_blank">
+                Inspect source JSON
+              </a>
+              <a href="/sample-evidence-preview.md" rel="noreferrer" target="_blank">
+                Read Markdown deliverable
+              </a>
+            </div>
+          </aside>
+        </div>
       </section>
 
       <section className="section terms-section" id="terms">

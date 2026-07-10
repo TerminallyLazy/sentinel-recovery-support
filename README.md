@@ -17,6 +17,7 @@ The site exposes a human-readable funding page, `$49/$99/$199` public-data servi
 - `/support.json` — exact wallet, network, assets, and funding terms
 - `/support-intent.json` — direction-specific payer and receiving-wallet policy
 - `/services.json` — fixed-price scope, deliverable, and turnaround catalog
+- `/sample-evidence-preview.json` and `.md` — inspectable `$99` format demonstration
 - `/service-payment.json` — canonical recipient, assets, quote fields, and verification rules
 - `/privacy.json` — minimal inputs, optional context, retention, and do-not-send rules
 - `/agent-guide.md` — mandatory agent authority boundaries
