@@ -33,6 +33,32 @@
       "paidBySender": true,
       "estimateBeforeSending": true
     },
+    "paymentRequests": [
+      {
+        "id": "usdc-1-example",
+        "standard": "ERC-681",
+        "asset": "USDC",
+        "amount": "1",
+        "amountBaseUnits": "1000000",
+        "uri": "ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48@1/transfer?address=0x91bdE13382c3Ee082EE42a147DF54f6A6129a412&uint256=1000000",
+        "suggested": true,
+        "payerMayChangeOrDecline": true,
+        "requestMovesFunds": false,
+        "requiresPayerPolicyApproval": true
+      },
+      {
+        "id": "usdt-1-example",
+        "standard": "ERC-681",
+        "asset": "USDT",
+        "amount": "1",
+        "amountBaseUnits": "1000000",
+        "uri": "ethereum:0xdAC17F958D2ee523a2206206994597C13D831ec7@1/transfer?address=0x91bdE13382c3Ee082EE42a147DF54f6A6129a412&uint256=1000000",
+        "suggested": true,
+        "payerMayChangeOrDecline": true,
+        "requestMovesFunds": false,
+        "requiresPayerPolicyApproval": true
+      }
+    ],
     "suggestedExamples": [
       {
         "asset": "USDC",

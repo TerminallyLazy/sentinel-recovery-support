@@ -276,6 +276,14 @@ nav a:hover {
   color: var(--ink);
 }
 
+.payment-request-note {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
 .ownership-note {
   margin: 22px 0 0;
   padding-top: 18px;
