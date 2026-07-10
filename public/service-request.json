@@ -9,21 +9,20 @@
     "to": "sentinel@genesysx.org",
     "contentType": "text/plain",
     "subjectTemplate": "Sentinel service request: {serviceId}",
-    "bodyTemplate": "Sentinel Recovery service request\nService ID: {serviceId}\nNetwork: Ethereum Mainnet (chain ID {chainId})\nEthereum Mainnet transaction hash: {transactionHash}\nReply email: {replyEmail}\nClaimant role or relationship (optional): {claimantRole}\nIntended use (optional): {intendedUse}\nPreferred output format (optional — HTML or Markdown): {preferredFormat}\nTiming need (optional): {timingNeed}\n\nThis is a quote request only. Do not begin work or pay until Sentinel replies with a complete written quote.\nSend public facts only. Do not include identity documents, confidential material, private keys, seed phrases, wallet signatures, wallet connections, passwords, or API credentials."
+    "bodyTemplate": "Sentinel Recovery service request\nService ID: {serviceId}\nNetwork: Ethereum Mainnet (chain ID {chainId})\nEthereum Mainnet transaction hash (case services): {transactionHash}\nPublic manifest URL(s) (agent review): {publicDocumentUrls}\nReply email: {replyEmail}\nClaimant role or relationship (optional): {claimantRole}\nIntended use (optional): {intendedUse}\nPreferred output format (optional — HTML or Markdown): {preferredFormat}\nTiming need (optional): {timingNeed}\n\nThis is a quote request only. Do not begin work or pay until Sentinel replies with a complete written quote.\nSend public facts only. Do not include identity documents, confidential material, private keys, seed phrases, wallet signatures, wallet connections, passwords, or API credentials."
   },
   "requestSchema": {
     "type": "object",
     "additionalProperties": false,
     "required": [
       "serviceId",
-      "chainId",
-      "transactionHash",
       "replyEmail"
     ],
     "properties": {
       "serviceId": {
         "type": "string",
         "enum": [
+          "agent-payment-boundary-review",
           "claimant-context-intake",
           "evidence-preview",
           "trace-snapshot"
@@ -37,6 +36,18 @@
         "type": "string",
         "pattern": "^0x[0-9a-fA-F]{64}$",
         "description": "One public Ethereum Mainnet transaction hash."
+      },
+      "publicDocumentUrls": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 2,
+        "uniqueItems": true,
+        "items": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "description": "One or two public HTTPS JSON, Markdown, or text documents for the agent payment boundary review."
       },
       "replyEmail": {
         "type": "string",
@@ -60,7 +71,42 @@
       "timingNeed": {
         "type": "string"
       }
-    }
+    },
+    "allOf": [
+      {
+        "if": {
+          "properties": {
+            "serviceId": {
+              "const": "agent-payment-boundary-review"
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "publicDocumentUrls"
+          ]
+        }
+      },
+      {
+        "if": {
+          "properties": {
+            "serviceId": {
+              "enum": [
+                "claimant-context-intake",
+                "evidence-preview",
+                "trace-snapshot"
+              ]
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "chainId",
+            "transactionHash"
+          ]
+        }
+      }
+    ]
   },
   "workflow": {
     "expectedResponse": "A clarification request or complete written quote; an email request alone creates no service entitlement.",

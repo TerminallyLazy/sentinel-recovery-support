@@ -353,6 +353,22 @@ nav a:hover {
   border: 1px solid var(--ink);
 }
 
+.service-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.service-grid .service-card {
+  border-bottom: 1px solid var(--ink);
+}
+
+.service-grid .service-card:nth-child(even) {
+  border-right: 0;
+}
+
+.service-grid .service-card:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
 .work-card {
   min-height: 330px;
   padding: 30px;
@@ -966,6 +982,14 @@ footer p,
   }
 
   .work-card:last-child {
+    border-bottom: 0;
+  }
+
+  .service-grid .service-card {
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .service-grid .service-card:last-child {
     border-bottom: 0;
   }
 

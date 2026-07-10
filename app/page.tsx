@@ -37,6 +37,7 @@ const serviceRequestText = (serviceId: string) => {
     serviceId,
     chainId: "1",
     transactionHash: "",
+    publicDocumentUrls: "",
     replyEmail: "",
     claimantRole: "",
     intendedUse: "",

@@ -330,15 +330,21 @@ test("publishes a fixed-scope paid evidence funnel", async () => {
   assert.deepEqual(
     services.offerings.map(({ id, priceUsd }) => ({ id, priceUsd })),
     [
+      { id: "agent-payment-boundary-review", priceUsd: 49 },
       { id: "claimant-context-intake", priceUsd: 49 },
       { id: "evidence-preview", priceUsd: 99 },
       { id: "trace-snapshot", priceUsd: 199 },
     ],
   );
-  assert.equal(services.offerings[0].verifiesIdentityOrWalletOwnership, false);
-  assert.equal(services.offerings[1].turnaroundBusinessDays, 2);
-  assert.equal(services.offerings[2].scope.maxDirectOutboundTransfers, 25);
-  assert.equal(services.offerings[2].scope.maxHops, 1);
+  const claimant = services.offerings.find(
+    ({ id }) => id === "claimant-context-intake",
+  );
+  const preview = services.offerings.find(({ id }) => id === "evidence-preview");
+  const trace = services.offerings.find(({ id }) => id === "trace-snapshot");
+  assert.equal(claimant.verifiesIdentityOrWalletOwnership, false);
+  assert.equal(preview.turnaroundBusinessDays, 2);
+  assert.equal(trace.scope.maxDirectOutboundTransfers, 25);
+  assert.equal(trace.scope.maxHops, 1);
   assert.ok(
     services.offerings.every(({ chainId }) => chainId === 1),
     "expected every paid offering to be Ethereum Mainnet only",
@@ -366,6 +372,45 @@ test("publishes a fixed-scope paid evidence funnel", async () => {
   assert.doesNotMatch(pageSource, /const paidServices\s*=\s*\[/);
 });
 
+test("publishes a fixed-scope payment-boundary review for agent builders", async () => {
+  const [response, services, request] = await Promise.all([
+    render(),
+    readJson("public/services.json"),
+    readJson("public/service-request.json"),
+  ]);
+  const html = await response.text();
+  const offer = services.offerings.find(
+    ({ id }) => id === "agent-payment-boundary-review",
+  );
+
+  assert.ok(offer, "expected the agent payment boundary review offer");
+  assert.equal(offer.priceUsd, 49);
+  assert.deepEqual(offer.requiredInputs, [
+    "one public HTTPS agent, payment, or support manifest URL",
+    "reachable email address",
+  ]);
+  assert.deepEqual(offer.scope, {
+    maxPublicDocuments: 2,
+    maxCombinedBytes: 100000,
+  });
+  assert.match(offer.summary, /payer authority/i);
+  assert.match(offer.deliverable, /findings matrix/i);
+  assert.match(html, /Agent Payment Boundary Review/i);
+  assert.match(html.replace(/<[^>]*>/g, ""), /Open \$49 email draft/i);
+  assert.ok(
+    request.requestSchema.properties.serviceId.enum.includes(
+      "agent-payment-boundary-review",
+    ),
+  );
+  const agentCondition = request.requestSchema.allOf.find(
+    (rule) =>
+      rule.if?.properties?.serviceId?.const ===
+      "agent-payment-boundary-review",
+  );
+  assert.ok(agentCondition, "expected agent-review conditional inputs");
+  assert.deepEqual(agentCondition.then.required, ["publicDocumentUrls"]);
+});
+
 test("publishes an executable quote-first service request contract", async () => {
   const request = await readJson("public/service-request.json");
 
@@ -374,12 +419,11 @@ test("publishes an executable quote-first service request contract", async () =>
   assert.equal(request.transport.to, "sentinel@genesysx.org");
   assert.deepEqual(request.requestSchema.required, [
     "serviceId",
-    "chainId",
-    "transactionHash",
     "replyEmail",
   ]);
   assert.equal(request.requestSchema.properties.chainId.const, 1);
   assert.deepEqual(request.requestSchema.properties.serviceId.enum, [
+    "agent-payment-boundary-review",
     "claimant-context-intake",
     "evidence-preview",
     "trace-snapshot",
@@ -391,7 +435,7 @@ test("publishes an executable quote-first service request contract", async () =>
   assert.match(request.transport.bodyTemplate, /Service ID: \{serviceId\}/);
   assert.match(
     request.transport.bodyTemplate,
-    /Ethereum Mainnet transaction hash: \{transactionHash\}/,
+    /Ethereum Mainnet transaction hash \(case services\): \{transactionHash\}/,
   );
   assert.match(request.transport.bodyTemplate, /Reply email: \{replyEmail\}/);
   assert.match(request.transport.bodyTemplate, /quote request only/i);
@@ -405,6 +449,11 @@ test("publishes an executable quote-first service request contract", async () =>
   assert.equal(request.safety.publicFactsOnly, true);
   assert.ok(request.safety.forbiddenInputs.includes("private keys"));
   assert.ok(request.safety.forbiddenInputs.includes("wallet signatures"));
+  const caseCondition = request.requestSchema.allOf.find((rule) =>
+    rule.if?.properties?.serviceId?.enum?.includes("evidence-preview"),
+  );
+  assert.ok(caseCondition, "expected case-service conditional inputs");
+  assert.deepEqual(caseCondition.then.required, ["chainId", "transactionHash"]);
 });
 
 test("renders an email-independent copy fallback from the request contract", async () => {

@@ -11,6 +11,30 @@
   },
   "offerings": [
     {
+      "id": "agent-payment-boundary-review",
+      "title": "Agent Payment Boundary Review",
+      "priceUsd": 49,
+      "chainId": 1,
+      "summary": "Review public agent payment metadata for ambiguity in payer authority, recipient wallet control, supported assets and networks, and donation-versus-service boundaries.",
+      "deliverable": "One-page findings matrix with cited fields, contradictions, missing safety statements, and prioritized corrections.",
+      "turnaroundBusinessDays": 1,
+      "turnaroundLabel": "Target within 1 business day after verified payment and complete public inputs.",
+      "requiredInputs": [
+        "one public HTTPS agent, payment, or support manifest URL",
+        "reachable email address"
+      ],
+      "optionalInputs": [
+        "one additional public specification URL",
+        "target agent framework or payment protocol",
+        "one specific authority or payment-boundary question"
+      ],
+      "scopeLabel": "Up to two public JSON, Markdown, or text documents totaling at most 100 KB; no private repositories, credentialed endpoints, code execution, or security certification.",
+      "scope": {
+        "maxPublicDocuments": 2,
+        "maxCombinedBytes": 100000
+      }
+    },
+    {
       "id": "claimant-context-intake",
       "title": "Claimant Context Intake",
       "priceUsd": 49,
@@ -91,7 +115,7 @@
     }
   ],
   "requestProcess": [
-    "A human or payer agent operating within its own delegated policy sends an email request with the transaction hash and any optional context.",
+    "A human or payer agent operating within its own delegated policy sends an email request with the selected offering's required public inputs and any optional context.",
     "Sentinel confirms scope, timing, exact payment reference, and payment instructions in writing.",
     "The requester decides whether to pay only after verifying the complete quote and canonical service-payment contract.",
     "Sentinel prepares only the confirmed evidence deliverable."
