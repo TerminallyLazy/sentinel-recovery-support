@@ -1,10 +1,10 @@
 {
   "manifest_version": "0.3",
   "name": "sentinel-agent-payment-boundary-preflight",
-  "display_name": "Sentinel Agent Payment Boundary Preflight",
-  "version": "0.2.0",
-  "description": "Deterministically inspect public agent and payment documents for authority, quote, replay, receipt, wallet-secret, and integrity boundaries.",
-  "long_description": "A read-only, deterministic preflight for one or two inline public JSON, Markdown, or text documents. It performs fixed checks, returns cited clear/ambiguous/missing findings, executes no supplied content, fetches no requester-controlled URL, moves no funds, and expands no payer authority. An optional fixed-scope review is available only through a separate quote-first process.",
+  "display_name": "Sentinel Payment Preflights",
+  "version": "0.3.0",
+  "description": "Deterministically inspect public agent-payment documents and decoded x402 v2 PaymentRequired JSON under explicit safety profiles.",
+  "long_description": "Two read-only deterministic preflights inspect inline public documents without executing supplied content or fetching requester-controlled URLs. The agent-payment tool performs 11 fixed authority, quote, replay, receipt, wallet-secret, and integrity checks. The x402 tool performs nine structural checks under a pinned, closed-world exact-EVM EIP-3009 Sentinel safety profile; it does not decode headers, evaluate payer policy, verify signatures, settle payments, or verify receipts. Neither tool moves funds or expands payer authority. An optional fixed-scope review is available only through a separate quote-first process.",
   "author": {
     "name": "TerminallyLazy",
     "url": "https://github.com/TerminallyLazy"
@@ -31,6 +31,10 @@
     {
       "name": "preflight_agent_payment_boundary",
       "description": "Inspect one or two inline public documents using 11 deterministic agent-payment boundary checks. No URL fetch, code execution, wallet access, request submission, or payment."
+    },
+    {
+      "name": "preflight_x402_v2_payment_required",
+      "description": "Inspect one decoded inline x402 v2 PaymentRequired JSON document using nine deterministic checks under the exact-EVM EIP-3009 Sentinel safety profile. No header decoding, URL fetch, wallet access, signature verification, settlement, receipt verification, or payment."
     }
   ],
   "tools_generated": false,

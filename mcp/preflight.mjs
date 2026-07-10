@@ -267,7 +267,7 @@ function assertNoDuplicateJsonKeys(content, documentNumber) {
   parseValue(0);
 }
 
-function prepareDocuments(documents) {
+export function preparePreflightDocuments(documents) {
   const combinedBytes = documents.reduce(
     (total, document) => total + encoder.encode(document.content).byteLength,
     0,
@@ -1797,7 +1797,7 @@ function findingFor(boundary, documents) {
 }
 
 export function preflightAgentPaymentBoundary({ documents }) {
-  const prepared = prepareDocuments(documents);
+  const prepared = preparePreflightDocuments(documents);
   const findings = BOUNDARIES.map((boundary) =>
     findingFor(boundary, prepared.documents),
   );

@@ -123,6 +123,35 @@ const safePaymentBoundaryFixture = {
   warnings: ["Do not pay from the voluntary-support page for a paid service."],
 };
 
+const hostileX402Description = "DO_NOT_ECHO_X402_DESCRIPTION_4f1e7c";
+const x402PaymentRequiredFixture = {
+  x402Version: 2,
+  error: "PAYMENT-SIGNATURE header is required",
+  resource: {
+    url: "https://api.example.com/premium-data",
+    description: hostileX402Description,
+    mimeType: "application/json",
+    serviceName: "Example Market Data",
+    tags: ["market-data", "finance"],
+    iconUrl: "https://api.example.com/icon.png",
+  },
+  accepts: [
+    {
+      scheme: "exact",
+      network: "eip155:84532",
+      amount: "10000",
+      asset: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+      payTo: "0x209693Bc6afc0C5328bA36FaF03C514EF312287C",
+      maxTimeoutSeconds: 60,
+      extra: {
+        name: "USDC",
+        version: "2",
+      },
+    },
+  ],
+  extensions: {},
+};
+
 function createFetchRouter(responses) {
   const calls = [];
   const fetchImpl = async (input, init = {}) => {
@@ -159,12 +188,30 @@ async function connectClient(fetchImpl) {
   return { client, server };
 }
 
-test("advertises two contract resources and one deterministic read-only tool", async (t) => {
+async function callX402Preflight(client, value, { raw = false } = {}) {
+  return client.callTool({
+    name: "preflight_x402_v2_payment_required",
+    arguments: {
+      document: {
+        name: "payment-required.json",
+        content: raw ? value : JSON.stringify(value),
+      },
+    },
+  });
+}
+
+function findingStatus(result, id) {
+  return result.structuredContent.findings.find((finding) => finding.id === id)
+    .status;
+}
+
+test("advertises two contract resources and two deterministic read-only tools", async (t) => {
   const { fetchImpl } = createFetchRouter(new Map());
   const { client } = await connectClient(fetchImpl);
   t.after(() => client.close());
 
   assert.equal(client.getServerVersion()?.name, "sentinel-recovery-mcp-server");
+  assert.equal(client.getServerVersion()?.version, "0.3.0");
   assert.ok(client.getServerCapabilities()?.resources);
   assert.ok(client.getServerCapabilities()?.tools);
   assert.match(client.getInstructions() ?? "", /read-only/i);
@@ -189,6 +236,16 @@ test("advertises two contract resources and one deterministic read-only tool", a
         name: "preflight_agent_payment_boundary",
         annotations: {
           title: "Agent Payment Boundary Preflight",
+          readOnlyHint: true,
+          destructiveHint: false,
+          idempotentHint: true,
+          openWorldHint: false,
+        },
+      },
+      {
+        name: "preflight_x402_v2_payment_required",
+        annotations: {
+          title: "x402 v2 PaymentRequired EIP-3009 Preflight",
           readOnlyHint: true,
           destructiveHint: false,
           idempotentHint: true,
@@ -258,6 +315,372 @@ test("preflights an inline payment manifest without network access", async (t) =
   assert.ok(result.content[0].text.length < 1000);
   assert.doesNotMatch(result.content[0].text, /"findings"/);
   assert.equal(calls.length, 0);
+});
+
+test("preflights an official x402 v2 exact-EVM PaymentRequired without granting authority", async (t) => {
+  const { calls, fetchImpl } = createFetchRouter(new Map());
+  const { client } = await connectClient(fetchImpl);
+  t.after(() => client.close());
+  const content = JSON.stringify(x402PaymentRequiredFixture);
+
+  const result = await client.callTool({
+    name: "preflight_x402_v2_payment_required",
+    arguments: {
+      document: {
+        name: "payment-required.json",
+        content,
+      },
+    },
+  });
+
+  assert.equal(result.isError, undefined);
+  assert.equal(result.structuredContent.schemaVersion, "1.0");
+  assert.equal(
+    result.structuredContent.kind,
+    "x402-v2-payment-required-preflight",
+  );
+  assert.deepEqual(result.structuredContent.scope, {
+    documentsAnalyzed: 1,
+    combinedBytes: Buffer.byteLength(content),
+    deterministic: true,
+    networkRequests: false,
+    codeExecution: false,
+    walletAccess: false,
+    decodedJsonOnly: true,
+    profile: "x402-v2-exact-evm-eip3009-sentinel-safe",
+    specificationCommit: "8b1abaeaef282e6307a2936b102c6d9223e61802",
+  });
+  assert.deepEqual(result.structuredContent.summary, {
+    clear: 8,
+    ambiguous: 1,
+    missing: 0,
+  });
+  assert.deepEqual(
+    result.structuredContent.findings.map(({ id, status }) => ({ id, status })),
+    [
+      { id: "XPR-001", status: "clear" },
+      { id: "XPR-002", status: "clear" },
+      { id: "XPR-003", status: "clear" },
+      { id: "XPR-004", status: "clear" },
+      { id: "XPR-005", status: "clear" },
+      { id: "XPR-006", status: "clear" },
+      { id: "XPR-007", status: "clear" },
+      { id: "XPR-008", status: "clear" },
+      { id: "XPR-009", status: "ambiguous" },
+    ],
+  );
+  assert.ok(
+    result.structuredContent.findings.every(
+      ({ evidence }) =>
+        evidence.untrustedEvidence === true && evidence.excerpt.length <= 180,
+    ),
+  );
+  assert.deepEqual(result.structuredContent.limitations, {
+    paymentRequiredOnly: true,
+    payerPolicyEvaluated: false,
+    paymentPayloadVerified: false,
+    signaturesVerified: false,
+    settlementVerified: false,
+    receiptVerified: false,
+    networkExistenceVerified: false,
+    assetContractBehaviorVerified: false,
+    eip712DomainVerified: false,
+    tokenOrRecipientOwnershipVerified: false,
+    implementationTested: false,
+  });
+  assert.deepEqual(result.structuredContent.escalation, {
+    optional: true,
+    serviceId: "agent-payment-boundary-review",
+    priceUsd: 49,
+    sampleUrl:
+      "https://terminallylazy.github.io/sentinel-recovery-support/sample-agent-payment-boundary-review.json",
+    quoteRequestContractUrl:
+      "https://terminallylazy.github.io/sentinel-recovery-support/service-request.json",
+    requestMovesFunds: false,
+    requestAuthorizesPayment: false,
+    completeWrittenQuoteRequired: true,
+    payerMustFollowOwnPolicy: true,
+  });
+  assert.match(result.structuredContent.disclaimer, /does not authorize payment/i);
+  assert.match(result.structuredContent.disclaimer, /payer policy/i);
+  assert.match(result.structuredContent.disclaimer, /stricter than core x402/i);
+  assert.doesNotMatch(JSON.stringify(result), new RegExp(hostileX402Description));
+  assert.ok(result.content[0].text.length < 1000);
+  assert.equal(calls.length, 0);
+});
+
+test("returns a controlled x402 error for JSON that is not an object", async (t) => {
+  const { fetchImpl } = createFetchRouter(new Map());
+  const { client } = await connectClient(fetchImpl);
+  t.after(() => client.close());
+
+  for (const content of ["null", "[]", '"not-an-object"']) {
+    const result = await client.callTool({
+      name: "preflight_x402_v2_payment_required",
+      arguments: {
+        document: { name: "payment-required.json", content },
+      },
+    });
+
+    assert.equal(result.isError, true);
+    assert.match(result.content[0].text, /must contain a JSON object/i);
+    assert.doesNotMatch(result.content[0].text, /not-an-object/);
+  }
+});
+
+test("evaluates every x402 payment alternative without cherry-picking", async (t) => {
+  const { fetchImpl } = createFetchRouter(new Map());
+  const { client } = await connectClient(fetchImpl);
+  t.after(() => client.close());
+
+  const distinct = structuredClone(x402PaymentRequiredFixture);
+  distinct.accepts.push({
+    ...structuredClone(distinct.accepts[0]),
+    network: "eip155:1",
+    amount: "25000",
+    asset: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+  });
+  const distinctResult = await callX402Preflight(client, distinct);
+  assert.deepEqual(distinctResult.structuredContent.summary, {
+    clear: 8,
+    ambiguous: 1,
+    missing: 0,
+  });
+
+  const delimiterCollision = structuredClone(x402PaymentRequiredFixture);
+  delimiterCollision.accepts[0].extra = { name: "US|DC", version: "2" };
+  delimiterCollision.accepts.push({
+    ...structuredClone(delimiterCollision.accepts[0]),
+    extra: { name: "US", version: "DC|2" },
+  });
+  const delimiterCollisionResult = await callX402Preflight(
+    client,
+    delimiterCollision,
+  );
+  assert.equal(findingStatus(delimiterCollisionResult, "XPR-003"), "clear");
+
+  const duplicate = structuredClone(x402PaymentRequiredFixture);
+  duplicate.accepts.push({
+    ...structuredClone(duplicate.accepts[0]),
+    asset: duplicate.accepts[0].asset.toLowerCase(),
+    payTo: duplicate.accepts[0].payTo.toUpperCase().replace("0X", "0x"),
+    extra: {
+      ...structuredClone(duplicate.accepts[0].extra),
+      assetTransferMethod: "eip3009",
+    },
+  });
+  const duplicateResult = await callX402Preflight(client, duplicate);
+  assert.equal(findingStatus(duplicateResult, "XPR-003"), "ambiguous");
+
+  const malformed = structuredClone(x402PaymentRequiredFixture);
+  malformed.accepts.push({
+    ...structuredClone(malformed.accepts[0]),
+    amount: "0",
+  });
+  const malformedResult = await callX402Preflight(client, malformed);
+  assert.equal(findingStatus(malformedResult, "XPR-003"), "ambiguous");
+  assert.equal(findingStatus(malformedResult, "XPR-005"), "ambiguous");
+  const malformedAmountFinding = malformedResult.structuredContent.findings.find(
+    ({ id }) => id === "XPR-005",
+  );
+  assert.equal(malformedAmountFinding.evidence.locator, "/accepts");
+  assert.equal(
+    malformedAmountFinding.evidence.excerpt,
+    "matched:invalid-or-unmodeled",
+  );
+});
+
+test("rejects malformed fields in the bounded x402 exact-EVM profile", async (t) => {
+  const { fetchImpl } = createFetchRouter(new Map());
+  const { client } = await connectClient(fetchImpl);
+  t.after(() => client.close());
+
+  const maximums = structuredClone(x402PaymentRequiredFixture);
+  maximums.error = "e".repeat(1_000);
+  maximums.resource.description = "d".repeat(2_048);
+  maximums.resource.serviceName = "s".repeat(32);
+  maximums.resource.tags = Array.from({ length: 5 }, () => "t".repeat(32));
+  maximums.accepts = Array.from({ length: 64 }, (_, index) => ({
+    ...structuredClone(maximums.accepts[0]),
+    amount: String(index + 1),
+    maxTimeoutSeconds: 86_400,
+    extra: {
+      assetTransferMethod: "eip3009",
+      name: "n".repeat(64),
+      version: "v".repeat(32),
+    },
+  }));
+  const maximumsResult = await callX402Preflight(client, maximums);
+  assert.deepEqual(maximumsResult.structuredContent.summary, {
+    clear: 8,
+    ambiguous: 1,
+    missing: 0,
+  });
+
+  const cases = [
+    ["XPR-001", (value) => { value.x402Version = 1; }],
+    ["XPR-001", (value) => { value.error = "x".repeat(1_001); }, "/"],
+    ["XPR-002", (value) => { value.resource.url = "file:///wallet"; }],
+    ["XPR-002", (value) => { value.resource.description = "x".repeat(2_049); }, "/resource"],
+    ["XPR-003", (value) => { value.accepts = []; }],
+    ["XPR-003", (value) => { value.accepts = Array.from({ length: 65 }, (_, index) => ({ ...structuredClone(value.accepts[0]), amount: String(index + 1) })); }],
+    ["XPR-004", (value) => { value.accepts[0].scheme = "upto"; }],
+    ["XPR-004", (value) => { value.accepts[0].network = "base-sepolia"; }],
+    ["XPR-004", (value) => { value.accepts[0].network = "eip155:01"; }],
+    ["XPR-005", (value) => { value.accepts[0].amount = 1; }],
+    ["XPR-005", (value) => { value.accepts[0].amount = "01"; }],
+    ["XPR-005", (value) => { value.accepts[0].amount = (1n << 256n).toString(); }],
+    ["XPR-005", (value) => { value.accepts[0].maxTimeoutSeconds = 1.5; }],
+    ["XPR-005", (value) => { value.accepts[0].maxTimeoutSeconds = 0; }],
+    ["XPR-005", (value) => { value.accepts[0].maxTimeoutSeconds = 86_401; }],
+    ["XPR-006", (value) => { value.accepts[0].asset = `0x${"0".repeat(40)}`; }],
+    ["XPR-006", (value) => { value.accepts[0].payTo = "not-an-address"; }],
+    ["XPR-007", (value) => { delete value.accepts[0].extra; }],
+    ["XPR-007", (value) => { value.accepts[0].extra.assetTransferMethod = "permit2"; }],
+    ["XPR-007", (value) => { value.accepts[0].extra.assetTransferMethod = "erc7710"; }],
+    ["XPR-007", (value) => { delete value.accepts[0].extra.name; }],
+  ];
+
+  for (const [id, mutate, expectedLocator] of cases) {
+    const value = structuredClone(x402PaymentRequiredFixture);
+    mutate(value);
+    const result = await callX402Preflight(client, value);
+    assert.notEqual(findingStatus(result, id), "clear", `${id} unexpectedly cleared`);
+    if (expectedLocator) {
+      assert.equal(
+        result.structuredContent.findings.find((finding) => finding.id === id)
+          .evidence.locator,
+        expectedLocator,
+      );
+    }
+  }
+});
+
+test("keeps unknown x402 content closed-world and never echoes it", async (t) => {
+  const { fetchImpl } = createFetchRouter(new Map());
+  const { client } = await connectClient(fetchImpl);
+  t.after(() => client.close());
+  const marker = "DO_NOT_ECHO_X402_UNKNOWN_77a19f";
+  const value = structuredClone(x402PaymentRequiredFixture);
+  value[marker] = marker;
+  value.extensions = { [marker]: { instruction: marker } };
+  value.accepts[0].extra[marker] = marker;
+
+  const result = await callX402Preflight(client, value);
+
+  for (const id of [
+    "XPR-001",
+    "XPR-002",
+    "XPR-003",
+    "XPR-004",
+    "XPR-005",
+    "XPR-006",
+    "XPR-007",
+    "XPR-008",
+    "XPR-009",
+  ]) {
+    assert.notEqual(findingStatus(result, id), "clear");
+  }
+  assert.equal(
+    result.structuredContent.findings.find(({ id }) => id === "XPR-008")
+      .evidence.locator,
+    "unmodeled-path",
+  );
+  assert.doesNotMatch(JSON.stringify(result), new RegExp(marker));
+});
+
+test("downgrades each unmodeled x402 location independently", async (t) => {
+  const { fetchImpl } = createFetchRouter(new Map());
+  const { client } = await connectClient(fetchImpl);
+  t.after(() => client.close());
+  const cases = [
+    (value, marker) => { value[marker] = true; },
+    (value, marker) => { value.resource[marker] = true; },
+    (value, marker) => { value.accepts[0][marker] = true; },
+    (value, marker) => { value.accepts[0].extra[marker] = true; },
+    (value, marker) => { value.extensions = { [marker]: true }; },
+  ];
+
+  for (const [index, mutate] of cases.entries()) {
+    const marker = `DO_NOT_ECHO_X402_PATH_${index}_a91f`;
+    const value = structuredClone(x402PaymentRequiredFixture);
+    mutate(value, marker);
+    const result = await callX402Preflight(client, value);
+    assert.deepEqual(result.structuredContent.summary, {
+      clear: 0,
+      ambiguous: 9,
+      missing: 0,
+    });
+    assert.doesNotMatch(JSON.stringify(result), new RegExp(marker));
+  }
+});
+
+test("never echoes attacker-controlled values from recognized x402 fields", async (t) => {
+  const { fetchImpl } = createFetchRouter(new Map());
+  const { client } = await connectClient(fetchImpl);
+  t.after(() => client.close());
+  const markers = [
+    "X402_ERROR_MARKER_8f91",
+    "x402-url-marker-8f91",
+    "X402_DESCRIPTION_MARKER_8f91",
+    "X402 SERVICE 8f91",
+    "X402_TAG_8f91",
+    "X402_ASSET_8f91",
+    "X402_VERSION_8f91",
+    "991337991337",
+    "0x8f918f918f918f918f918f918f918f918f918f91",
+    "0x7e817e817e817e817e817e817e817e817e817e81",
+  ];
+  const value = structuredClone(x402PaymentRequiredFixture);
+  value.error = markers[0];
+  value.resource.url = `https://example.com/${markers[1]}`;
+  value.resource.description = markers[2];
+  value.resource.serviceName = markers[3];
+  value.resource.tags = [markers[4]];
+  value.accepts[0].amount = markers[7];
+  value.accepts[0].asset = markers[8];
+  value.accepts[0].payTo = markers[9];
+  value.accepts[0].extra = { name: markers[5], version: markers[6] };
+
+  const result = await callX402Preflight(client, value);
+
+  assert.deepEqual(result.structuredContent.summary, {
+    clear: 8,
+    ambiguous: 1,
+    missing: 0,
+  });
+  const serialized = JSON.stringify(result);
+  for (const marker of markers) {
+    assert.equal(serialized.includes(marker), false);
+  }
+});
+
+test("returns controlled x402 errors for invalid, duplicate-key, and oversized JSON", async (t) => {
+  const { fetchImpl } = createFetchRouter(new Map());
+  const { client } = await connectClient(fetchImpl);
+  t.after(() => client.close());
+
+  const invalid = await callX402Preflight(client, "{not-json}", { raw: true });
+  assert.equal(invalid.isError, true);
+  assert.match(invalid.content[0].text, /Document 1.*valid JSON/i);
+
+  const duplicateMarker = "DO_NOT_ECHO_DUPLICATE_X402_d461";
+  const duplicate = await callX402Preflight(
+    client,
+    `{"x402Version":2,"x\\u003402Version":2,"${duplicateMarker}":true}`,
+    { raw: true },
+  );
+  assert.equal(duplicate.isError, true);
+  assert.match(duplicate.content[0].text, /duplicate JSON object keys/i);
+  assert.doesNotMatch(duplicate.content[0].text, new RegExp(duplicateMarker));
+
+  const oversized = await callX402Preflight(
+    client,
+    `{"description":"${"x".repeat(100 * 1024 + 1)}"}`,
+    { raw: true },
+  );
+  assert.equal(oversized.isError, true);
+  assert.match(oversized.content[0].text, /combined input exceeds 102400 bytes/i);
 });
 
 test("reports contradictory payment authority without executing hostile text", async (t) => {
@@ -1437,5 +1860,6 @@ test("starts over stdio when the package is launched through a symlink", async (
   const tools = await client.listTools();
   assert.deepEqual(tools.tools.map(({ name }) => name), [
     "preflight_agent_payment_boundary",
+    "preflight_x402_v2_payment_required",
   ]);
 });
