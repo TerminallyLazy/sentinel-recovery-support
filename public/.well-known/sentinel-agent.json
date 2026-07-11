@@ -35,17 +35,17 @@
     "distributionStatus": "github-release",
     "remoteEndpointAvailable": false,
     "release": {
-      "version": "0.3.0",
-      "tag": "v0.3.0",
-      "bundleUrl": "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.3.0/sentinel-agent-payment-boundary-v0.3.0.mcpb",
-      "checksumUrl": "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.3.0/sentinel-agent-payment-boundary-v0.3.0.mcpb.sha256",
-      "sha256": "dd3582fbc24d43569ada443df8d2c069ba4be157146d7e17921b558ec07d9757"
+      "version": "0.4.0",
+      "tag": "v0.4.0",
+      "bundleUrl": "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.4.0/sentinel-agent-payment-boundary-v0.4.0.mcpb",
+      "checksumUrl": "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.4.0/sentinel-agent-payment-boundary-v0.4.0.mcpb.sha256",
+      "sha256": "47cb25e6f69fdd6fbf68ffca0c98309ecf31cb998bd1527273e31803954e7a29"
     },
     "registry": {
       "name": "io.github.TerminallyLazy/sentinel-recovery-services",
-      "version": "0.3.0",
-      "publicationStatus": "published",
-      "versionApiUrl": "https://registry.modelcontextprotocol.io/v0.1/servers/io.github.TerminallyLazy%2Fsentinel-recovery-services/versions/0.3.0",
+      "version": "0.4.0",
+      "publicationStatus": "publication-pending",
+      "versionApiUrl": "https://registry.modelcontextprotocol.io/v0.1/servers/io.github.TerminallyLazy%2Fsentinel-recovery-services/versions/0.4.0",
       "serverJsonUrl": "https://raw.githubusercontent.com/TerminallyLazy/sentinel-recovery-support/main/mcp/server.json"
     },
     "source": {
@@ -57,6 +57,24 @@
     },
     "capabilities": {
       "tools": [
+        {
+          "name": "prepare_agent_payment_boundary_quote_request",
+          "input": "one-or-two-public-https-document-urls",
+          "maxUrls": 2,
+          "maxUrlCharacters": 2048,
+          "requestTransport": "github-issue",
+          "serviceId": "agent-payment-boundary-review",
+          "urlQueryParametersAllowed": false,
+          "urlFragmentsAllowed": false,
+          "nonPublicHostsAllowed": false,
+          "networkRequests": false,
+          "fetchesInputUrls": false,
+          "submitsRequest": false,
+          "authorizesPayment": false,
+          "includesPaymentInstructions": false,
+          "createsServiceEntitlement": false,
+          "completeHumanIssuedWrittenQuoteRequired": true
+        },
         {
           "name": "preflight_agent_payment_boundary",
           "input": "one-or-two-inline-public-documents",

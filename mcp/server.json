@@ -1,22 +1,22 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.TerminallyLazy/sentinel-recovery-services",
-  "title": "Sentinel Payment Preflights",
-  "description": "Read-only preflights for agent-payment boundaries and decoded x402 v2 PaymentRequired JSON.",
+  "title": "Sentinel Payment Boundary Tools",
+  "description": "Read-only payment-boundary preflights plus an unsubmitted public quote-request draft tool.",
   "repository": {
     "url": "https://github.com/TerminallyLazy/sentinel-recovery-support",
     "source": "github",
     "id": "1295829629",
     "subfolder": "mcp"
   },
-  "version": "0.3.0",
+  "version": "0.4.0",
   "websiteUrl": "https://terminallylazy.github.io/sentinel-recovery-support/",
   "packages": [
     {
       "registryType": "mcpb",
-      "identifier": "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.3.0/sentinel-agent-payment-boundary-v0.3.0.mcpb",
-      "version": "0.3.0",
-      "fileSha256": "dd3582fbc24d43569ada443df8d2c069ba4be157146d7e17921b558ec07d9757",
+      "identifier": "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.4.0/sentinel-agent-payment-boundary-v0.4.0.mcpb",
+      "version": "0.4.0",
+      "fileSha256": "47cb25e6f69fdd6fbf68ffca0c98309ecf31cb998bd1527273e31803954e7a29",
       "transport": {
         "type": "stdio"
       }
