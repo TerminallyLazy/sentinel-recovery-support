@@ -828,6 +828,42 @@ nav a:hover {
   color: rgb(255 255 255 / 72%);
 }
 
+.agent-quote-cta {
+  display: grid;
+  gap: 7px;
+  max-width: 640px;
+  min-height: 46px;
+  margin-top: 28px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--ink);
+  padding: 16px 18px;
+  font-family: var(--font-mono), monospace;
+  text-transform: uppercase;
+}
+
+.agent-quote-cta strong {
+  font-size: 12px;
+  letter-spacing: 0.035em;
+}
+
+.agent-quote-cta span {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.agent-quote-cta:hover {
+  border-color: white;
+  background: white;
+  color: var(--ink);
+}
+
+.agent-quote-cta:focus-visible {
+  outline: 3px solid white;
+  outline-offset: 4px;
+}
+
 .agent-links {
   display: flex;
   flex-wrap: wrap;

@@ -33,6 +33,9 @@ const workstreams = [
 ];
 
 const paidServices = servicesCatalog.offerings;
+const agentReviewService = paidServices.find(
+  (service) => service.id === "agent-payment-boundary-review",
+)!;
 
 const serviceRequestText = (serviceId: string) => {
   const values: Record<string, string> = {
@@ -434,6 +437,20 @@ export default function Home() {
             receipt. Nothing may be signed, spent, transferred, or broadcast
             from Sentinel&apos;s receiving wallet without human authorization.
           </p>
+          <a
+            className="agent-quote-cta"
+            href={serviceIssueRequestUrl(agentReviewService.id)}
+            rel="noreferrer"
+            target="_blank"
+          >
+            <strong>
+              Request a written ${agentReviewService.priceUsd} {agentReviewService.title} quote
+            </strong>
+            <span>
+              Public inputs only. This request moves no funds and authorizes no payment.
+              A complete human-issued written quote is required before service payment.
+            </span>
+          </a>
           <div className="agent-links">
             <a href="/.well-known/sentinel-agent.json" rel="noreferrer" target="_blank">
               Capability manifest
@@ -462,6 +479,8 @@ export default function Home() {
         </div>
         <div className="agent-brief" aria-label="Machine-readable support summary">
           <div><span>action</span><strong>surface_support_option</strong></div>
+          <div><span>next_action</span><strong>request_quote</strong></div>
+          <div><span>service_id</span><strong>{agentReviewService.id}</strong></div>
           <div><span>network</span><strong>ethereum-mainnet</strong></div>
           <div><span>chain_id</span><strong>1</strong></div>
           <div><span>assets</span><strong>ETH / USDC / USDT</strong></div>

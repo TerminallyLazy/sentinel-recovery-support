@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, rm, symlink } from "node:fs/promises";
+import { mkdtemp, readFile, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -205,13 +205,13 @@ function findingStatus(result, id) {
     .status;
 }
 
-test("advertises two contract resources and two deterministic read-only tools", async (t) => {
+test("advertises two contract resources and three deterministic read-only tools", async (t) => {
   const { fetchImpl } = createFetchRouter(new Map());
   const { client } = await connectClient(fetchImpl);
   t.after(() => client.close());
 
   assert.equal(client.getServerVersion()?.name, "sentinel-recovery-mcp-server");
-  assert.equal(client.getServerVersion()?.version, "0.3.0");
+  assert.equal(client.getServerVersion()?.version, "0.4.0");
   assert.ok(client.getServerCapabilities()?.resources);
   assert.ok(client.getServerCapabilities()?.tools);
   assert.match(client.getInstructions() ?? "", /read-only/i);
@@ -232,6 +232,16 @@ test("advertises two contract resources and two deterministic read-only tools", 
   assert.deepEqual(
     tools.tools.map(({ name, annotations }) => ({ name, annotations })),
     [
+      {
+        name: "prepare_agent_payment_boundary_quote_request",
+        annotations: {
+          title: "Prepare Sentinel Service Quote Request",
+          readOnlyHint: true,
+          destructiveHint: false,
+          idempotentHint: true,
+          openWorldHint: false,
+        },
+      },
       {
         name: "preflight_agent_payment_boundary",
         annotations: {
@@ -254,6 +264,249 @@ test("advertises two contract resources and two deterministic read-only tools", 
       },
     ],
   );
+});
+
+test("prepares a complete public GitHub quote request without submitting or paying", async (t) => {
+  const { calls, fetchImpl } = createFetchRouter(new Map());
+  const { client } = await connectClient(fetchImpl);
+  t.after(() => client.close());
+
+  const result = await client.callTool({
+    name: "prepare_agent_payment_boundary_quote_request",
+    arguments: {
+      serviceId: "agent-payment-boundary-review",
+      requestTransport: "github-issue",
+      publicDocumentUrls: [
+        "https://example.com/agent.json",
+        "https://example.com/payment.md",
+      ],
+      intendedUse: "Identify ambiguous payment-authority declarations.",
+      preferredFormat: "Markdown",
+    },
+  });
+
+  assert.equal(result.isError, undefined);
+  assert.equal(result.structuredContent.schemaVersion, "1.0");
+  assert.equal(
+    result.structuredContent.kind,
+    "sentinel-service-quote-request-draft",
+  );
+  assert.equal(result.structuredContent.complete, true);
+  assert.equal(
+    result.structuredContent.packetStatus,
+    "complete-unsubmitted-request",
+  );
+  assert.deepEqual(result.structuredContent.contract, {
+    schemaVersion: "1.0",
+    canonicalUrl:
+      "https://terminallylazy.github.io/sentinel-recovery-support/service-request.json",
+  });
+  assert.equal(
+    result.structuredContent.serviceId,
+    "agent-payment-boundary-review",
+  );
+  assert.equal(result.structuredContent.servicePriceUsd, 49);
+  assert.equal(result.structuredContent.requestTransport, "github-issue");
+  assert.deepEqual(result.structuredContent.request, {
+    serviceId: "agent-payment-boundary-review",
+    requestTransport: "github-issue",
+    chainId: 1,
+    publicDocumentUrls: [
+      "https://example.com/agent.json",
+      "https://example.com/payment.md",
+    ],
+    intendedUse: "Identify ambiguous payment-authority declarations.",
+    preferredFormat: "Markdown",
+  });
+  assert.deepEqual(result.structuredContent.destination, {
+    method: "github-issue",
+    visibility: "public",
+    repository: "TerminallyLazy/sentinel-recovery-support",
+    webUrl:
+      "https://github.com/TerminallyLazy/sentinel-recovery-support/issues/new?template=service-request.yml&title=Sentinel%20quote%20request%3A%20agent-payment-boundary-review",
+    apiEndpoint:
+      "https://api.github.com/repos/TerminallyLazy/sentinel-recovery-support/issues",
+    requesterOwnCredentialRequiredToSubmit: true,
+  });
+  assert.deepEqual(result.structuredContent.submissionRequirements, {
+    requesterMustConfirmPublicFactsOnly: true,
+    requesterMustConfirmRequestMovesNoFundsOrAuthorizesPayment: true,
+    requesterMustConfirmWaitForCompleteWrittenQuote: true,
+  });
+  assert.match(
+    result.structuredContent.requestTitle,
+    /^Sentinel quote request: agent-payment-boundary-review$/,
+  );
+  assert.match(
+    result.structuredContent.requestBody,
+    /Public manifest, document, or x402 resource URL\(s\).*https:\/\/example\.com\/agent\.json, https:\/\/example\.com\/payment\.md/,
+  );
+  assert.match(
+    result.structuredContent.requestBody,
+    /This is a quote request only\. It moves no funds and authorizes no payment\./,
+  );
+  assert.match(
+    result.structuredContent.requestBody,
+    /Ethereum Mainnet transaction hash \(case services\): not applicable \(agent review\)/,
+  );
+  assert.doesNotMatch(result.structuredContent.requestBody, /\{[^}]+\}/);
+  assert.doesNotMatch(result.structuredContent.requestBody, /:\s*\n/);
+  assert.deepEqual(result.structuredContent.safety, {
+    publicFactsOnly: true,
+    requestMovesFunds: false,
+    requestAuthorizesPayment: false,
+    paymentInstructionsIncluded: false,
+    completeWrittenQuoteRequired: true,
+    payerMustFollowOwnPolicy: true,
+    communicationAuthorityRequired: true,
+    networkRequests: false,
+    urlsFetched: false,
+    publicAvailabilityVerified: false,
+    walletAccess: false,
+    credentialsRequested: false,
+    signaturesRequested: false,
+    createsServiceEntitlement: false,
+    submitted: false,
+  });
+  for (const forbiddenField of [
+    "recipient",
+    "asset",
+    "amountBaseUnits",
+    "quoteId",
+    "paymentReference",
+  ]) {
+    assert.equal(
+      Object.hasOwn(result.structuredContent, forbiddenField),
+      false,
+      `${forbiddenField} must not appear in a request draft`,
+    );
+  }
+  assert.equal(calls.length, 0);
+});
+
+test("rejects credential-bearing public document URLs before drafting", async (t) => {
+  const { calls, fetchImpl } = createFetchRouter(new Map());
+  const { client } = await connectClient(fetchImpl);
+  t.after(() => client.close());
+
+  const result = await client.callTool({
+    name: "prepare_agent_payment_boundary_quote_request",
+    arguments: {
+      serviceId: "agent-payment-boundary-review",
+      requestTransport: "github-issue",
+      publicDocumentUrls: [
+        "https://operator:DO_NOT_ECHO_URL_SECRET@example.com/manifest.json",
+      ],
+    },
+  });
+
+  assert.equal(result.isError, true);
+  assert.match(result.content[0].text, /must not include credentials/i);
+  assert.doesNotMatch(result.content[0].text, /DO_NOT_ECHO_URL_SECRET/);
+  assert.equal(calls.length, 0);
+});
+
+test("rejects unsafe, duplicate, oversized, and non-public URL inputs", async (t) => {
+  const { calls, fetchImpl } = createFetchRouter(new Map());
+  const { client } = await connectClient(fetchImpl);
+  t.after(() => client.close());
+
+  for (const publicDocumentUrls of [
+    ["http://example.com/manifest.json"],
+    ["https://example.com/manifest.json?token=DO_NOT_ECHO_QUERY_SECRET"],
+    ["https://example.com/manifest.json#DO_NOT_ECHO_FRAGMENT_SECRET"],
+    ["https://localhost/manifest.json"],
+    ["https://127.0.0.1/manifest.json"],
+    ["https://192.168.1.5/manifest.json"],
+    ["https://[::1]/manifest.json"],
+    [`https://example.com/${"a".repeat(2049)}`],
+    [
+      "https://example.com/manifest.json",
+      "https://example.com/manifest.json",
+    ],
+    [
+      "https://example.com/one.json",
+      "https://example.com/two.json",
+      "https://example.com/three.json",
+    ],
+  ]) {
+    const result = await client.callTool({
+      name: "prepare_agent_payment_boundary_quote_request",
+      arguments: {
+        serviceId: "agent-payment-boundary-review",
+        requestTransport: "github-issue",
+        publicDocumentUrls,
+      },
+    });
+
+    assert.equal(result.isError, true);
+    assert.doesNotMatch(
+      JSON.stringify(result),
+      /DO_NOT_ECHO_(?:QUERY|FRAGMENT)_SECRET/,
+    );
+  }
+
+  assert.equal(calls.length, 0);
+});
+
+test("renders the quote-request packet from the canonical public contract template", async (t) => {
+  const { fetchImpl } = createFetchRouter(new Map());
+  const { client } = await connectClient(fetchImpl);
+  t.after(() => client.close());
+  const contract = JSON.parse(
+    await readFile(new URL("../public/service-request.json", import.meta.url), "utf8"),
+  );
+  const github = contract.alternateTransports.find(
+    ({ id }) => id === "github-issue",
+  );
+  const values = {
+    serviceId: "agent-payment-boundary-review",
+    chainId: "1",
+    transactionHash: "not applicable (agent review)",
+    publicDocumentUrls: "https://example.com/agent.json",
+    intendedUse: "not provided",
+    preferredFormat: "not provided",
+    timingNeed: "not provided",
+  };
+  const expectedBody = Object.entries(values).reduce(
+    (template, [key, value]) => template.replaceAll(`{${key}}`, value),
+    github.bodyTemplate,
+  );
+
+  const result = await client.callTool({
+    name: "prepare_agent_payment_boundary_quote_request",
+    arguments: {
+      serviceId: "agent-payment-boundary-review",
+      requestTransport: "github-issue",
+      publicDocumentUrls: ["https://example.com/agent.json"],
+    },
+  });
+
+  assert.equal(result.isError, undefined);
+  assert.equal(result.structuredContent.contract.schemaVersion, "1.0");
+  assert.equal(
+    result.structuredContent.contract.canonicalUrl,
+    contract.canonicalUrl,
+  );
+  assert.equal(
+    result.structuredContent.requestTitle,
+    github.titleTemplate.replace("{serviceId}", values.serviceId),
+  );
+  assert.equal(result.structuredContent.requestBody, expectedBody);
+  assert.doesNotMatch(result.structuredContent.requestBody, /\{[^}]+\}/);
+
+  const issueTemplate = await readFile(
+    new URL("../.github/ISSUE_TEMPLATE/service-request.yml", import.meta.url),
+    "utf8",
+  );
+  for (const pattern of [
+    /This issue is public/i,
+    /moves no funds and authorizes no payment/i,
+    /complete written quote/i,
+  ]) {
+    assert.match(issueTemplate, pattern);
+    assert.match(result.structuredContent.requestBody, pattern);
+  }
 });
 
 test("preflights an inline payment manifest without network access", async (t) => {
@@ -1859,6 +2112,7 @@ test("starts over stdio when the package is launched through a symlink", async (
   await client.connect(transport);
   const tools = await client.listTools();
   assert.deepEqual(tools.tools.map(({ name }) => name), [
+    "prepare_agent_payment_boundary_quote_request",
     "preflight_agent_payment_boundary",
     "preflight_x402_v2_payment_required",
   ]);

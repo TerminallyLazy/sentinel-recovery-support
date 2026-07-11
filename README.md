@@ -26,11 +26,12 @@ The site exposes a human-readable funding page, `$49/$99/$199` public-data servi
 - `/agent-guide.md` — mandatory agent authority boundaries
 - `/impact.json` — historical receipt and contribution-funded-work snapshot
 - `/llms.txt` — short discovery index
-- `mcp/` — read-only stdio MCP server with deterministic agent-payment and x402 `PaymentRequired` preflights plus the live service and quote-request resources; install from source or the checksummed [`v0.3.0` GitHub Release](https://github.com/TerminallyLazy/sentinel-recovery-support/releases/tag/v0.3.0), not from the static Pages site
+- `mcp/` — read-only stdio MCP server with deterministic agent-payment and x402 `PaymentRequired` preflights, a local public quote-request draft preparer, and the live service and quote-request resources; install from source or the checksummed [`v0.3.0` GitHub Release](https://github.com/TerminallyLazy/sentinel-recovery-support/releases/tag/v0.3.0), not from the static Pages site
 
 ## Local MCP preflight and resources
 
-The MCP server exposes two deterministic read-only tools:
+The source checkout is version `0.4.0` and exposes three deterministic read-only
+tools:
 
 - `preflight_agent_payment_boundary` — checks one or two inline public
   documents against 11 fixed payment-authority boundaries, without fetching
@@ -41,6 +42,12 @@ The MCP server exposes two deterministic read-only tools:
   EIP-3009 Sentinel safety profile, without decoding headers, evaluating payer
   policy, verifying signatures or receipts, settling, connecting a wallet, or
   moving funds
+- `prepare_agent_payment_boundary_quote_request` — prepares a complete,
+  unsubmitted public GitHub issue draft for the fixed-scope Agent Payment
+  Boundary Review from one or two caller-supplied public HTTPS document URLs
+  without credentials, query strings, fragments, or non-public hosts; it does
+  not fetch or verify those URLs, make a network request, use credentials,
+  submit the issue, authorize payment, or create service entitlement
 
 It also exposes exactly two read-only resources:
 
@@ -48,9 +55,13 @@ It also exposes exactly two read-only resources:
 - `sentinel://services/quote-request-contract`
 
 Only resource reads fetch the two hard-coded canonical live JSON contracts.
-Both preflights run locally on inline content and make no network request. Neither
-path can submit a request, move funds, authorize payment, request credentials,
-connect a wallet, or perform wallet actions.
+Both preflights run locally on inline content, and the request-draft preparer
+formats its inputs locally without fetching supplied URLs. All three tools make
+no network request and cannot submit a request, move funds, authorize payment,
+request credentials, connect a wallet, or create service entitlement. The
+requester decides whether to submit the public draft within its own communication
+authority; a Sentinel human controls issuance of the complete written quote, and
+any later payment remains controlled by the payer's own policy.
 
 The checksummed `v0.3.0` MCPB and its SHA-256 sidecar are published on the
 [GitHub Release](https://github.com/TerminallyLazy/sentinel-recovery-support/releases/tag/v0.3.0).

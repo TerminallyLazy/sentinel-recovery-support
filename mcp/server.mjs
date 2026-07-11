@@ -11,6 +11,11 @@ import {
   PreflightInputError,
   preflightAgentPaymentBoundary,
 } from "./preflight.mjs";
+import {
+  prepareServiceQuoteRequest,
+  quoteRequestInputSchema,
+  quoteRequestOutputSchema,
+} from "./quote-request.mjs";
 import { preflightX402V2PaymentRequired } from "./x402-payment-required.mjs";
 
 export const MAX_RESOURCE_BYTES = 256 * 1024;
@@ -40,7 +45,7 @@ export const RESOURCE_DEFINITIONS = Object.freeze([
 ]);
 
 const SERVER_INSTRUCTIONS =
-  "This server is read-only. It exposes Sentinel Recovery's public service catalog and quote-request contract as MCP resources plus two deterministic preflight tools for inline public documents. Each tool makes no network requests, executes no supplied content, submits no request, moves no funds, authorizes no payment, creates no service entitlement, and never requests credentials, keys, signatures, wallet connections, custody, or wallet control. A complete written quote is required before any service payment.";
+  "This server is read-only. It exposes Sentinel Recovery's public service catalog and quote-request contract as MCP resources, two deterministic preflight tools for inline public documents, and one local tool that prepares but never submits a public quote-request draft. Each tool makes no network requests, executes no supplied content, submits no request, moves no funds, authorizes no payment, creates no service entitlement, and never requests credentials, keys, signatures, wallet connections, custody, or wallet control. A complete written quote is required before any service payment.";
 
 const preflightDocumentSchema = z.object({
   name: z
@@ -246,7 +251,7 @@ export function createSentinelServer({ fetchImpl = globalThis.fetch } = {}) {
   const server = new McpServer(
     {
       name: "sentinel-recovery-mcp-server",
-      version: "0.3.0",
+      version: "0.4.0",
     },
     {
       instructions: SERVER_INSTRUCTIONS,
@@ -276,6 +281,37 @@ export function createSentinelServer({ fetchImpl = globalThis.fetch } = {}) {
       },
     );
   }
+
+  server.registerTool(
+    "prepare_agent_payment_boundary_quote_request",
+    {
+      title: "Prepare Sentinel Service Quote Request",
+      description:
+        "Prepare a complete public GitHub quote-request draft for Sentinel's fixed-scope Agent Payment Boundary Review from one or two public HTTPS URLs without credentials, query strings, fragments, or non-public hosts. This local read-only tool does not submit the request, fetch URLs, connect a wallet, move funds, authorize payment, or create a service entitlement.",
+      inputSchema: quoteRequestInputSchema,
+      outputSchema: quoteRequestOutputSchema,
+      annotations: {
+        title: "Prepare Sentinel Service Quote Request",
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false,
+      },
+    },
+    async (input) => {
+      const structuredContent = prepareServiceQuoteRequest(input);
+      return {
+        content: [
+          {
+            type: "text",
+            text:
+              "Prepared a complete public GitHub quote-request draft. Nothing was submitted, no credential was used, no payment was authorized, and no funds moved. Inspect structuredContent, then submit only within the requester's own communication policy.",
+          },
+        ],
+        structuredContent,
+      };
+    },
+  );
 
   server.registerTool(
     "preflight_agent_payment_boundary",

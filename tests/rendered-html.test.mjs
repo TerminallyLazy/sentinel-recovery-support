@@ -135,6 +135,35 @@ test("renders a mobile contribution jump link", async () => {
   assert.match(html, /href="#services"[^>]*>View paid evidence services<\/a>/i);
 });
 
+test("agent handoff exposes one quote-first conversion path", async () => {
+  const [response, services] = await Promise.all([
+    render(),
+    readJson("public/services.json"),
+  ]);
+  const html = await response.text();
+  const review = services.offerings.find(
+    ({ id }) => id === "agent-payment-boundary-review",
+  );
+
+  assert.ok(review, "expected the agent payment review offering");
+  assert.equal(review.priceUsd, 49);
+  assert.equal(services.contact.quoteIssuanceHumanApprovalRequired, true);
+  assert.equal(services.payment.directPaymentFromThisPageEnabled, false);
+  assert.match(
+    html,
+    /class="agent-quote-cta"[^>]*href="https:\/\/github\.com\/TerminallyLazy\/sentinel-recovery-support\/issues\/new\?template=service-request\.yml&amp;title=Sentinel%20quote%20request%3A%20agent-payment-boundary-review"/i,
+  );
+  assert.match(
+    html,
+    /Request a written \$[\s\S]{0,30}49[\s\S]{0,30}Agent Payment Boundary Review[\s\S]{0,20}quote/i,
+  );
+  assert.match(html, /This request moves no funds and authorizes no payment/i);
+  assert.match(
+    html,
+    /class="agent-quote-cta"[\s\S]{0,700}complete human-issued written quote is required before service payment[\s\S]{0,100}<\/a>/i,
+  );
+});
+
 test("removes starter artifacts and publishes agent discovery files", async () => {
   await assert.rejects(access(new URL("app/_sites-preview", root)));
 
@@ -292,18 +321,20 @@ test("publishes a source-installable deterministic MCP preflight", async () => {
     },
   });
   assert.equal(mcpPackage.name, "sentinel-recovery-mcp");
-  assert.equal(mcpPackage.version, "0.3.0");
+  assert.equal(mcpPackage.version, "0.4.0");
   assert.equal(
     mcpPackage.mcpName,
     "io.github.terminallylazy/sentinel-recovery-services",
   );
   assert.equal(mcpPackage.license, "UNLICENSED");
+  assert.ok(mcpPackage.files.includes("quote-request.mjs"));
   assert.ok(mcpPackage.files.includes("x402-payment-required.mjs"));
   assert.equal(mcpBundle.manifest_version, "0.3");
-  assert.equal(mcpBundle.version, "0.3.0");
+  assert.equal(mcpBundle.version, "0.4.0");
   assert.deepEqual(
     mcpBundle.tools.map(({ name }) => name),
     [
+      "prepare_agent_payment_boundary_quote_request",
       "preflight_agent_payment_boundary",
       "preflight_x402_v2_payment_required",
     ],

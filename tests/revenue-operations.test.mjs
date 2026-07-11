@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 
+import { prepareServiceQuoteRequest } from "../mcp/quote-request.mjs";
+
 const root = new URL("../", import.meta.url);
 
 test("publishes a complete but nonpayable example quote", async () => {
@@ -36,6 +38,32 @@ test("publishes a complete but nonpayable example quote", async () => {
     "cancellationAndRefundTerms",
   ]) {
     assert.ok(sample[field], `expected sample field ${field}`);
+  }
+});
+
+test("keeps an MCP quote-request draft separate from a payable quote", () => {
+  const draft = prepareServiceQuoteRequest({
+    serviceId: "agent-payment-boundary-review",
+    requestTransport: "github-issue",
+    publicDocumentUrls: ["https://example.com/agent.json"],
+  });
+
+  assert.equal(draft.kind, "sentinel-service-quote-request-draft");
+  assert.equal(draft.packetStatus, "complete-unsubmitted-request");
+  assert.equal(draft.safety.requestMovesFunds, false);
+  assert.equal(draft.safety.requestAuthorizesPayment, false);
+  assert.equal(draft.safety.paymentInstructionsIncluded, false);
+  assert.equal(draft.safety.createsServiceEntitlement, false);
+  assert.equal(draft.safety.submitted, false);
+  for (const forbiddenField of [
+    "recipient",
+    "asset",
+    "amountBaseUnits",
+    "quoteId",
+    "paymentReference",
+    "payable",
+  ]) {
+    assert.equal(Object.hasOwn(draft, forbiddenField), false);
   }
 });
 
