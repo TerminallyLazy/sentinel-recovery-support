@@ -9,14 +9,14 @@
     "id": "1295829629",
     "subfolder": "mcp"
   },
-  "version": "0.4.0",
+  "version": "0.4.1",
   "websiteUrl": "https://terminallylazy.github.io/sentinel-recovery-support/",
   "packages": [
     {
       "registryType": "mcpb",
-      "identifier": "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.4.0/sentinel-agent-payment-boundary-v0.4.0.mcpb",
-      "version": "0.4.0",
-      "fileSha256": "47cb25e6f69fdd6fbf68ffca0c98309ecf31cb998bd1527273e31803954e7a29",
+      "identifier": "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.4.1/sentinel-agent-payment-boundary-v0.4.1.mcpb",
+      "version": "0.4.1",
+      "fileSha256": "17a25cf1171d73384c23770a424d2e2c0f4caced2a693c03d153f5d5389485b9",
       "transport": {
         "type": "stdio"
       }
