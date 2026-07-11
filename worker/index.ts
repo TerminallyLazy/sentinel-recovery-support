@@ -1,21 +1,31 @@
 /** Cloudflare Worker entry point for the vinext-starter template. */
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
+import { matchesHostedX402PreflightRoute } from "./hosted-x402-preflight.mjs";
+import { createX402PreflightApp } from "./x402-preflight-app.mjs";
 
-interface Env {
-  ASSETS: Fetcher;
-  IMAGES: {
-    input(stream: ReadableStream): {
-      transform(options: Record<string, unknown>): {
-        output(options: { format: string; quality: number }): Promise<{ response(): Response }>;
-      };
-    };
-  };
+let x402PreflightApp: ReturnType<typeof createX402PreflightApp> | undefined;
+const imageOutputFormats = new Set([
+  "image/jpeg",
+  "image/avif",
+  "image/webp",
+  "image/png",
+  "image/gif",
+] as const);
+type ImageOutputFormat =
+  | "image/jpeg"
+  | "image/avif"
+  | "image/webp"
+  | "image/png"
+  | "image/gif";
+
+function isImageOutputFormat(value: string): value is ImageOutputFormat {
+  return imageOutputFormats.has(value as ImageOutputFormat);
 }
 
-interface ExecutionContext {
-  waitUntil(promise: Promise<unknown>): void;
-  passThroughOnException(): void;
+function getX402PreflightApp() {
+  x402PreflightApp ??= createX402PreflightApp();
+  return x402PreflightApp;
 }
 
 // Image security config. SVG sources with .svg extension auto-skip the
@@ -33,10 +43,17 @@ const worker = {
       return handleImageOptimization(request, {
         fetchAsset: (path) => env.ASSETS.fetch(new Request(new URL(path, request.url))),
         transformImage: async (body, { width, format, quality }) => {
+          if (!isImageOutputFormat(format)) {
+            throw new Error("Unsupported image output format.");
+          }
           const result = await env.IMAGES.input(body).transform(width > 0 ? { width } : {}).output({ format, quality });
           return result.response();
         },
       }, allowedWidths);
+    }
+
+    if (matchesHostedX402PreflightRoute(url)) {
+      return getX402PreflightApp().fetch(request, env, ctx);
     }
 
     return handler.fetch(request, env, ctx);
