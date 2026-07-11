@@ -225,7 +225,7 @@ test("publishes canonical GitHub Pages interfaces for agents", async () => {
   for (const document of [guide, llms]) {
     assert.ok(document.includes(registryName));
     assert.ok(document.includes(registryVersionUrl));
-    assert.match(
+    assert.doesNotMatch(
       document,
       /Registry publication[\s\S]{0,240}\bpending\b/i,
     );
@@ -267,7 +267,7 @@ test("publishes a source-installable deterministic MCP preflight", async () => {
     registry: {
       name: registryName,
       version: "0.4.1",
-      publicationStatus: "publication-pending",
+      publicationStatus: "published",
       versionApiUrl: registryVersionUrl,
       serverJsonUrl:
         "https://raw.githubusercontent.com/TerminallyLazy/sentinel-recovery-support/main/mcp/server.json",
