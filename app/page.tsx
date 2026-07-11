@@ -35,7 +35,11 @@ const workstreams = [
 const paidServices = servicesCatalog.offerings;
 const agentReviewService = paidServices.find(
   (service) => service.id === "agent-payment-boundary-review",
-)!;
+);
+
+if (!agentReviewService) {
+  throw new Error("Agent Payment Boundary Review service is missing");
+}
 
 const serviceRequestText = (serviceId: string) => {
   const values: Record<string, string> = {

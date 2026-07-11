@@ -419,6 +419,10 @@ test("rejects unsafe, duplicate, oversized, and non-public URL inputs", async (t
     ["https://127.0.0.1/manifest.json"],
     ["https://192.168.1.5/manifest.json"],
     ["https://[::1]/manifest.json"],
+    ["https://service.test/manifest.json"],
+    ["https://service.example/manifest.json"],
+    ["https://service.invalid/manifest.json"],
+    ["https://service.onion/manifest.json"],
     [`https://example.com/${"a".repeat(2049)}`],
     [
       "https://example.com/manifest.json",
