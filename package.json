@@ -18,9 +18,13 @@
     "quote:create": "node scripts/create-service-quote.mjs",
     "quote:prepare": "node scripts/prepare-service-quote.mjs",
     "receipt:verify": "node scripts/verify-service-receipt.mjs",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern pages"
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern pages --ignore-pattern worker-configuration.d.ts"
   },
   "dependencies": {
+    "@x402/core": "^2.18.0",
+    "@x402/evm": "^2.18.0",
+    "@x402/hono": "^2.18.0",
+    "hono": "^4.12.29",
     "next": "16.2.6",
     "react": "19.2.6",
     "react-dom": "19.2.6"
