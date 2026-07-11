@@ -1,10 +1,10 @@
 {
   "manifest_version": "0.3",
   "name": "sentinel-agent-payment-boundary-preflight",
-  "display_name": "Sentinel Payment Preflights",
-  "version": "0.3.0",
-  "description": "Deterministically inspect public agent-payment documents and decoded x402 v2 PaymentRequired JSON under explicit safety profiles.",
-  "long_description": "Two read-only deterministic preflights inspect inline public documents without executing supplied content or fetching requester-controlled URLs. The agent-payment tool performs 11 fixed authority, quote, replay, receipt, wallet-secret, and integrity checks. The x402 tool performs nine structural checks under a pinned, closed-world exact-EVM EIP-3009 Sentinel safety profile; it does not decode headers, evaluate payer policy, verify signatures, settle payments, or verify receipts. Neither tool moves funds or expands payer authority. An optional fixed-scope review is available only through a separate quote-first process.",
+  "display_name": "Sentinel Payment Boundary Tools",
+  "version": "0.4.0",
+  "description": "Inspect payment boundaries and locally prepare an unsubmitted public quote-request draft.",
+  "long_description": "Three read-only tools run locally without wallet access. Two deterministic preflights inspect inline public documents without executing supplied content or fetching requester-controlled URLs. The third tool prepares a complete but unsubmitted public GitHub quote-request draft for the fixed-scope Agent Payment Boundary Review; it requires one or two explicit public HTTPS source URLs without credentials, query strings, fragments, or non-public hosts, never fetches them, and includes no payment instructions. No tool submits a request, moves funds, authorizes payment, or creates a service entitlement. A complete human-issued written quote is required before any service payment.",
   "author": {
     "name": "TerminallyLazy",
     "url": "https://github.com/TerminallyLazy"
@@ -28,6 +28,10 @@
     }
   },
   "tools": [
+    {
+      "name": "prepare_agent_payment_boundary_quote_request",
+      "description": "Prepare a complete but unsubmitted public GitHub quote-request draft for the $49 Agent Payment Boundary Review. Requires one or two explicit public HTTPS URLs without credentials, query strings, fragments, or non-public hosts; no URL fetch, wallet access, request submission, or payment."
+    },
     {
       "name": "preflight_agent_payment_boundary",
       "description": "Inspect one or two inline public documents using 11 deterministic agent-payment boundary checks. No URL fetch, code execution, wallet access, request submission, or payment."

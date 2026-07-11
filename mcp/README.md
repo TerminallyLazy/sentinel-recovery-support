@@ -1,10 +1,12 @@
-# Sentinel Payment Preflights
+# Sentinel Payment Boundary Tools
 
 Read-only stdio MCP server with two deterministic free preflights for public
-payment metadata, plus Sentinel Recovery's public service catalog and
-quote-request contract.
+payment metadata, one local public quote-request draft preparer, and Sentinel
+Recovery's public service catalog and quote-request contract.
 
-Source version `0.3.0` adds a pinned x402 v2 exact-EVM EIP-3009 safety profile.
+Source version `0.4.0` adds
+`prepare_agent_payment_boundary_quote_request` while retaining the pinned x402
+v2 exact-EVM EIP-3009 safety profile.
 Checksummed versioned MCPB artifacts are published on the
 [GitHub Releases page](https://github.com/TerminallyLazy/sentinel-recovery-support/releases).
 It is not published to npm. The official MCP Registry name is
@@ -45,6 +47,14 @@ endpoint.
   authorizes a payment, a signature is valid, settlement occurred, or a receipt
   exists. Permit2, ERC-7710, nonempty extensions, and other unmodeled content are
   reported as unsupported or ambiguous, not silently accepted.
+- `prepare_agent_payment_boundary_quote_request` accepts one or two unique
+  public HTTPS document URLs without credentials, query strings, fragments, or
+  non-public hosts, plus optional public request details, and prepares a
+  complete, unsubmitted public GitHub issue draft for the fixed-scope Agent
+  Payment Boundary Review.
+- The preparer formats the request locally. It does not fetch or verify supplied
+  URLs, make a network request, use a credential, submit the issue, authorize
+  payment, include payment instructions, or create service entitlement.
 
 ## Resources
 
@@ -52,11 +62,15 @@ endpoint.
 - `sentinel://services/quote-request-contract` reads and validates the live
   `service-request.json`.
 
-A resource read or preflight moves no funds. It submits no quote request,
-authorizes no payment, and creates no service entitlement. The server never
-requests credentials, keys, signatures, wallet connections, custody, or wallet
-control. An optional `$49` review is quote-first; using the free tool does not
-create a payment obligation.
+A resource read, preflight, or request-draft preparation moves no funds. The
+draft preparer returns a complete public GitHub request packet but submits
+nothing, authorizes no payment, and creates no service entitlement. The
+requester remains in control of whether to submit it within its own delegated
+communication policy. A Sentinel human remains in control of issuing a complete
+written quote, and any later payment remains controlled by the payer's own
+policy. The server never requests credentials, keys, signatures, wallet
+connections, custody, or wallet control. An optional `$49` review is
+quote-first; using a free tool does not create a payment obligation.
 
 ## Install and verify
 
@@ -91,6 +105,10 @@ protocol messages to stdout; startup failures go to stderr.
 
 - Only the two hard-coded canonical HTTPS URLs are fetched.
 - Both preflight tools accept inline content only and make no network requests.
+- The request-draft preparer accepts caller-supplied public HTTPS URLs but does
+  not accept query strings, fragments, credential-bearing URLs, or non-public
+  hosts and does not fetch them, verify their availability, use credentials,
+  make a network request, or submit the resulting public GitHub issue draft.
 - JSON with duplicate object keys is rejected before evaluation; recognized
   fields and containers must match their bounded types and value domains.
 - Requests use `GET`, a ten-second timeout, and a 256 KiB response cap.
