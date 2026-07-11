@@ -26,7 +26,7 @@ The site exposes a human-readable funding page, `$49/$99/$199` public-data servi
 - `/agent-guide.md` — mandatory agent authority boundaries
 - `/impact.json` — historical receipt and contribution-funded-work snapshot
 - `/llms.txt` — short discovery index
-- `mcp/` — read-only stdio MCP server with deterministic agent-payment and x402 `PaymentRequired` preflights, a local public quote-request draft preparer, and the live service and quote-request resources; install from source or the checksummed [`v0.4.0` GitHub Release](https://github.com/TerminallyLazy/sentinel-recovery-support/releases/tag/v0.4.0), not from the static Pages site
+- `mcp/` — read-only stdio MCP server with deterministic agent-payment and x402 `PaymentRequired` preflights, a local public quote-request draft preparer, and the live service and quote-request resources; install from source or the checksummed [`v0.4.1` GitHub Release](https://github.com/TerminallyLazy/sentinel-recovery-support/releases/tag/v0.4.1), not from the static Pages site
 
 ## Local MCP preflight and resources
 
@@ -63,12 +63,12 @@ requester decides whether to submit the public draft within its own communicatio
 authority; a Sentinel human controls issuance of the complete written quote, and
 any later payment remains controlled by the payer's own policy.
 
-The checksummed `v0.4.0` MCPB and its SHA-256 sidecar are published on the
-[GitHub Release](https://github.com/TerminallyLazy/sentinel-recovery-support/releases/tag/v0.4.0).
-The official MCP Registry lists version `0.4.0` as active and latest under
-`io.github.TerminallyLazy/sentinel-recovery-services`; verify the exact
-[Registry record](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.TerminallyLazy%2Fsentinel-recovery-services/versions/0.4.0)
-before relying on availability.
+The checksummed `v0.4.1` MCPB and its SHA-256 sidecar are published on the
+[GitHub Release](https://github.com/TerminallyLazy/sentinel-recovery-support/releases/tag/v0.4.1).
+Registry publication for version `0.4.1` is pending under
+`io.github.TerminallyLazy/sentinel-recovery-services`; verify that the exact
+[Registry record](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.TerminallyLazy%2Fsentinel-recovery-services/versions/0.4.1)
+is active before relying on Registry availability.
 
 Install and verify it from the repository root:
 

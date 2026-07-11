@@ -35,17 +35,17 @@
     "distributionStatus": "github-release",
     "remoteEndpointAvailable": false,
     "release": {
-      "version": "0.4.0",
-      "tag": "v0.4.0",
-      "bundleUrl": "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.4.0/sentinel-agent-payment-boundary-v0.4.0.mcpb",
-      "checksumUrl": "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.4.0/sentinel-agent-payment-boundary-v0.4.0.mcpb.sha256",
-      "sha256": "47cb25e6f69fdd6fbf68ffca0c98309ecf31cb998bd1527273e31803954e7a29"
+      "version": "0.4.1",
+      "tag": "v0.4.1",
+      "bundleUrl": "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.4.1/sentinel-agent-payment-boundary-v0.4.1.mcpb",
+      "checksumUrl": "https://github.com/TerminallyLazy/sentinel-recovery-support/releases/download/v0.4.1/sentinel-agent-payment-boundary-v0.4.1.mcpb.sha256",
+      "sha256": "17a25cf1171d73384c23770a424d2e2c0f4caced2a693c03d153f5d5389485b9"
     },
     "registry": {
       "name": "io.github.TerminallyLazy/sentinel-recovery-services",
-      "version": "0.4.0",
-      "publicationStatus": "published",
-      "versionApiUrl": "https://registry.modelcontextprotocol.io/v0.1/servers/io.github.TerminallyLazy%2Fsentinel-recovery-services/versions/0.4.0",
+      "version": "0.4.1",
+      "publicationStatus": "publication-pending",
+      "versionApiUrl": "https://registry.modelcontextprotocol.io/v0.1/servers/io.github.TerminallyLazy%2Fsentinel-recovery-services/versions/0.4.1",
       "serverJsonUrl": "https://raw.githubusercontent.com/TerminallyLazy/sentinel-recovery-support/main/mcp/server.json"
     },
     "source": {
