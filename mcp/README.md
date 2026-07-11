@@ -4,9 +4,9 @@ Read-only stdio MCP server with two deterministic free preflights for public
 payment metadata, one local public quote-request draft preparer, and Sentinel
 Recovery's public service catalog and quote-request contract.
 
-Source version `0.4.0` adds
-`prepare_agent_payment_boundary_quote_request` while retaining the pinned x402
-v2 exact-EVM EIP-3009 safety profile.
+Source version `0.4.1` hardens public quote-draft URL validation and the service
+catalog guard while retaining `prepare_agent_payment_boundary_quote_request`
+and the pinned x402 v2 exact-EVM EIP-3009 safety profile.
 Checksummed versioned MCPB artifacts are published on the
 [GitHub Releases page](https://github.com/TerminallyLazy/sentinel-recovery-support/releases).
 It is not published to npm. The official MCP Registry name is

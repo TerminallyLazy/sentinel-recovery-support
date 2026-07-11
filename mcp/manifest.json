@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "sentinel-agent-payment-boundary-preflight",
   "display_name": "Sentinel Payment Boundary Tools",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Inspect payment boundaries and locally prepare an unsubmitted public quote-request draft.",
   "long_description": "Three read-only tools run locally without wallet access. Two deterministic preflights inspect inline public documents without executing supplied content or fetching requester-controlled URLs. The third tool prepares a complete but unsubmitted public GitHub quote-request draft for the fixed-scope Agent Payment Boundary Review; it requires one or two explicit public HTTPS source URLs without credentials, query strings, fragments, or non-public hosts, never fetches them, and includes no payment instructions. No tool submits a request, moves funds, authorizes payment, or creates a service entitlement. A complete human-issued written quote is required before any service payment.",
   "author": {
