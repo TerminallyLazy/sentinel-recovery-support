@@ -65,10 +65,10 @@ any later payment remains controlled by the payer's own policy.
 
 The checksummed `v0.4.1` MCPB and its SHA-256 sidecar are published on the
 [GitHub Release](https://github.com/TerminallyLazy/sentinel-recovery-support/releases/tag/v0.4.1).
-Registry publication for version `0.4.1` is pending under
-`io.github.TerminallyLazy/sentinel-recovery-services`; verify that the exact
+The official MCP Registry lists version `0.4.1` as active and latest under
+`io.github.TerminallyLazy/sentinel-recovery-services`; verify the exact
 [Registry record](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.TerminallyLazy%2Fsentinel-recovery-services/versions/0.4.1)
-is active before relying on Registry availability.
+before relying on availability.
 
 Install and verify it from the repository root:
 
