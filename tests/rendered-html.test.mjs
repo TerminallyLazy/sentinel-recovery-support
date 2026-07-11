@@ -343,7 +343,7 @@ test("publishes a source-installable deterministic MCP preflight", async () => {
     },
   });
   assert.equal(mcpPackage.name, "sentinel-recovery-mcp");
-  assert.equal(mcpPackage.version, "0.4.0");
+  assert.equal(mcpPackage.version, "0.4.1");
   assert.equal(
     mcpPackage.mcpName,
     "io.github.terminallylazy/sentinel-recovery-services",
@@ -352,7 +352,7 @@ test("publishes a source-installable deterministic MCP preflight", async () => {
   assert.ok(mcpPackage.files.includes("quote-request.mjs"));
   assert.ok(mcpPackage.files.includes("x402-payment-required.mjs"));
   assert.equal(mcpBundle.manifest_version, "0.3");
-  assert.equal(mcpBundle.version, "0.4.0");
+  assert.equal(mcpBundle.version, "0.4.1");
   assert.deepEqual(
     mcpBundle.tools.map(({ name }) => name),
     [

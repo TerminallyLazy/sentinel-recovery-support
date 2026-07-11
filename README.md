@@ -30,7 +30,7 @@ The site exposes a human-readable funding page, `$49/$99/$199` public-data servi
 
 ## Local MCP preflight and resources
 
-The source checkout is version `0.4.0` and exposes three deterministic read-only
+The source checkout is version `0.4.1` and exposes three deterministic read-only
 tools:
 
 - `preflight_agent_payment_boundary` — checks one or two inline public

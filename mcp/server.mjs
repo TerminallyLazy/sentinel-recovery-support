@@ -251,7 +251,7 @@ export function createSentinelServer({ fetchImpl = globalThis.fetch } = {}) {
   const server = new McpServer(
     {
       name: "sentinel-recovery-mcp-server",
-      version: "0.4.0",
+      version: "0.4.1",
     },
     {
       instructions: SERVER_INSTRUCTIONS,

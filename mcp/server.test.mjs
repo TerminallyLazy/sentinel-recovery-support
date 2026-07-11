@@ -211,7 +211,7 @@ test("advertises two contract resources and three deterministic read-only tools"
   t.after(() => client.close());
 
   assert.equal(client.getServerVersion()?.name, "sentinel-recovery-mcp-server");
-  assert.equal(client.getServerVersion()?.version, "0.4.0");
+  assert.equal(client.getServerVersion()?.version, "0.4.1");
   assert.ok(client.getServerCapabilities()?.resources);
   assert.ok(client.getServerCapabilities()?.tools);
   assert.match(client.getInstructions() ?? "", /read-only/i);
