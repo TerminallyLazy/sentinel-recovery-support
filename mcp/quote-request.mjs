@@ -24,9 +24,18 @@ function isPublicHost(hostnameValue) {
     .replace(/\.$/, "");
   if (
     hostname === "localhost" ||
-    [".localhost", ".local", ".localdomain", ".internal", ".home", ".lan"].some(
-      (suffix) => hostname.endsWith(suffix),
-    )
+    [
+      ".localhost",
+      ".local",
+      ".localdomain",
+      ".internal",
+      ".home",
+      ".lan",
+      ".test",
+      ".example",
+      ".invalid",
+      ".onion",
+    ].some((suffix) => hostname.endsWith(suffix))
   ) {
     return false;
   }

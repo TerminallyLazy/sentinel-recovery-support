@@ -225,7 +225,10 @@ test("publishes canonical GitHub Pages interfaces for agents", async () => {
   for (const document of [guide, llms]) {
     assert.ok(document.includes(registryName));
     assert.ok(document.includes(registryVersionUrl));
-    assert.doesNotMatch(document, /Registry publication[^.]*pending/i);
+    assert.doesNotMatch(
+      document,
+      /Registry publication[\s\S]{0,240}\bpending\b/i,
+    );
     assert.doesNotMatch(
       document,
       /Registry availability[\s\S]{0,120}unverified/i,
