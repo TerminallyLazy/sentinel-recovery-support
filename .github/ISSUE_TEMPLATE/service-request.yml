@@ -21,6 +21,7 @@ body:
         - Claimant Context Intake ($49) — claimant-context-intake
         - Evidence Preview ($99) — evidence-preview
         - One-hop Trace Snapshot ($199) — trace-snapshot
+        - 48-Hour Agent Payment Failure Reproduction Sprint ($1,500) — 48-hour-agent-payment-failure-reproduction-sprint
     validations:
       required: true
 
@@ -28,14 +29,14 @@ body:
     id: transaction_hash
     attributes:
       label: Public Ethereum Mainnet transaction hash
-      description: Required for case services; leave blank for an agent payment boundary review.
+      description: Required for case services; leave blank for agent-facing services.
       placeholder: 0x...
 
   - type: textarea
     id: public_document_urls
     attributes:
       label: Public manifest, document, or x402 resource URLs
-      description: Required for this review. Provide 1–2 public HTTPS documents or public unauthenticated x402 resource URLs whose current HTTP 402 supplies PaymentRequired. Do not provide credentialed endpoints.
+      description: Required for agent-facing services. Provide 1–2 public repository, sandbox, or protocol URLs, public HTTPS documents, or public unauthenticated x402 resource URLs whose current HTTP 402 supplies PaymentRequired. Do not provide credentialed endpoints.
       placeholder: https://example.com/protected-resource
 
   - type: textarea

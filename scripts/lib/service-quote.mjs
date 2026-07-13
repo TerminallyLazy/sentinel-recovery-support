@@ -209,6 +209,14 @@ export function createServiceQuote({
   if (!service) {
     throw new Error("unknown serviceId");
   }
+  if (
+    service.requestOnly === true ||
+    service.canonicalServicePaymentQuoteEligible === false
+  ) {
+    throw new Error(
+      "request-only services require a separately human-approved SOW and are not eligible for a canonical service-payment quote",
+    );
+  }
 
   validateRequest(request, service);
   requireUuid("quoteId", quoteId);

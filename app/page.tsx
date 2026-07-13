@@ -45,7 +45,10 @@ const serviceRequestText = (serviceId: string) => {
   const values: Record<string, string> = {
     serviceId,
     requestTransport: "email",
-    chainId: "1",
+    chainId:
+      serviceId === "48-hour-agent-payment-failure-reproduction-sprint"
+        ? ""
+        : "1",
     transactionHash: "",
     publicDocumentUrls: "",
     replyEmail: "",
@@ -193,7 +196,7 @@ export default function Home() {
           </p>
         </div>
         <p className="service-flow" aria-label="Paid service sequence">
-          Request → human-issued quote → exact payment → return transaction hash → delivery
+          Request → human-issued quote or SOW → human approval → payment under accepted terms → delivery
         </p>
         <div className="work-grid service-grid">
           {paidServices.map((service) => (
@@ -208,6 +211,12 @@ export default function Home() {
                 <p>{service.scopeLabel}</p>
                 <span>DELIVERY TARGET</span>
                 <p>{service.turnaroundLabel}</p>
+                {"requestOnlyDisclosure" in service ? (
+                  <>
+                    <span>REQUEST-ONLY TERMS</span>
+                    <p>{service.requestOnlyDisclosure}</p>
+                  </>
+                ) : null}
               </div>
               <div className="service-actions">
                 <a
@@ -257,6 +266,16 @@ export default function Home() {
                     View sample Evidence Preview
                   </a>
                 ) : null}
+                {"proofUrl" in service ? (
+                  <a
+                    className="service-sample-link"
+                    href={service.proofUrl}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    Inspect MatchFlight deterministic proof
+                  </a>
+                ) : null}
                 <CopyValue
                   label="complete request"
                   value={serviceRequestText(service.id)}
@@ -278,9 +297,15 @@ export default function Home() {
           GitHub quote requests are public. Never include identity documents,
           confidential material, credentials, keys, wallet connections, or
           signatures. Email or a GitHub reply cannot change the recipient. {" "}
-          Do not pay from this page. Paid quotes currently use canonical USDC
-          or canonical USDT on Ethereum Mainnet. Payment is requested only after written
-          scope confirmation, including cancellation and refund terms. The
+          Do not pay from this page. Catalog-quote services currently use canonical USDC
+          or canonical USDT on Ethereum Mainnet. The 48-hour sprint is request-only:
+          an ACH, Wise, or Zelle invoice, its optional kickoff structure, and all
+          payment terms can appear only in a separately human-approved SOW. Zelle
+          is available only after a signed SOW and invoice and buyer acknowledgement
+          that Zelle has no purchase protection. This page publishes no sprint
+          payment instructions or banking details. Payment is requested only after
+          written scope confirmation,
+          including cancellation and refund terms. The
           seven-day quote and service-payment instructions are separate from
           voluntary-support metadata. Before paying, independently verify the
           chain, asset contract, recipient, quote ID, and expiry against the{" "}

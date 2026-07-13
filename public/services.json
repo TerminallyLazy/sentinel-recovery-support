@@ -115,12 +115,62 @@
         "maxDirectOutboundTransfers": 25,
         "observationCutoffConfirmedInWriting": true
       }
+    },
+    {
+      "id": "48-hour-agent-payment-failure-reproduction-sprint",
+      "title": "48-Hour Agent Payment Failure Reproduction Sprint",
+      "priceUsd": 1500,
+      "networkScope": "protocol-agnostic",
+      "requestOnly": true,
+      "directPaymentEnabled": false,
+      "canonicalServicePaymentQuoteEligible": false,
+      "deliveryMode": "asynchronous",
+      "meetingsRequired": false,
+      "summary": "Exercise one public agent-payment flow against deterministic replay, restart, expiry, recipient, amount, network, authorization, and receipt-identity failure cases.",
+      "deliverable": "Eight deterministic negative-path cases, one runnable Node regression harness, machine-readable findings.json, and prioritized remediation notes.",
+      "proofUrl": "https://terminallylazy.github.io/matchflight/",
+      "turnaroundHours": 48,
+      "turnaroundLabel": "Target within 48 hours after the separately human-approved SOW's kickoff condition is satisfied and complete public inputs are available.",
+      "requiredInputs": [
+        "one or two public HTTPS URLs identifying the repository, sandbox, protocol specification, or sanitized agent-payment artifacts to test",
+        "reachable email address only when using email transport"
+      ],
+      "optionalInputs": [
+        "one specific payment invariant or failure mode to prioritize",
+        "runtime, framework, or protocol version",
+        "one public command or fixture that reproduces the current flow"
+      ],
+      "scopeLabel": "One public or sanitized agent-payment flow, eight fixed negative-path cases, and one Node regression harness; no certification, no penetration test, no production exploitation, no private repositories, no credentials, no wallet connection, no signing, and no settlement action.",
+      "scope": {
+        "maxPublicUrls": 2,
+        "negativePathCases": 8,
+        "regressionHarnesses": 1,
+        "networkRequestsDuringEvaluationRequireWrittenScope": true
+      },
+      "commercialTerms": {
+        "fixedScopePriceUsd": 1500,
+        "optionalKickoffUsd": 750,
+        "invoiceRails": [
+          "ACH",
+          "Wise",
+          "Zelle"
+        ],
+        "kickoffRequiresSeparateHumanApprovedSow": true,
+        "invoiceIssuedOnlyAfterHumanApprovedSow": true,
+        "balanceAndAcceptanceTermsDefinedInSow": true,
+        "zelleRequiresSignedSowAndInvoice": true,
+        "zelleBuyerMustAcknowledgeNoPurchaseProtection": true,
+        "paymentInstructionsPublished": false
+      },
+      "requestOnlyDisclosure": "Request only. The engagement and delivery are asynchronous; no meeting or call is required. ACH, Wise, or Zelle invoice terms, including the optional $750 kickoff structure, are available only when stated in a separately human-approved SOW containing complete commercial terms. Zelle is available only after a signed SOW and invoice and the buyer's acknowledgement that Zelle has no purchase protection. This catalog publishes no payment instructions or banking details for the sprint.",
+      "securityCertification": false,
+      "penetrationTest": false
     }
   ],
   "requestProcess": [
     "A human or payer agent operating within its own delegated policy sends an email or a public GitHub issue with the selected offering's required public inputs and any optional context.",
-    "Sentinel confirms scope, timing, exact payment reference, and payment instructions in writing.",
-    "The requester decides whether to pay only after verifying the complete quote and canonical service-payment contract.",
+    "Sentinel confirms scope and timing in writing. Catalog-quote services also receive an exact payment reference and payment instructions; request-only offerings require a separately human-approved SOW and receive no payment instructions from this catalog.",
+    "The requester decides whether to proceed only after verifying the complete written quote or separately human-approved SOW and all applicable payment terms.",
     "Sentinel prepares only the confirmed evidence deliverable."
   ],
   "payment": {
@@ -134,6 +184,13 @@
     "networkFeesAdditional": true,
     "serviceTermsProvidedBeforePayment": true,
     "quoteExpiresAfterDays": 7,
+    "requestOnlyOfferingsRequireSeparateHumanApprovedSow": true,
+    "requestOnlyOfferingsPublishPaymentInstructions": false,
+    "requestOnlyInvoiceRails": [
+      "ACH",
+      "Wise",
+      "Zelle"
+    ],
     "voluntarySupportMetadataIsNotServicePaymentInstructions": true,
     "canonicalPaymentContract": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
     "writtenEmailCannotChangeRecipient": true,

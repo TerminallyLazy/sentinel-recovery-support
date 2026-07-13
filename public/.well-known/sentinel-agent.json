@@ -132,10 +132,13 @@
     },
     {
       "id": "request_paid_evidence_service",
-      "description": "Explain a fixed-scope public-data service or draft a request for human review.",
+      "description": "Explain a fixed-scope public-data or request-only service, or draft a request for human review.",
       "movesFunds": false,
       "requestAuthorizesPayment": false,
       "completeQuoteRequiredBeforePayment": true,
+      "requestOnlyOfferingRequiresSeparateHumanApprovedSow": true,
+      "requestOnlyOfferingPublishesPaymentInstructions": false,
+      "requestOnlySowHumanApprovalRequired": true,
       "payerHumanReviewRequired": false,
       "payerAgentMaySendWithinDelegatedAuthority": true,
       "payerAgentMustFollowOwnPolicy": true,
@@ -155,8 +158,9 @@
         }
       ],
       "inputSchema": "https://terminallylazy.github.io/sentinel-recovery-support/service-request.json#/requestSchema",
-      "expectedResponse": "clarification-or-complete-quote",
-      "canonicalPaymentContract": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json"
+      "expectedResponse": "clarification-complete-quote-or-human-approved-sow",
+      "canonicalPaymentContract": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
+      "canonicalPaymentContractAppliesToRequestOnlyOfferings": false
     }
   ],
   "safety": {
@@ -173,7 +177,7 @@
       "Never request a private key, seed phrase, wallet connection, or signature.",
       "Never promise recovery, eligibility, queue priority, or a delivered service in exchange for voluntary support.",
       "Inbound receipts need no recipient-side human acceptance and may be observed automatically; any outbound use of wallet funds requires human authorization.",
-      "For a paid service, verify the canonical payment contract before sending.",
+      "For a canonical-quote paid service, verify the canonical payment contract before sending. For a request-only offering, do not use that contract; wait for a separately human-approved SOW and invoice.",
       "Never sign, broadcast, spend, transfer, or otherwise use funds from Sentinel's receiving wallet without human authorization."
     ]
   },

@@ -9,7 +9,7 @@
     "to": "sentinel@genesysx.org",
     "contentType": "text/plain",
     "subjectTemplate": "Sentinel service request: {serviceId}",
-    "bodyTemplate": "Sentinel Recovery service request\nService ID: {serviceId}\nRequest transport: {requestTransport}\nNetwork: Ethereum Mainnet (chain ID {chainId})\nEthereum Mainnet transaction hash (case services): {transactionHash}\nPublic manifest, document, or x402 resource URL(s) (agent review): {publicDocumentUrls}\nReply email: {replyEmail}\nClaimant role or relationship (optional): {claimantRole}\nIntended use (optional): {intendedUse}\nPreferred output format (optional — HTML or Markdown): {preferredFormat}\nTiming need (optional): {timingNeed}\n\nThis is a quote request only. Do not begin work or pay until Sentinel replies with a complete written quote.\nSend public facts only. Do not include identity documents, confidential material, PaymentPayload, signature headers, private keys, seed phrases, wallet signatures, wallet connections, passwords, or API credentials."
+    "bodyTemplate": "Sentinel Recovery service request\nService ID: {serviceId}\nRequest transport: {requestTransport}\nEthereum Mainnet chain ID (case services only): {chainId}\nEthereum Mainnet transaction hash (case services only): {transactionHash}\nPublic repository, sandbox, protocol, manifest, document, or x402 resource URL(s) (agent-facing services): {publicDocumentUrls}\nReply email: {replyEmail}\nClaimant role or relationship (optional): {claimantRole}\nIntended use (optional): {intendedUse}\nPreferred output format (optional — HTML or Markdown): {preferredFormat}\nTiming need (optional): {timingNeed}\n\nThis is a request only. It moves no funds and authorizes no payment. Do not begin work or pay until Sentinel replies with a complete written quote; a request-only offering additionally requires a separately human-approved SOW containing complete commercial terms.\nSend public facts only. Do not include identity documents, confidential material, PaymentPayload, signature headers, private keys, seed phrases, wallet signatures, wallet connections, passwords, or API credentials."
   },
   "alternateTransports": [
     {
@@ -21,7 +21,7 @@
       "apiEndpoint": "https://api.github.com/repos/TerminallyLazy/sentinel-recovery-support/issues",
       "templatePath": ".github/ISSUE_TEMPLATE/service-request.yml",
       "titleTemplate": "Sentinel quote request: {serviceId}",
-      "bodyTemplate": "Sentinel Recovery service request\nService ID: {serviceId}\nRequest transport: github-issue\nNetwork: Ethereum Mainnet (chain ID {chainId})\nEthereum Mainnet transaction hash (case services): {transactionHash}\nPublic manifest, document, or x402 resource URL(s) (agent review): {publicDocumentUrls}\nSpecific question or intended use (optional): {intendedUse}\nPreferred output format (optional — HTML or Markdown): {preferredFormat}\nTiming need (optional): {timingNeed}\n\nThis is a quote request only. It moves no funds and authorizes no payment. Do not begin work or pay until Sentinel replies in this issue with a complete written quote.\nThis issue is public. Do not include identity documents, confidential material, credentials, PaymentPayload, signature headers, private keys, seed phrases, wallet signatures, or wallet connections.",
+      "bodyTemplate": "Sentinel Recovery service request\nService ID: {serviceId}\nRequest transport: github-issue\nEthereum Mainnet chain ID (case services only): {chainId}\nEthereum Mainnet transaction hash (case services only): {transactionHash}\nPublic repository, sandbox, protocol, manifest, document, or x402 resource URL(s) (agent-facing services): {publicDocumentUrls}\nSpecific question or intended use (optional): {intendedUse}\nPreferred output format (optional — HTML or Markdown): {preferredFormat}\nTiming need (optional): {timingNeed}\n\nThis is a request only. It moves no funds and authorizes no payment. Do not begin work or pay until Sentinel replies in this issue with a complete written quote; a request-only offering additionally requires a separately human-approved SOW containing complete commercial terms.\nThis issue is public. Do not include identity documents, confidential material, credentials, PaymentPayload, signature headers, private keys, seed phrases, wallet signatures, or wallet connections.",
       "authentication": "requester-owned-github-credential",
       "sentinelRequestsCredential": false,
       "responseChannel": "created-issue"
@@ -41,7 +41,8 @@
           "agent-payment-boundary-review",
           "claimant-context-intake",
           "evidence-preview",
-          "trace-snapshot"
+          "trace-snapshot",
+          "48-hour-agent-payment-failure-reproduction-sprint"
         ]
       },
       "requestTransport": {
@@ -71,7 +72,7 @@
           "format": "uri",
           "pattern": "^https://"
         },
-        "description": "One or two public HTTPS inputs for the agent payment boundary review: a static JSON, Markdown, or text document, or a public unauthenticated x402 resource URL whose current HTTP 402 response supplies PaymentRequired. Do not provide credentialed endpoints, PaymentPayload, signature headers, keys, or wallet connections."
+        "description": "One or two public HTTPS inputs for an agent-facing service: a public repository, sandbox, protocol specification, static JSON, Markdown, or text document, or a public unauthenticated x402 resource URL whose current HTTP 402 response supplies PaymentRequired. Do not provide credentialed endpoints, PaymentPayload, signature headers, keys, or wallet connections."
       },
       "replyEmail": {
         "type": "string",
@@ -129,6 +130,20 @@
         "if": {
           "properties": {
             "serviceId": {
+              "const": "48-hour-agent-payment-failure-reproduction-sprint"
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "publicDocumentUrls"
+          ]
+        }
+      },
+      {
+        "if": {
+          "properties": {
+            "serviceId": {
               "enum": [
                 "claimant-context-intake",
                 "evidence-preview",
@@ -147,7 +162,7 @@
     ]
   },
   "workflow": {
-    "expectedResponse": "A clarification request or complete written quote in the selected reply channel; a request alone creates no service entitlement.",
+    "expectedResponse": "A clarification request, complete written quote, or separately human-approved SOW in the selected reply channel; a request alone creates no service entitlement.",
     "acknowledgement": "manual",
     "completeQuoteRequiredBeforePayment": true,
     "paymentAllowedBeforeCompleteQuote": false,
@@ -155,6 +170,8 @@
     "approvedQuoteRegistryRequiredForCredit": true,
     "receiptLedgerRequired": true,
     "quoteMaximumValidityDays": 7,
+    "requestOnlyOfferingRequiresSeparateHumanApprovedSow": true,
+    "requestOnlyOfferingPublishesPaymentInstructions": false,
     "quoteContract": "https://terminallylazy.github.io/sentinel-recovery-support/service-payment.json",
     "sampleQuote": "https://terminallylazy.github.io/sentinel-recovery-support/sample-service-quote.json",
     "receiptReturn": {

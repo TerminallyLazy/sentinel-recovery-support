@@ -197,6 +197,32 @@ test("rejects requests missing transport-specific or service-specific inputs", a
   );
 });
 
+test("rejects canonical payment quotes for the request-only 48-hour sprint", async () => {
+  const [services, paymentContract] = await Promise.all([
+    readFile(new URL("../public/services.json", import.meta.url), "utf8").then(JSON.parse),
+    readFile(new URL("../public/service-payment.json", import.meta.url), "utf8").then(JSON.parse),
+  ]);
+
+  assert.throws(
+    () =>
+      createServiceQuote({
+        request: {
+          serviceId: "48-hour-agent-payment-failure-reproduction-sprint",
+          requestTransport: "github-issue",
+          publicDocumentUrls: ["https://example.com/public-agent-repository"],
+        },
+        services,
+        paymentContract,
+        assetSymbol: "USDC",
+        quoteId,
+        paymentReference,
+        issuedAt: "2026-07-13T12:00:00.000Z",
+        expiresAt: "2026-07-20T12:00:00.000Z",
+      }),
+    /request-only.*separately human-approved SOW.*not eligible.*canonical service-payment quote/i,
+  );
+});
+
 test("rejects a stablecoin underpayment override and credentialed public URLs", async () => {
   const [services, paymentContract] = await Promise.all([
     readFile(new URL("../public/services.json", import.meta.url), "utf8").then(JSON.parse),

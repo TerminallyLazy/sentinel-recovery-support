@@ -67,6 +67,111 @@ test("keeps an MCP quote-request draft separate from a payable quote", () => {
   }
 });
 
+test("publishes a request-only 48-hour payment failure reproduction sprint", async () => {
+  const [services, request, issueTemplate, pageSource, readme, manifest, guide, llms] = await Promise.all([
+    readFile(new URL("public/services.json", root), "utf8").then(JSON.parse),
+    readFile(new URL("public/service-request.json", root), "utf8").then(JSON.parse),
+    readFile(new URL(".github/ISSUE_TEMPLATE/service-request.yml", root), "utf8"),
+    readFile(new URL("app/page.tsx", root), "utf8"),
+    readFile(new URL("README.md", root), "utf8"),
+    readFile(new URL("public/.well-known/sentinel-agent.json", root), "utf8").then(JSON.parse),
+    readFile(new URL("public/agent-guide.md", root), "utf8"),
+    readFile(new URL("public/llms.txt", root), "utf8"),
+  ]);
+  const serviceId = "48-hour-agent-payment-failure-reproduction-sprint";
+  const sprint = services.offerings.find(({ id }) => id === serviceId);
+
+  assert.ok(sprint, "expected the 48-hour sprint offering");
+  assert.equal(sprint.title, "48-Hour Agent Payment Failure Reproduction Sprint");
+  assert.equal(sprint.priceUsd, 1500);
+  assert.equal(sprint.requestOnly, true);
+  assert.equal(sprint.directPaymentEnabled, false);
+  assert.equal(sprint.canonicalServicePaymentQuoteEligible, false);
+  assert.equal(sprint.deliveryMode, "asynchronous");
+  assert.equal(sprint.meetingsRequired, false);
+  assert.equal("chainId" in sprint, false);
+  assert.equal(sprint.networkScope, "protocol-agnostic");
+  assert.equal(sprint.turnaroundHours, 48);
+  assert.equal(sprint.securityCertification, false);
+  assert.equal(sprint.penetrationTest, false);
+  assert.equal(
+    sprint.proofUrl,
+    "https://terminallylazy.github.io/matchflight/",
+  );
+  assert.deepEqual(sprint.commercialTerms, {
+    fixedScopePriceUsd: 1500,
+    optionalKickoffUsd: 750,
+    invoiceRails: ["ACH", "Wise", "Zelle"],
+    kickoffRequiresSeparateHumanApprovedSow: true,
+    invoiceIssuedOnlyAfterHumanApprovedSow: true,
+    balanceAndAcceptanceTermsDefinedInSow: true,
+    zelleRequiresSignedSowAndInvoice: true,
+    zelleBuyerMustAcknowledgeNoPurchaseProtection: true,
+    paymentInstructionsPublished: false,
+  });
+  assert.match(sprint.deliverable, /eight deterministic negative-path cases/i);
+  assert.match(sprint.deliverable, /runnable Node regression harness/i);
+  assert.match(sprint.deliverable, /findings\.json/i);
+  assert.match(sprint.scopeLabel, /no certification/i);
+  assert.match(sprint.scopeLabel, /no penetration test/i);
+  assert.match(sprint.requestOnlyDisclosure, /separately human-approved SOW/i);
+  assert.match(sprint.requestOnlyDisclosure, /publishes no payment instructions/i);
+  assert.match(sprint.requestOnlyDisclosure, /no meeting or call is required/i);
+
+  assert.ok(request.requestSchema.properties.serviceId.enum.includes(serviceId));
+  const publicUrlCondition = request.requestSchema.allOf.find(
+    (rule) =>
+      rule.if?.properties?.serviceId?.const === serviceId ||
+      rule.if?.properties?.serviceId?.enum?.includes(serviceId),
+  );
+  assert.ok(publicUrlCondition, "expected sprint public-URL input condition");
+  assert.deepEqual(publicUrlCondition.then.required, ["publicDocumentUrls"]);
+  assert.equal(
+    request.workflow.requestOnlyOfferingRequiresSeparateHumanApprovedSow,
+    true,
+  );
+  assert.equal(request.workflow.requestOnlyOfferingPublishesPaymentInstructions, false);
+  assert.equal(
+    services.payment.requestOnlyOfferingsRequireSeparateHumanApprovedSow,
+    true,
+  );
+  assert.equal(services.payment.requestOnlyOfferingsPublishPaymentInstructions, false);
+  assert.deepEqual(services.payment.requestOnlyInvoiceRails, ["ACH", "Wise", "Zelle"]);
+  assert.doesNotMatch(
+    JSON.stringify({ sprint, payment: services.payment }),
+    /routing number|account number|bank address|swift|iban/i,
+  );
+
+  assert.match(issueTemplate, /48-Hour Agent Payment Failure Reproduction Sprint \(\$1,500\)/);
+  assert.match(issueTemplate, /public repository, sandbox, or protocol URL/i);
+  assert.match(request.transport.bodyTemplate, /chain ID \(case services only\)/i);
+  assert.match(pageSource, /service\.requestOnlyDisclosure/);
+  assert.match(pageSource, /service\.proofUrl/);
+  assert.match(pageSource, /human-issued quote or SOW/i);
+  assert.match(pageSource, /ACH, Wise, or Zelle invoice/i);
+  assert.match(pageSource, /Zelle has no purchase protection/i);
+  assert.match(readme, /48-Hour Agent Payment Failure Reproduction Sprint/i);
+  assert.match(readme, /request-only/i);
+  assert.match(readme, /MatchFlight/i);
+  assert.match(readme, /requires no meeting or call/i);
+
+  const requestCapability = manifest.capabilities.find(
+    ({ id }) => id === "request_paid_evidence_service",
+  );
+  assert.equal(
+    requestCapability.expectedResponse,
+    "clarification-complete-quote-or-human-approved-sow",
+  );
+  assert.equal(
+    requestCapability.canonicalPaymentContractAppliesToRequestOnlyOfferings,
+    false,
+  );
+  assert.match(guide, /request-only.*human-approved SOW and invoice/is);
+  assert.match(guide, /canonical crypto service-payment contract must not be used/i);
+  assert.match(llms, /request-only \$1,500 sprint/i);
+  assert.match(llms, /does not authorize payment for request-only offerings/i);
+});
+
 test("does not expose payable quote artifacts through public GitHub Actions", async () => {
   await assert.rejects(
     access(new URL(".github/workflows/prepare-service-quote.yml", root)),
