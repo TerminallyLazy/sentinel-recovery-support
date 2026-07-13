@@ -226,14 +226,14 @@ export function prepareServiceQuoteRequest(input) {
     "Sentinel Recovery service request",
     `Service ID: ${request.serviceId}`,
     "Request transport: github-issue",
-    "Network: Ethereum Mainnet (chain ID 1)",
-    "Ethereum Mainnet transaction hash (case services): not applicable (agent review)",
-    `Public manifest, document, or x402 resource URL(s) (agent review): ${publicDocumentUrls}`,
+    "Ethereum Mainnet chain ID (case services only): 1",
+    "Ethereum Mainnet transaction hash (case services only): not applicable (agent review)",
+    `Public repository, sandbox, protocol, manifest, document, or x402 resource URL(s) (agent-facing services): ${publicDocumentUrls}`,
     `Specific question or intended use (optional): ${request.intendedUse ?? "not provided"}`,
     `Preferred output format (optional — HTML or Markdown): ${request.preferredFormat ?? "not provided"}`,
     `Timing need (optional): ${request.timingNeed ?? "not provided"}`,
     "",
-    "This is a quote request only. It moves no funds and authorizes no payment. Do not begin work or pay until Sentinel replies in this issue with a complete written quote.",
+    "This is a request only. It moves no funds and authorizes no payment. Do not begin work or pay until Sentinel replies in this issue with a complete written quote; a request-only offering additionally requires a separately human-approved SOW containing complete commercial terms.",
     "This issue is public. Do not include identity documents, confidential material, credentials, PaymentPayload, signature headers, private keys, seed phrases, wallet signatures, or wallet connections.",
   ].join("\n");
   const webUrl = `${GITHUB_NEW_ISSUE_URL}?template=service-request.yml&title=${encodeURIComponent(requestTitle)}`;
