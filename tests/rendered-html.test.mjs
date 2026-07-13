@@ -494,7 +494,20 @@ test("advertises an actionable paid-service request capability", async () => {
     capability.inputSchema,
     `${siteBase}service-request.json#/requestSchema`,
   );
-  assert.equal(capability.expectedResponse, "clarification-or-complete-quote");
+  assert.equal(
+    capability.expectedResponse,
+    "clarification-complete-quote-or-human-approved-sow",
+  );
+  assert.equal(
+    capability.requestOnlyOfferingRequiresSeparateHumanApprovedSow,
+    true,
+  );
+  assert.equal(capability.requestOnlyOfferingPublishesPaymentInstructions, false);
+  assert.equal(capability.requestOnlySowHumanApprovalRequired, true);
+  assert.equal(
+    capability.canonicalPaymentContractAppliesToRequestOnlyOfferings,
+    false,
+  );
 });
 
 test("publishes one canonical service-request URL across agent interfaces", async () => {
@@ -653,8 +666,8 @@ test("publishes a fixed-scope paid evidence funnel", async () => {
 
   assert.match(html, /Need a deliverable, not a donation\?/i);
   assert.match(
-    html,
-    /Request → human-issued quote → exact payment → return transaction hash → delivery/i,
+    html.replaceAll("<!-- -->", ""),
+    /Request → human-issued quote or SOW → human approval → payment under accepted terms → delivery/i,
   );
   assert.match(html, /Claimant Context Intake/i);
   assert.match(html, /does not verify identity or wallet ownership/i);
@@ -680,6 +693,10 @@ test("publishes a fixed-scope paid evidence funnel", async () => {
       { id: "claimant-context-intake", priceUsd: 49 },
       { id: "evidence-preview", priceUsd: 99 },
       { id: "trace-snapshot", priceUsd: 199 },
+      {
+        id: "48-hour-agent-payment-failure-reproduction-sprint",
+        priceUsd: 1500,
+      },
     ],
   );
   const claimant = services.offerings.find(
@@ -692,9 +709,21 @@ test("publishes a fixed-scope paid evidence funnel", async () => {
   assert.equal(trace.scope.maxDirectOutboundTransfers, 25);
   assert.equal(trace.scope.maxHops, 1);
   assert.ok(
-    services.offerings.every(({ chainId }) => chainId === 1),
-    "expected every paid offering to be Ethereum Mainnet only",
+    services.offerings
+      .filter(({ canonicalServicePaymentQuoteEligible }) =>
+        canonicalServicePaymentQuoteEligible !== false,
+      )
+      .every(({ chainId }) => chainId === 1),
+    "expected every canonical service-payment quote offering to be Ethereum Mainnet only",
   );
+  const requestOnlySprint = services.offerings.find(
+    ({ id }) => id === "48-hour-agent-payment-failure-reproduction-sprint",
+  );
+  assert.equal("chainId" in requestOnlySprint, false);
+  assert.equal(requestOnlySprint.networkScope, "protocol-agnostic");
+  assert.equal(requestOnlySprint.deliveryMode, "asynchronous");
+  assert.equal(requestOnlySprint.meetingsRequired, false);
+  assert.match(html, /no meeting or call is required/i);
   assert.ok(
     services.offerings.every(({ requiredInputs }) =>
       requiredInputs.includes(
@@ -824,13 +853,13 @@ test("accepts a public unauthenticated x402 resource as a review input", async (
 
   assert.match(
     request.transport.bodyTemplate,
-    /Public manifest, document, or x402 resource URL\(s\) \(agent review\)/i,
+    /Public repository, sandbox, protocol, manifest, document, or x402 resource URL\(s\) \(agent-facing services\)/i,
   );
   assert.match(request.transport.bodyTemplate, /PaymentPayload\b/i);
   assert.match(request.transport.bodyTemplate, /signature headers/i);
   assert.match(
     githubTransport.bodyTemplate,
-    /Public manifest, document, or x402 resource URL\(s\) \(agent review\)/i,
+    /Public repository, sandbox, protocol, manifest, document, or x402 resource URL\(s\) \(agent-facing services\)/i,
   );
   assert.match(
     template,
@@ -955,6 +984,7 @@ test("publishes an executable quote-first service request contract", async () =>
     "claimant-context-intake",
     "evidence-preview",
     "trace-snapshot",
+    "48-hour-agent-payment-failure-reproduction-sprint",
   ]);
   assert.equal(
     request.requestSchema.properties.transactionHash.pattern,
@@ -963,11 +993,11 @@ test("publishes an executable quote-first service request contract", async () =>
   assert.match(request.transport.bodyTemplate, /Service ID: \{serviceId\}/);
   assert.match(
     request.transport.bodyTemplate,
-    /Ethereum Mainnet transaction hash \(case services\): \{transactionHash\}/,
+    /Ethereum Mainnet transaction hash \(case services only\): \{transactionHash\}/,
   );
   assert.match(request.transport.bodyTemplate, /Reply email: \{replyEmail\}/);
   assert.match(request.transport.bodyTemplate, /Request transport: \{requestTransport\}/);
-  assert.match(request.transport.bodyTemplate, /quote request only/i);
+  assert.match(request.transport.bodyTemplate, /request only/i);
   assert.match(request.transport.bodyTemplate, /do not.*pay.*complete written quote/i);
   assert.equal(request.workflow.completeQuoteRequiredBeforePayment, true);
   assert.equal(request.workflow.paymentAllowedBeforeCompleteQuote, false);
@@ -1065,7 +1095,7 @@ test("publishes a public GitHub issue transport for quote requests", async () =>
     templatePath: ".github/ISSUE_TEMPLATE/service-request.yml",
     titleTemplate: "Sentinel quote request: {serviceId}",
     bodyTemplate:
-      "Sentinel Recovery service request\nService ID: {serviceId}\nRequest transport: github-issue\nNetwork: Ethereum Mainnet (chain ID {chainId})\nEthereum Mainnet transaction hash (case services): {transactionHash}\nPublic manifest, document, or x402 resource URL(s) (agent review): {publicDocumentUrls}\nSpecific question or intended use (optional): {intendedUse}\nPreferred output format (optional — HTML or Markdown): {preferredFormat}\nTiming need (optional): {timingNeed}\n\nThis is a quote request only. It moves no funds and authorizes no payment. Do not begin work or pay until Sentinel replies in this issue with a complete written quote.\nThis issue is public. Do not include identity documents, confidential material, credentials, PaymentPayload, signature headers, private keys, seed phrases, wallet signatures, or wallet connections.",
+      "Sentinel Recovery service request\nService ID: {serviceId}\nRequest transport: github-issue\nEthereum Mainnet chain ID (case services only): {chainId}\nEthereum Mainnet transaction hash (case services only): {transactionHash}\nPublic repository, sandbox, protocol, manifest, document, or x402 resource URL(s) (agent-facing services): {publicDocumentUrls}\nSpecific question or intended use (optional): {intendedUse}\nPreferred output format (optional — HTML or Markdown): {preferredFormat}\nTiming need (optional): {timingNeed}\n\nThis is a request only. It moves no funds and authorizes no payment. Do not begin work or pay until Sentinel replies in this issue with a complete written quote; a request-only offering additionally requires a separately human-approved SOW containing complete commercial terms.\nThis issue is public. Do not include identity documents, confidential material, credentials, PaymentPayload, signature headers, private keys, seed phrases, wallet signatures, or wallet connections.",
     authentication: "requester-owned-github-credential",
     sentinelRequestsCredential: false,
     responseChannel: "created-issue",
