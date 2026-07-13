@@ -339,15 +339,15 @@ test("prepares a complete public GitHub quote request without submitting or payi
   );
   assert.match(
     result.structuredContent.requestBody,
-    /Public manifest, document, or x402 resource URL\(s\).*https:\/\/example\.com\/agent\.json, https:\/\/example\.com\/payment\.md/,
+    /Public repository, sandbox, protocol, manifest, document, or x402 resource URL\(s\).*https:\/\/example\.com\/agent\.json, https:\/\/example\.com\/payment\.md/,
   );
   assert.match(
     result.structuredContent.requestBody,
-    /This is a quote request only\. It moves no funds and authorizes no payment\./,
+    /This is a request only\. It moves no funds and authorizes no payment\./,
   );
   assert.match(
     result.structuredContent.requestBody,
-    /Ethereum Mainnet transaction hash \(case services\): not applicable \(agent review\)/,
+    /Ethereum Mainnet transaction hash \(case services only\): not applicable \(agent review\)/,
   );
   assert.doesNotMatch(result.structuredContent.requestBody, /\{[^}]+\}/);
   assert.doesNotMatch(result.structuredContent.requestBody, /:\s*\n/);
