@@ -128,6 +128,13 @@
       "meetingsRequired": false,
       "summary": "Exercise one public agent-payment flow against deterministic replay, restart, expiry, recipient, amount, network, authorization, and receipt-identity failure cases.",
       "deliverable": "Eight deterministic negative-path cases, one runnable Node regression harness, machine-readable findings.json, and prioritized remediation notes.",
+      "acceptanceCriteria": [
+        "npm ci && npm test runs the delivered public fixture bundle without buyer credentials",
+        "all eight negative-path cases have an explicit PASS, FAIL, or NOT-TESTABLE result",
+        "every FAIL is reproducible and pinned to the tested source revision",
+        "every delivered artifact is included in the SHA-256 hash manifest"
+      ],
+      "acceptanceBoundary": "These are objective technical completion checks. Buyer-specific legal acceptance, cancellation, refund, tax, invoice, and governing terms are defined only in the separately human-approved SOW.",
       "proofUrl": "https://terminallylazy.github.io/matchflight/",
       "turnaroundHours": 48,
       "turnaroundLabel": "Target within 48 hours after the separately human-approved SOW's kickoff condition is satisfied and complete public inputs are available.",

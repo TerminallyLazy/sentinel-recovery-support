@@ -402,6 +402,7 @@ nav a:hover {
 
 .work-card p,
 .service-deliverable p,
+.service-acceptance,
 .service-note,
 .term-panel li,
 .irreversible-note,
@@ -433,6 +434,7 @@ nav a:hover {
   display: flex;
   min-height: 430px;
   flex-direction: column;
+  scroll-margin-top: 78px;
 }
 
 .service-price,
@@ -470,6 +472,15 @@ nav a:hover {
 
 .service-deliverable p {
   margin-bottom: 0;
+}
+
+.service-acceptance {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.service-acceptance li + li {
+  margin-top: 6px;
 }
 
 .service-actions {

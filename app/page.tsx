@@ -1,4 +1,5 @@
 import { CopyValue, SupportActions } from "./SupportActions";
+import { HashAnchorCorrection } from "./HashAnchorCorrection";
 import { ASSETS, SUPPORT_WALLET } from "./support-data";
 import servicesCatalog from "../public/services.json";
 import serviceRequest from "../public/service-request.json";
@@ -77,6 +78,7 @@ const serviceRequestUrl = (title: string, serviceId: string) => {
 export default function Home() {
   return (
     <main>
+      <HashAnchorCorrection />
       <header className="site-header">
         <a className="brand" href="#top" aria-label="Sentinel Support home">
           <span className="brand-mark" aria-hidden="true">S</span>
@@ -200,7 +202,11 @@ export default function Home() {
         </p>
         <div className="work-grid service-grid">
           {paidServices.map((service) => (
-            <article className="work-card service-card" key={service.id}>
+            <article
+              className="work-card service-card"
+              id={service.id}
+              key={service.id}
+            >
               <span className="service-price">${service.priceUsd}</span>
               <h3>{service.title}</h3>
               <p>{service.summary}</p>
@@ -211,6 +217,17 @@ export default function Home() {
                 <p>{service.scopeLabel}</p>
                 <span>DELIVERY TARGET</span>
                 <p>{service.turnaroundLabel}</p>
+                {"acceptanceCriteria" in service ? (
+                  <>
+                    <span>TECHNICAL COMPLETION CHECKS</span>
+                    <ul className="service-acceptance">
+                      {service.acceptanceCriteria.map((criterion) => (
+                        <li key={criterion}>{criterion}</li>
+                      ))}
+                    </ul>
+                    <p>{service.acceptanceBoundary}</p>
+                  </>
+                ) : null}
                 {"requestOnlyDisclosure" in service ? (
                   <>
                     <span>REQUEST-ONLY TERMS</span>
