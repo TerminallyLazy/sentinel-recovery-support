@@ -22,6 +22,7 @@ body:
         - Evidence Preview ($99) — evidence-preview
         - One-hop Trace Snapshot ($199) — trace-snapshot
         - 48-Hour Agent Payment Failure Reproduction Sprint ($1,500) — 48-hour-agent-payment-failure-reproduction-sprint
+        - 24-Hour Node/TypeScript Release-Blocker Reproduction ($750) — 24-hour-node-typescript-release-blocker-reproduction
     validations:
       required: true
 

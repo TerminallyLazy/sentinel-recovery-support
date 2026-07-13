@@ -42,7 +42,8 @@
           "claimant-context-intake",
           "evidence-preview",
           "trace-snapshot",
-          "48-hour-agent-payment-failure-reproduction-sprint"
+          "48-hour-agent-payment-failure-reproduction-sprint",
+          "24-hour-node-typescript-release-blocker-reproduction"
         ]
       },
       "requestTransport": {
@@ -130,7 +131,10 @@
         "if": {
           "properties": {
             "serviceId": {
-              "const": "48-hour-agent-payment-failure-reproduction-sprint"
+              "enum": [
+                "48-hour-agent-payment-failure-reproduction-sprint",
+                "24-hour-node-typescript-release-blocker-reproduction"
+              ]
             }
           }
         },

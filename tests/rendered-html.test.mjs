@@ -697,6 +697,10 @@ test("publishes a fixed-scope paid evidence funnel", async () => {
         id: "48-hour-agent-payment-failure-reproduction-sprint",
         priceUsd: 1500,
       },
+      {
+        id: "24-hour-node-typescript-release-blocker-reproduction",
+        priceUsd: 750,
+      },
     ],
   );
   const claimant = services.offerings.find(
@@ -724,6 +728,14 @@ test("publishes a fixed-scope paid evidence funnel", async () => {
   assert.equal(requestOnlySprint.deliveryMode, "asynchronous");
   assert.equal(requestOnlySprint.meetingsRequired, false);
   assert.match(html, /no meeting or call is required/i);
+  const releaseBlocker = services.offerings.find(
+    ({ id }) => id === "24-hour-node-typescript-release-blocker-reproduction",
+  );
+  assert.equal("chainId" in releaseBlocker, false);
+  assert.equal(releaseBlocker.turnaroundHours, 24);
+  assert.equal(releaseBlocker.requestOnly, true);
+  assert.equal(releaseBlocker.meetingsRequired, false);
+  assert.match(releaseBlocker.deliverable, /NOT_REPRODUCIBLE/i);
   assert.ok(
     services.offerings.every(({ requiredInputs }) =>
       requiredInputs.includes(
@@ -985,6 +997,7 @@ test("publishes an executable quote-first service request contract", async () =>
     "evidence-preview",
     "trace-snapshot",
     "48-hour-agent-payment-failure-reproduction-sprint",
+    "24-hour-node-typescript-release-blocker-reproduction",
   ]);
   assert.equal(
     request.requestSchema.properties.transactionHash.pattern,

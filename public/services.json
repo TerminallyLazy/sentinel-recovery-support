@@ -172,6 +172,61 @@
       "requestOnlyDisclosure": "Request only. The engagement and delivery are asynchronous; no meeting or call is required. ACH, Wise, or Zelle invoice terms, including the optional $750 kickoff structure, are available only when stated in a separately human-approved SOW containing complete commercial terms. Zelle is available only after a signed SOW and invoice and the buyer's acknowledgement that Zelle has no purchase protection. This catalog publishes no payment instructions or banking details for the sprint.",
       "securityCertification": false,
       "penetrationTest": false
+    },
+    {
+      "id": "24-hour-node-typescript-release-blocker-reproduction",
+      "title": "24-Hour Node/TypeScript Release-Blocker Reproduction",
+      "priceUsd": 750,
+      "networkScope": "public-node-typescript",
+      "requestOnly": true,
+      "directPaymentEnabled": false,
+      "canonicalServicePaymentQuoteEligible": false,
+      "deliveryMode": "asynchronous",
+      "meetingsRequired": false,
+      "summary": "Turn one public Node.js or TypeScript release-blocking failure into a deterministic reproducer or a source-pinned NOT_REPRODUCIBLE dossier.",
+      "deliverable": "One deterministic failing test or smallest reproducible fixture—or a source-pinned NOT_REPRODUCIBLE dossier—plus environment and SHA-256 manifests and one prioritized correction path.",
+      "acceptanceCriteria": [
+        "the reproduction command runs without buyer credentials",
+        "the tested commit, dependency lockfile, runtime, and failure evidence are pinned",
+        "the result is explicitly REPRODUCED or NOT_REPRODUCIBLE",
+        "every delivered file is listed in the SHA-256 hash manifest"
+      ],
+      "acceptanceBoundary": "These are objective technical completion checks. Buyer-specific legal acceptance, cancellation, refund, tax, invoice, and governing terms are defined only in the separately human-approved SOW.",
+      "proofUrl": "https://terminallylazy.github.io/matchflight/",
+      "turnaroundHours": 24,
+      "turnaroundLabel": "Target within 24 hours after the separately human-approved SOW's kickoff condition is satisfied and complete public inputs are available.",
+      "requiredInputs": [
+        "one public Node.js or TypeScript repository URL and one public failing CI log URL",
+        "reachable email address only when using email transport"
+      ],
+      "optionalInputs": [
+        "the exact failing command",
+        "Node.js, package-manager, and CI runtime version",
+        "one source file or suspected release boundary to prioritize"
+      ],
+      "scopeLabel": "One public Node.js or TypeScript repository, one public failing CI log, and one release-blocking failure; no private repositories, credentials, production access, remediation implementation, deployment, certification, penetration test, wallet connection, signing, or settlement action.",
+      "scope": {
+        "publicRepositories": 1,
+        "publicCiLogs": 1,
+        "blockingFailures": 1,
+        "networkRequestsDuringEvaluationRequireWrittenScope": true
+      },
+      "commercialTerms": {
+        "fixedScopePriceUsd": 750,
+        "invoiceRails": [
+          "ACH",
+          "Wise",
+          "Zelle"
+        ],
+        "invoiceIssuedOnlyAfterHumanApprovedSow": true,
+        "acceptanceTermsDefinedInSow": true,
+        "zelleRequiresSignedSowAndInvoice": true,
+        "zelleBuyerMustAcknowledgeNoPurchaseProtection": true,
+        "paymentInstructionsPublished": false
+      },
+      "requestOnlyDisclosure": "Request only. The engagement and delivery are asynchronous; no meeting or call is required. ACH, Wise, or Zelle invoice terms are available only when stated in a separately human-approved SOW containing complete commercial terms. Zelle is available only after a signed SOW and invoice and the buyer's acknowledgement that Zelle has no purchase protection. This catalog publishes no payment instructions or banking details for the release-blocker reproduction.",
+      "securityCertification": false,
+      "penetrationTest": false
     }
   ],
   "requestProcess": [

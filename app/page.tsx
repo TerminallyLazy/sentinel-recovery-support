@@ -37,6 +37,10 @@ const paidServices = servicesCatalog.offerings;
 const agentReviewService = paidServices.find(
   (service) => service.id === "agent-payment-boundary-review",
 );
+const nonCaseServiceIds = new Set([
+  "48-hour-agent-payment-failure-reproduction-sprint",
+  "24-hour-node-typescript-release-blocker-reproduction",
+]);
 
 if (!agentReviewService) {
   throw new Error("Agent Payment Boundary Review service is missing");
@@ -46,10 +50,7 @@ const serviceRequestText = (serviceId: string) => {
   const values: Record<string, string> = {
     serviceId,
     requestTransport: "email",
-    chainId:
-      serviceId === "48-hour-agent-payment-failure-reproduction-sprint"
-        ? ""
-        : "1",
+    chainId: nonCaseServiceIds.has(serviceId) ? "" : "1",
     transactionHash: "",
     publicDocumentUrls: "",
     replyEmail: "",
