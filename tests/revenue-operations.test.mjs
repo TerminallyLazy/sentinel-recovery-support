@@ -161,7 +161,7 @@ test("publishes a request-only 48-hour payment failure reproduction sprint", asy
   assert.match(readme, /48-Hour Agent Payment Failure Reproduction Sprint/i);
   assert.match(readme, /request-only/i);
   assert.match(readme, /MatchFlight/i);
-  assert.match(readme, /requires no meeting or call/i);
+  assert.match(readme, /require no meeting or call/i);
 
   const requestCapability = manifest.capabilities.find(
     ({ id }) => id === "request_paid_evidence_service",
@@ -176,8 +176,51 @@ test("publishes a request-only 48-hour payment failure reproduction sprint", asy
   );
   assert.match(guide, /request-only.*human-approved SOW and invoice/is);
   assert.match(guide, /canonical crypto service-payment contract must not be used/i);
-  assert.match(llms, /request-only \$1,500 sprint/i);
+  assert.match(llms, /request-only.*\$1,500.*sprint/i);
   assert.match(llms, /does not authorize payment for request-only offerings/i);
+});
+
+test("publishes a request-only 24-hour Node/TypeScript release-blocker reproduction", async () => {
+  const [services, request, issueTemplate, pageSource, readme, guide, llms] = await Promise.all([
+    readFile(new URL("public/services.json", root), "utf8").then(JSON.parse),
+    readFile(new URL("public/service-request.json", root), "utf8").then(JSON.parse),
+    readFile(new URL(".github/ISSUE_TEMPLATE/service-request.yml", root), "utf8"),
+    readFile(new URL("app/page.tsx", root), "utf8"),
+    readFile(new URL("README.md", root), "utf8"),
+    readFile(new URL("public/agent-guide.md", root), "utf8"),
+    readFile(new URL("public/llms.txt", root), "utf8"),
+  ]);
+  const serviceId = "24-hour-node-typescript-release-blocker-reproduction";
+  const offering = services.offerings.find(({ id }) => id === serviceId);
+
+  assert.ok(offering, "expected the 24-hour release-blocker offering");
+  assert.equal(offering.title, "24-Hour Node/TypeScript Release-Blocker Reproduction");
+  assert.equal(offering.priceUsd, 750);
+  assert.equal(offering.requestOnly, true);
+  assert.equal(offering.directPaymentEnabled, false);
+  assert.equal(offering.canonicalServicePaymentQuoteEligible, false);
+  assert.equal(offering.deliveryMode, "asynchronous");
+  assert.equal(offering.meetingsRequired, false);
+  assert.equal(offering.turnaroundHours, 24);
+  assert.deepEqual(offering.acceptanceCriteria, [
+    "the reproduction command runs without buyer credentials",
+    "the tested commit, dependency lockfile, runtime, and failure evidence are pinned",
+    "the result is explicitly REPRODUCED or NOT_REPRODUCIBLE",
+    "every delivered file is listed in the SHA-256 hash manifest",
+  ]);
+  assert.match(offering.scopeLabel, /no private repositories/i);
+  assert.match(offering.requestOnlyDisclosure, /no meeting or call is required/i);
+  assert.ok(request.requestSchema.properties.serviceId.enum.includes(serviceId));
+  const publicUrlCondition = request.requestSchema.allOf.find((rule) =>
+    rule.if?.properties?.serviceId?.enum?.includes(serviceId),
+  );
+  assert.ok(publicUrlCondition, "expected public-URL input condition");
+  assert.deepEqual(publicUrlCondition.then.required, ["publicDocumentUrls"]);
+  assert.match(issueTemplate, /24-Hour Node\/TypeScript Release-Blocker Reproduction \(\$750\)/);
+  assert.match(pageSource, /24-hour-node-typescript-release-blocker-reproduction/);
+  assert.match(readme, /24-Hour Release-Blocker Reproduction/i);
+  assert.match(guide, /24-Hour Release-Blocker Reproduction/i);
+  assert.match(llms, /24-hour release-blocker reproduction/i);
 });
 
 test("does not expose payable quote artifacts through public GitHub Actions", async () => {
