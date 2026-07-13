@@ -1062,12 +1062,31 @@ test("renders an email-independent copy fallback from the request contract", asy
   assert.match(html, /Service ID: evidence-preview/i);
   assert.match(html, /Reply email:/i);
   assert.match(html, /href="\/service-request\.json"/i);
+  assert.match(
+    html,
+    /<article[^>]*id="48-hour-agent-payment-failure-reproduction-sprint"[^>]*>/i,
+  );
+  assert.match(html, /TECHNICAL COMPLETION CHECKS/i);
+  assert.match(
+    html,
+    /all eight negative-path cases have an explicit PASS, FAIL, or NOT-TESTABLE result/i,
+  );
+  assert.match(html, /objective technical completion checks/i);
+  assert.match(html, /Buyer-specific legal acceptance/i);
 
   const pageSource = await readFile(new URL("app/page.tsx", root), "utf8");
+  const anchorCorrection = await readFile(
+    new URL("app/HashAnchorCorrection.tsx", root),
+    "utf8",
+  );
   assert.match(
     pageSource,
     /import serviceRequest from "\.\.\/public\/service-request\.json"/,
   );
+  assert.match(pageSource, /<HashAnchorCorrection\s*\/>/);
+  assert.match(anchorCorrection, /document\.fonts\.ready/);
+  assert.match(anchorCorrection, /scrollIntoView\(\{ block: "start" \}\)/);
+  assert.match(anchorCorrection, /addEventListener\("hashchange"/);
 });
 
 test("publishes a public GitHub issue transport for quote requests", async () => {

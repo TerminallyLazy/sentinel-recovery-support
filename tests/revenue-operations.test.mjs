@@ -94,6 +94,14 @@ test("publishes a request-only 48-hour payment failure reproduction sprint", asy
   assert.equal(sprint.turnaroundHours, 48);
   assert.equal(sprint.securityCertification, false);
   assert.equal(sprint.penetrationTest, false);
+  assert.deepEqual(sprint.acceptanceCriteria, [
+    "npm ci && npm test runs the delivered public fixture bundle without buyer credentials",
+    "all eight negative-path cases have an explicit PASS, FAIL, or NOT-TESTABLE result",
+    "every FAIL is reproducible and pinned to the tested source revision",
+    "every delivered artifact is included in the SHA-256 hash manifest",
+  ]);
+  assert.match(sprint.acceptanceBoundary, /objective technical completion checks/i);
+  assert.match(sprint.acceptanceBoundary, /separately human-approved SOW/i);
   assert.equal(
     sprint.proofUrl,
     "https://terminallylazy.github.io/matchflight/",
