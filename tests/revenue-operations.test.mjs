@@ -225,8 +225,9 @@ test("publishes a request-only 24-hour Node/TypeScript release-blocker reproduct
   const formUrl = offering.noLoginRequestForm.url;
   for (const document of [readme, llms]) {
     assert.match(document, new RegExp(formUrl.replaceAll(".", "\\.")));
-    assert.match(document, /request moves no funds, authorizes no payment, and starts no work/i);
-    assert.match(document, /separately human-approved written SOW/i);
+    assert.match(document, /opaque, non-identifying request reference/i);
+    assert.match(document, /request moves\s+no funds, authorizes no payment, and starts no work/i);
+    assert.match(document, /separately human-approved\s+written SOW/i);
   }
   assert.ok(
     readme.indexOf(formUrl) < readme.indexOf("**Paid services:**"),
