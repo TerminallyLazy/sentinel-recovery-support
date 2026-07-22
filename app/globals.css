@@ -978,6 +978,7 @@ nav a:hover {
 
 .agent-brief {
   align-self: center;
+  margin: 0;
   border: 1px solid rgb(255 255 255 / 34%);
   background: rgb(255 255 255 / 5%);
 }
@@ -997,8 +998,13 @@ nav a:hover {
   border-bottom: 0;
 }
 
-.agent-brief span {
+.agent-brief dt {
   color: rgb(255 255 255 / 50%);
+  font-weight: 400;
+}
+
+.agent-brief dd {
+  margin: 0;
 }
 
 .verify-section {
