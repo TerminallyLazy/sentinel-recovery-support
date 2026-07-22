@@ -25,6 +25,39 @@
       "authentication": "requester-owned-github-credential",
       "sentinelRequestsCredential": false,
       "responseChannel": "created-issue"
+    },
+    {
+      "id": "google-form-release-blocker",
+      "method": "web-form",
+      "provider": "Google Forms",
+      "serviceIds": [
+        "24-hour-node-typescript-release-blocker-reproduction"
+      ],
+      "visibility": "private-to-form-owner",
+      "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSforl4TZfhhn9YJXSydD32bNtEPjdte32ckhaogksosbQ9OIQ/viewform",
+      "authentication": "none",
+      "signInRequired": false,
+      "requesterCredentialRequired": false,
+      "thirdPartyProcessing": true,
+      "requiredFields": [
+        "opaque request reference",
+        "public Node.js or TypeScript repository URL",
+        "public failing CI log URL",
+        "reply email"
+      ],
+      "optionalFields": [
+        "exact failing command or brief failure summary"
+      ],
+      "prefill": {
+        "requestReferenceParameter": "entry.2082650723",
+        "generatedClientSide": true,
+        "randomSource": "Web Crypto getRandomValues"
+      },
+      "responseChannel": "reply-email",
+      "requestMovesFunds": false,
+      "requestAuthorizesPayment": false,
+      "startsWork": false,
+      "humanApprovedSowRequiredBeforePaymentOrWork": true
     }
   ],
   "requestSchema": {
@@ -50,9 +83,10 @@
         "type": "string",
         "enum": [
           "email",
-          "github-issue"
+          "github-issue",
+          "web-form"
         ],
-        "description": "Select email or a public GitHub issue. The requester supplies and controls any credential required by the chosen transport."
+        "description": "Select email, a public GitHub issue, or the no-login web form available only for the $750 release-blocker service. The requester supplies and controls any credential required by the chosen transport."
       },
       "chainId": {
         "type": "integer",
@@ -78,7 +112,7 @@
       "replyEmail": {
         "type": "string",
         "format": "email",
-        "description": "A reachable reply address for clarification and the written quote. Required only for email transport."
+        "description": "A reachable reply address for clarification and the written quote. Required for email and no-login web-form transport."
       },
       "claimantRole": {
         "type": "string",
@@ -108,6 +142,25 @@
           }
         },
         "then": {
+          "required": [
+            "replyEmail"
+          ]
+        }
+      },
+      {
+        "if": {
+          "properties": {
+            "requestTransport": {
+              "const": "web-form"
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "serviceId": {
+              "const": "24-hour-node-typescript-release-blocker-reproduction"
+            }
+          },
           "required": [
             "replyEmail"
           ]
@@ -195,6 +248,8 @@
   "safety": {
     "publicFactsOnly": true,
     "githubIssueRequestsArePublic": true,
+    "webFormResponsesArePrivateToFormOwner": true,
+    "webFormThirdPartyProcessor": "Google Forms",
     "sentinelRequestsGitHubCredentials": false,
     "requestCreatesServiceEntitlement": false,
     "paymentInstructionsIncluded": false,

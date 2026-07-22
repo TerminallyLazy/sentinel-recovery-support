@@ -1,5 +1,6 @@
 import { CopyValue, SupportActions } from "./SupportActions";
 import { HashAnchorCorrection } from "./HashAnchorCorrection";
+import { ReleaseBlockerIntake } from "./ReleaseBlockerIntake";
 import { ASSETS, SUPPORT_WALLET } from "./support-data";
 import servicesCatalog from "../public/services.json";
 import serviceRequest from "../public/service-request.json";
@@ -14,6 +15,8 @@ const outreachUrl =
 const serviceContactEmail = servicesCatalog.contact.email;
 const githubIssueRequestUrl =
   "https://github.com/TerminallyLazy/sentinel-recovery-support/issues/new?template=service-request.yml";
+const releaseBlockerServiceId =
+  "24-hour-node-typescript-release-blocker-reproduction";
 
 const workstreams = [
   {
@@ -98,31 +101,102 @@ export default function Home() {
 
       <section className="hero" id="top">
         <div className="hero-copy">
-          <p className="eyebrow">VOLUNTARY SUPPORT / ETHEREUM MAINNET</p>
-          <h1>Fund evidence work that refuses to overclaim.</h1>
+          <p className="eyebrow">24-HOUR ASYNC RELEASE-BLOCKER REPRODUCTION</p>
+          <h1>Turn a public Node failure into evidence.</h1>
           <p className="hero-lede">
-            Sentinel Recovery is building a narrow, non-custodial path for
-            Ethereum mistake triage. Support helps keep the public tools,
-            safety boundaries, and agent handoffs moving without pretending an
-            intake receipt is a recovery result.
+            Fixed $750 scope: one public Node.js or TypeScript repository, one
+            public failing CI log, and one deterministic reproducer or
+            source-pinned NOT_REPRODUCIBLE dossier. No meeting, private access,
+            credentials, or production access required.
           </p>
           <div className="mobile-action-row">
-            <a className="mobile-support-link" href="#services">
-              View paid evidence services
+            <a className="mobile-support-link" href="#release-blocker-request">
+              Start the no-login request
             </a>
-            <a className="mobile-support-link secondary" href="#support">
-              View contribution options
+            <a className="mobile-support-link secondary" href={`#${releaseBlockerServiceId}`}>
+              Inspect exact scope
             </a>
           </div>
-          <div className="hero-proof" aria-label="Sentinel operating principles">
-            <span>NO CUSTODY</span>
-            <span>NO KEY REQUESTS</span>
-            <span>NO RECOVERY GUARANTEE</span>
+          <div className="hero-proof" aria-label="Release-blocker service facts">
+            <span>PUBLIC INPUTS ONLY</span>
+            <span>NO MEETING</span>
+            <span>FIXED $750 SCOPE</span>
           </div>
         </div>
 
-        <aside className="support-card" id="support" aria-labelledby="support-title">
-          <div className="card-kicker">DIRECT PUBLIC SUPPORT</div>
+        <aside
+          className="support-card featured-service-card"
+          id="release-blocker-request"
+          aria-labelledby="release-blocker-title"
+        >
+          <div className="card-kicker">$750 / REQUEST ONLY / ASYNCHRONOUS</div>
+          <h2 id="release-blocker-title">One blocker. One pinned answer.</h2>
+          <p className="card-intro">
+            Submit only the public repository, public failing CI log, reply
+            email, and optional failure summary. A complete human-approved SOW
+            is required before payment or work begins.
+          </p>
+          <ReleaseBlockerIntake />
+          <div className="release-intake-inputs" aria-label="Required public inputs">
+            <span>PUBLIC REPOSITORY</span>
+            <span>PUBLIC CI LOG</span>
+            <span>REPLY EMAIL</span>
+          </div>
+        </aside>
+      </section>
+
+      <section className="status-strip" aria-label="Featured service summary">
+        <div>
+          <span className="status-label">PRICE</span>
+          <strong>$750 FIXED SCOPE</strong>
+        </div>
+        <div>
+          <span className="status-label">INPUT</span>
+          <strong>PUBLIC REPO + CI</strong>
+        </div>
+        <div>
+          <span className="status-label">MODE</span>
+          <strong>ASYNC / NO MEETING</strong>
+        </div>
+        <div>
+          <span className="status-label">PAYMENT</span>
+          <strong>ONLY AFTER ACCEPTED SOW</strong>
+        </div>
+      </section>
+
+      <section className="section" id="work">
+        <div className="section-heading">
+          <p className="eyebrow">WHAT SUPPORT ADVANCES</p>
+          <h2>Small checks. Publicly inspectable work.</h2>
+          <p>
+            The project is deliberately early and narrow. Contributions support
+            concrete product work, not a promise of successful recovery.
+          </p>
+        </div>
+        <div className="work-grid">
+          {workstreams.map((item) => (
+            <article className="work-card" key={item.index}>
+              <span className="work-index">{item.index}</span>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="section contribution-section" id="support">
+        <div className="section-heading compact">
+          <p className="eyebrow">VOLUNTARY PUBLIC SUPPORT</p>
+          <h2>Fund the free tools without buying a service.</h2>
+          <p>
+            Contributions support public evidence tooling and create no service
+            entitlement, queue priority, or recovery outcome.
+          </p>
+        </div>
+        <aside className="support-card contribution-card" aria-labelledby="support-title">
+          <div className="card-kicker">
+            ETHEREUM MAINNET / OPTIONAL / NO RECOVERY GUARANTEE
+          </div>
           <h2 id="support-title">Contribute any amount</h2>
           <p className="card-intro">
             Send only supported assets on Ethereum Mainnet. There is no minimum.
@@ -149,53 +223,16 @@ export default function Home() {
         </aside>
       </section>
 
-      <section className="status-strip" aria-label="Funding model">
-        <div>
-          <span className="status-label">MODEL</span>
-          <strong>VOLUNTARY</strong>
-        </div>
-        <div>
-          <span className="status-label">NETWORK</span>
-          <strong>ETHEREUM / 1</strong>
-        </div>
-        <div>
-          <span className="status-label">OUTBOUND WALLET</span>
-          <strong>HUMAN AUTHORIZATION</strong>
-        </div>
-        <div>
-          <span className="status-label">RECOVERY CLAIM</span>
-          <strong>NONE</strong>
-        </div>
-      </section>
-
-      <section className="section" id="work">
-        <div className="section-heading">
-          <p className="eyebrow">WHAT SUPPORT ADVANCES</p>
-          <h2>Small checks. Publicly inspectable work.</h2>
-          <p>
-            The project is deliberately early and narrow. Contributions support
-            concrete product work, not a promise of successful recovery.
-          </p>
-        </div>
-        <div className="work-grid">
-          {workstreams.map((item) => (
-            <article className="work-card" key={item.index}>
-              <span className="work-index">{item.index}</span>
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
       <section className="section services-section" id="services">
         <div className="section-heading">
           <p className="eyebrow">PAID EVIDENCE WORK</p>
           <h2>Need a deliverable, not a donation?</h2>
           <p>
-            Request a fixed-scope public-data review by email or public GitHub
-            issue. Sentinel confirms the scope, timing, exact payment reference,
-            and payment instructions in writing before you send anything.
+            Start the $750 public release-blocker request with no login, or
+            request another fixed-scope public-data review by email or public
+            GitHub issue. Sentinel confirms the scope, timing, exact payment
+            reference, and payment instructions in writing before you send
+            anything.
           </p>
         </div>
         <p className="service-flow" aria-label="Paid service sequence">
@@ -237,8 +274,17 @@ export default function Home() {
                 ) : null}
               </div>
               <div className="service-actions">
+                {service.id === releaseBlockerServiceId ? (
+                  <a className="service-cta" href="#release-blocker-request">
+                    Start the no-login $750 request
+                  </a>
+                ) : null}
                 <a
-                  className="service-cta"
+                  className={
+                    service.id === releaseBlockerServiceId
+                      ? "service-cta secondary"
+                      : "service-cta"
+                  }
                   href={serviceRequestUrl(service.title, service.id)}
                 >
                   Request ${service.priceUsd} service by email
@@ -312,7 +358,9 @@ export default function Home() {
           <CopyValue label="service email" value={serviceContactEmail} />
         </p>
         <p className="service-note">
-          GitHub quote requests are public. Never include identity documents,
+          The no-login release-blocker form is processed by Google Forms and is
+          visible only to the form owner; GitHub quote requests are public.
+          Never include identity documents,
           confidential material, credentials, keys, wallet connections, or
           signatures. Email or a GitHub reply cannot change the recipient. {" "}
           Do not pay from this page. Catalog-quote services currently use canonical USDC

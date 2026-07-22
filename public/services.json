@@ -197,8 +197,28 @@
       "turnaroundLabel": "Target within 24 hours after the separately human-approved SOW's kickoff condition is satisfied and complete public inputs are available.",
       "requiredInputs": [
         "one public Node.js or TypeScript repository URL and one public failing CI log URL",
-        "reachable email address only when using email transport"
+        "reachable reply email when using email or no-login web-form transport"
       ],
+      "noLoginRequestForm": {
+        "provider": "Google Forms",
+        "url": "https://docs.google.com/forms/d/e/1FAIpQLSforl4TZfhhn9YJXSydD32bNtEPjdte32ckhaogksosbQ9OIQ/viewform",
+        "signInRequired": false,
+        "visibility": "private-to-form-owner",
+        "thirdPartyProcessing": true,
+        "requiredFields": [
+          "opaque request reference",
+          "public Node.js or TypeScript repository URL",
+          "public failing CI log URL",
+          "reply email"
+        ],
+        "optionalFields": [
+          "exact failing command or brief failure summary"
+        ],
+        "requestMovesFunds": false,
+        "requestAuthorizesPayment": false,
+        "startsWork": false,
+        "humanApprovedSowRequiredBeforePaymentOrWork": true
+      },
       "optionalInputs": [
         "the exact failing command",
         "Node.js, package-manager, and CI runtime version",
@@ -230,7 +250,7 @@
     }
   ],
   "requestProcess": [
-    "A human or payer agent operating within its own delegated policy sends an email or a public GitHub issue with the selected offering's required public inputs and any optional context.",
+    "A human or payer agent operating within its own delegated policy sends an email or a public GitHub issue with the selected offering's required public inputs and any optional context. The $750 release-blocker service also offers a no-login Google Form that is private to the form owner.",
     "Sentinel confirms scope and timing in writing. Catalog-quote services also receive an exact payment reference and payment instructions; request-only offerings require a separately human-approved SOW and receive no payment instructions from this catalog.",
     "The requester decides whether to proceed only after verifying the complete written quote or separately human-approved SOW and all applicable payment terms.",
     "Sentinel prepares only the confirmed evidence deliverable."

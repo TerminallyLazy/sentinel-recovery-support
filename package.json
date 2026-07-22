@@ -18,7 +18,7 @@
     "quote:create": "node scripts/create-service-quote.mjs",
     "quote:prepare": "node scripts/prepare-service-quote.mjs",
     "receipt:verify": "node scripts/verify-service-receipt.mjs",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern pages --ignore-pattern worker-configuration.d.ts"
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern pages --ignore-pattern .pages-artifact --ignore-pattern worker-configuration.d.ts"
   },
   "dependencies": {
     "@x402/core": "^2.18.0",

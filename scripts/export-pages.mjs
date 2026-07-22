@@ -84,6 +84,8 @@ for (const required of [
   `${basePath}/impact.json`,
   "0x91bdE13382c3Ee082EE42a147DF54f6A6129a412",
   "NO RECOVERY GUARANTEE",
+  "PUBLIC INPUTS ONLY",
+  "A complete human-approved SOW is required",
 ]) {
   if (!exported.includes(required)) {
     throw new Error(`Static export is missing: ${required}`);

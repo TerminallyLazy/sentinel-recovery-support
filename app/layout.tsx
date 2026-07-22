@@ -18,11 +18,11 @@ export const metadata: Metadata = {
   ),
   title: "Sentinel Recovery — Ethereum Evidence Services",
   description:
-    "Request fixed-scope $49/$99/$199 public-data reviews or support evidence-first tooling. Non-custodial, with no recovery guarantees.",
+    "Request a fixed-scope $750 public Node/TypeScript release-blocker reproduction with a 24-hour target, no meeting, and public inputs only.",
   openGraph: {
     title: "Sentinel Recovery — Ethereum Evidence Services",
     description:
-      "Fixed-scope Ethereum public-data services, voluntary support, and agent-safe payment contracts without custody or recovery guarantees.",
+      "A $750 public Node/TypeScript release-blocker reproduction with a 24-hour target, plus fixed-scope evidence services and agent-safe payment boundaries.",
     type: "website",
     url: "https://terminallylazy.github.io/sentinel-recovery-support/",
   },
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: "Sentinel Recovery — Ethereum Evidence Services",
     description:
-      "Request a $49/$99/$199 Ethereum evidence deliverable or support the public tooling.",
+      "Turn one public Node/TypeScript release blocker into a deterministic reproducer or source-pinned dossier for $750.",
   },
   alternates: {
     canonical: "https://terminallylazy.github.io/sentinel-recovery-support/",
