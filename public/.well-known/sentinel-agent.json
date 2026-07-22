@@ -155,6 +155,20 @@
           "method": "github-issue",
           "visibility": "public",
           "newIssueUrl": "https://github.com/TerminallyLazy/sentinel-recovery-support/issues/new?template=service-request.yml"
+        },
+        {
+          "method": "web-form",
+          "provider": "Google Forms",
+          "serviceIds": [
+            "24-hour-node-typescript-release-blocker-reproduction"
+          ],
+          "visibility": "private-to-form-owner",
+          "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSforl4TZfhhn9YJXSydD32bNtEPjdte32ckhaogksosbQ9OIQ/viewform",
+          "signInRequired": false,
+          "thirdPartyProcessing": true,
+          "requestMovesFunds": false,
+          "requestAuthorizesPayment": false,
+          "humanApprovedSowRequiredBeforePaymentOrWork": true
         }
       ],
       "inputSchema": "https://terminallylazy.github.io/sentinel-recovery-support/service-request.json#/requestSchema",

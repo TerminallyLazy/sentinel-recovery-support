@@ -71,9 +71,9 @@ test("server-renders the Sentinel support surface", async () => {
   );
   assert.match(
     html,
-    /Request fixed-scope \$49\/\$99\/\$199 public-data reviews or support evidence-first tooling/i,
+    /Request a fixed-scope \$750 public Node\/TypeScript release-blocker reproduction with a 24-hour target, no meeting, and public inputs only/i,
   );
-  assert.match(html, /Fund evidence work that refuses to overclaim/i);
+  assert.match(html, /Turn a public Node failure into evidence/i);
   assert.match(html, /0x91bdE13382c3Ee082EE42a147DF54f6A6129a412/);
   assert.match(
     html,
@@ -96,8 +96,10 @@ test("server-renders the Sentinel support surface", async () => {
   );
   assert.match(html, /0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/);
   assert.match(html, /0xdAC17F958D2ee523a2206206994597C13D831ec7/);
-  assert.match(html, /NO RECOVERY GUARANTEE/);
-  assert.match(html, /HUMAN AUTHORIZATION/);
+  assert.match(html, /PUBLIC INPUTS ONLY/);
+  assert.match(html, /NO MEETING/);
+  assert.match(html, /FIXED \$750 SCOPE/);
+  assert.match(html, /human-approved SOW/i);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 });
 
@@ -123,16 +125,23 @@ test("renders the durable main-branch source link", async () => {
   assert.doesNotMatch(html, /codex\/donation-revenue/);
 });
 
-test("renders a mobile contribution jump link", async () => {
+test("renders a mobile no-login release-blocker jump link", async () => {
   const response = await render();
   const html = await response.text();
 
-  assert.match(html, /href="#support"[^>]*>View contribution options<\/a>/i);
   assert.match(
     html,
-    /(?:id="support"[^>]*class="support-card"|class="support-card"[^>]*id="support")/i,
+    /href="#release-blocker-request"[^>]*>Start the no-login request<\/a>/i,
   );
-  assert.match(html, /href="#services"[^>]*>View paid evidence services<\/a>/i);
+  assert.match(
+    html,
+    /(?:id="release-blocker-request"[^>]*class="support-card featured-service-card"|class="support-card featured-service-card"[^>]*id="release-blocker-request")/i,
+  );
+  assert.match(
+    html,
+    /href="#24-hour-node-typescript-release-blocker-reproduction"[^>]*>Inspect exact scope<\/a>/i,
+  );
+  assert.match(html, /id="support"/i);
 });
 
 test("agent handoff exposes one quote-first conversion path", async () => {
@@ -737,12 +746,21 @@ test("publishes a fixed-scope paid evidence funnel", async () => {
   assert.equal(releaseBlocker.meetingsRequired, false);
   assert.match(releaseBlocker.deliverable, /NOT_REPRODUCIBLE/i);
   assert.ok(
-    services.offerings.every(({ requiredInputs }) =>
-      requiredInputs.includes(
-        "reachable email address only when using email transport",
+    services.offerings
+      .filter(({ id }) =>
+        id !== "24-hour-node-typescript-release-blocker-reproduction",
+      )
+      .every(({ requiredInputs }) =>
+        requiredInputs.includes(
+          "reachable email address only when using email transport",
+        ),
       ),
+    "expected non-form offerings to make email conditional on email transport",
+  );
+  assert.ok(
+    releaseBlocker.requiredInputs.includes(
+      "reachable reply email when using email or no-login web-form transport",
     ),
-    "expected every paid offering to make email conditional on email transport",
   );
   assert.equal(services.payment.sendOnlyAfterWrittenConfirmation, true);
   assert.equal(services.payment.directPaymentFromThisPageEnabled, false);
@@ -859,7 +877,10 @@ test("accepts a public unauthenticated x402 resource as a review input", async (
   const requiredCollection = privacy.collection.required.join(" ");
   assert.match(requiredCollection, /x402 resource URLs/i);
   assert.match(requiredCollection, /transaction hash for case services/i);
-  assert.match(requiredCollection, /reply email address.*email transport/i);
+  assert.match(
+    requiredCollection,
+    /reply email address.*email or no-login web-form transport/i,
+  );
   assert.ok(privacy.security.doNotSend.includes("PaymentPayload"));
   assert.ok(privacy.security.doNotSend.includes("signature headers"));
 
@@ -989,6 +1010,7 @@ test("publishes an executable quote-first service request contract", async () =>
   assert.deepEqual(request.requestSchema.properties.requestTransport.enum, [
     "email",
     "github-issue",
+    "web-form",
   ]);
   assert.equal(request.requestSchema.properties.chainId.const, 1);
   assert.deepEqual(request.requestSchema.properties.serviceId.enum, [
@@ -1157,6 +1179,66 @@ test("publishes a public GitHub issue transport for quote requests", async () =>
       .alternateTransports[0].method,
     "github-issue",
   );
+});
+
+test("publishes a no-login release-blocker request transport without payment authority", async () => {
+  const [response, request, services, privacy, manifest, intakeSource] =
+    await Promise.all([
+      render(),
+      readJson("public/service-request.json"),
+      readJson("public/services.json"),
+      readJson("public/privacy.json"),
+      readJson("public/.well-known/sentinel-agent.json"),
+      readText("app/ReleaseBlockerIntake.tsx"),
+    ]);
+  const html = await response.text();
+  const serviceId = "24-hour-node-typescript-release-blocker-reproduction";
+  const formUrl =
+    "https://docs.google.com/forms/d/e/1FAIpQLSforl4TZfhhn9YJXSydD32bNtEPjdte32ckhaogksosbQ9OIQ/viewform";
+  const formTransport = request.alternateTransports.find(
+    ({ id }) => id === "google-form-release-blocker",
+  );
+  const offering = services.offerings.find(({ id }) => id === serviceId);
+  const manifestTransport = manifest.capabilities
+    .find(({ id }) => id === "request_paid_evidence_service")
+    .alternateTransports.find(({ method }) => method === "web-form");
+  const formCondition = request.requestSchema.allOf.find(
+    (rule) => rule.if?.properties?.requestTransport?.const === "web-form",
+  );
+
+  assert.equal(formTransport.formUrl, formUrl);
+  assert.deepEqual(formTransport.serviceIds, [serviceId]);
+  assert.equal(formTransport.signInRequired, false);
+  assert.equal(formTransport.visibility, "private-to-form-owner");
+  assert.equal(formTransport.thirdPartyProcessing, true);
+  assert.equal(formTransport.requestMovesFunds, false);
+  assert.equal(formTransport.requestAuthorizesPayment, false);
+  assert.equal(formTransport.startsWork, false);
+  assert.equal(formTransport.humanApprovedSowRequiredBeforePaymentOrWork, true);
+  assert.equal(
+    formTransport.prefill.requestReferenceParameter,
+    "entry.2082650723",
+  );
+  assert.equal(formCondition.then.properties.serviceId.const, serviceId);
+  assert.deepEqual(formCondition.then.required, ["replyEmail"]);
+
+  assert.equal(offering.noLoginRequestForm.url, formUrl);
+  assert.equal(offering.noLoginRequestForm.signInRequired, false);
+  assert.equal(offering.noLoginRequestForm.requestMovesFunds, false);
+  assert.equal(manifestTransport.formUrl, formUrl);
+  assert.equal(manifestTransport.requestAuthorizesPayment, false);
+
+  assert.match(html, /Start the no-login \$750 request/i);
+  assert.match(html, new RegExp(formUrl.replaceAll(".", "\\.")));
+  assert.match(html, /Google processes the public URLs, reply email/i);
+  assert.match(html, /request moves no funds, authorizes no payment, and starts no work/i);
+
+  assert.match(intakeSource, /crypto\.getRandomValues/);
+  assert.match(intakeSource, /entry\.2082650723/);
+  assert.doesNotMatch(intakeSource, /Math\.random/);
+  assert.equal(privacy.security.googleFormIsThirdPartyProcessing, true);
+  assert.equal(privacy.use.processors[0].name, "Google Forms and Google Drive");
+  assert.equal(privacy.use.processors[0].responseVisibility, "private-to-form-owner");
 });
 
 test("keeps a service request non-financial until a complete quote", async () => {

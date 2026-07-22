@@ -215,6 +215,75 @@ nav a:hover {
   color: white;
 }
 
+.featured-service-card {
+  border-top: 10px solid var(--accent);
+}
+
+.release-intake-inputs {
+  display: grid;
+  gap: 8px;
+  margin: 24px 0;
+}
+
+.release-intake-inputs span {
+  border-left: 4px solid var(--accent);
+  background: var(--soft);
+  padding: 10px 12px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.release-intake {
+  margin-top: 24px;
+}
+
+.release-intake-cta {
+  display: inline-flex;
+  width: 100%;
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: white;
+  padding: 12px 16px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.release-intake-cta:hover {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.release-intake-reference,
+.release-intake-note {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.release-intake-reference {
+  border: 1px solid var(--line);
+  background: var(--soft);
+  color: var(--ink);
+  padding: 12px;
+}
+
+.release-intake-reference code {
+  overflow-wrap: anywhere;
+  font-family: inherit;
+  font-weight: 700;
+}
+
 .wallet-block {
   border: 1px solid var(--line);
   background: var(--soft);
@@ -415,6 +484,16 @@ nav a:hover {
 
 .services-section {
   border-top: 1px solid var(--ink);
+}
+
+.contribution-section {
+  border-top: 1px solid var(--ink);
+  background: var(--soft);
+}
+
+.contribution-card {
+  max-width: 820px;
+  background: var(--paper);
 }
 
 .service-flow {

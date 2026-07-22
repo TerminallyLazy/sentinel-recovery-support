@@ -7,7 +7,8 @@
     "required": [
       "selected service ID and request transport",
       "one or two public HTTPS manifests, static documents, or unauthenticated x402 resource URLs for the Agent Payment Boundary Review, or one Ethereum Mainnet transaction hash for case services",
-      "reply email address only for email transport"
+      "for the no-login $750 release-blocker form: an opaque request reference, one public Node.js or TypeScript repository URL, one public failing CI log URL, and a reply email",
+      "reply email address for email or no-login web-form transport"
     ],
     "optional": [
       "stated role or relationship to the transaction",
@@ -29,7 +30,16 @@
     ],
     "sold": false,
     "usedForUnrelatedMarketing": false,
-    "sharing": "Only infrastructure providers needed to operate email and public hosting may process the data."
+    "sharing": "Infrastructure providers needed to operate email and public hosting may process the data. Google Forms and Google Drive process no-login release-blocker form submissions for storage and owner review.",
+    "processors": [
+      {
+        "name": "Google Forms and Google Drive",
+        "purpose": "store and present no-login release-blocker requests to the form owner",
+        "appliesTo": "google-form-release-blocker transport",
+        "signInRequired": false,
+        "responseVisibility": "private-to-form-owner"
+      }
+    ]
   },
   "retention": {
     "unpaidInquiryDaysAfterClosure": 30,
@@ -38,6 +48,7 @@
   },
   "security": {
     "ordinaryEmailIsNotConfidential": true,
+    "googleFormIsThirdPartyProcessing": true,
     "sendPublicFactsOnly": true,
     "doNotSend": [
       "identity documents",
