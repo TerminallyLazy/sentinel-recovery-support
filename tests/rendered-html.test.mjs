@@ -99,6 +99,7 @@ test("server-renders the Sentinel support surface", async () => {
   assert.match(html, /PUBLIC INPUTS ONLY/);
   assert.match(html, /NO MEETING/);
   assert.match(html, /FIXED \$750 SCOPE/);
+  assert.match(html, /NO RECOVERY GUARANTEE/);
   assert.match(html, /human-approved SOW/i);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 });
@@ -1226,7 +1227,15 @@ test("publishes a no-login release-blocker request transport without payment aut
   assert.equal(offering.noLoginRequestForm.signInRequired, false);
   assert.equal(offering.noLoginRequestForm.requestMovesFunds, false);
   assert.equal(manifestTransport.formUrl, formUrl);
+  assert.equal(manifestTransport.visibility, "private-to-form-owner");
+  assert.equal(manifestTransport.signInRequired, false);
+  assert.equal(manifestTransport.thirdPartyProcessing, true);
+  assert.equal(manifestTransport.requestMovesFunds, false);
   assert.equal(manifestTransport.requestAuthorizesPayment, false);
+  assert.equal(
+    manifestTransport.humanApprovedSowRequiredBeforePaymentOrWork,
+    true,
+  );
 
   assert.match(html, /Start the no-login \$750 request/i);
   assert.match(html, new RegExp(formUrl.replaceAll(".", "\\.")));

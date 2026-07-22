@@ -194,7 +194,9 @@ export default function Home() {
           </p>
         </div>
         <aside className="support-card contribution-card" aria-labelledby="support-title">
-          <div className="card-kicker">ETHEREUM MAINNET / OPTIONAL</div>
+          <div className="card-kicker">
+            ETHEREUM MAINNET / OPTIONAL / NO RECOVERY GUARANTEE
+          </div>
           <h2 id="support-title">Contribute any amount</h2>
           <p className="card-intro">
             Send only supported assets on Ethereum Mainnet. There is no minimum.
