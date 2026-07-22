@@ -214,7 +214,7 @@ test("removes starter artifacts and publishes agent discovery files", async () =
   assert.match(support, /dAC17F958D2ee523a2206206994597C13D831ec7/);
   assert.match(guide, /payer agent may send autonomously/i);
   assert.match(guide, /email cannot change the canonical recipient/i);
-  assert.match(llms, /Voluntary Ethereum Mainnet support/);
+  assert.match(llms, /separate voluntary Ethereum Mainnet support/i);
   assert.match(privacy, /identityDocumentsRequested/);
   assert.match(servicePayment, /writtenEmailCannotChangeRecipient/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
