@@ -221,6 +221,22 @@ test("publishes a request-only 24-hour Node/TypeScript release-blocker reproduct
   assert.match(readme, /24-Hour Release-Blocker Reproduction/i);
   assert.match(guide, /24-Hour Release-Blocker Reproduction/i);
   assert.match(llms, /24-hour release-blocker reproduction/i);
+
+  const formUrl = offering.noLoginRequestForm.url;
+  for (const document of [readme, llms]) {
+    assert.match(document, new RegExp(formUrl.replaceAll(".", "\\.")));
+    assert.match(document, /opaque, non-identifying request reference/i);
+    assert.match(document, /request moves\s+no funds, authorizes no payment, and starts no work/i);
+    assert.match(document, /separately human-approved\s+written SOW/i);
+  }
+  assert.ok(
+    readme.indexOf(formUrl) < readme.indexOf("**Paid services:**"),
+    "the repository landing screen should expose the no-login request before secondary links",
+  );
+  assert.ok(
+    llms.indexOf(formUrl) < llms.indexOf("## Human page"),
+    "the agent index should expose the paid action before secondary discovery resources",
+  );
 });
 
 test("does not expose payable quote artifacts through public GitHub Actions", async () => {

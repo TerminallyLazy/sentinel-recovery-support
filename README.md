@@ -1,8 +1,18 @@
 # Sentinel Recovery Support
 
-Public support and fixed-scope Ethereum evidence-service surface for Sentinel Recovery.
+Asynchronous Node/TypeScript evidence work, free local agent-payment preflights,
+and separate voluntary support for Sentinel Recovery.
 
 **Live site:** <https://terminallylazy.github.io/sentinel-recovery-support/>
+
+**Start a no-login $750 release-blocker request:** <https://docs.google.com/forms/d/e/1FAIpQLSforl4TZfhhn9YJXSydD32bNtEPjdte32ckhaogksosbQ9OIQ/viewform>
+
+Submit an opaque, non-identifying request reference, one public Node.js or
+TypeScript repository URL, one public failing CI log URL, a reply email, and an
+optional failure summary. No sign-in or meeting is required. The request moves
+no funds, authorizes no payment, and starts no work; a separately human-approved
+written SOW is required before payment or work. Google Forms processes the
+submitted reference, public URLs, and reply email privately for the form owner.
 
 **Paid services:** <https://terminallylazy.github.io/sentinel-recovery-support/#services>
 

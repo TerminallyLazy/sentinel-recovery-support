@@ -1,6 +1,10 @@
 # Sentinel Recovery Support
 
-> Voluntary Ethereum Mainnet support for evidence-first mistake triage, public safety boundaries, and agent-safe handoffs. Support does not purchase recovery or a service.
+> Asynchronous Node/TypeScript release-blocker evidence, free local agent-payment and x402 boundary preflights, and separate voluntary Ethereum Mainnet support.
+
+## Primary paid action
+
+- [Start the no-login $750 release-blocker request](https://docs.google.com/forms/d/e/1FAIpQLSforl4TZfhhn9YJXSydD32bNtEPjdte32ckhaogksosbQ9OIQ/viewform): Submit an opaque, non-identifying request reference, one public Node.js or TypeScript repository URL, one public failing CI log URL, a reply email, and an optional failure summary. No sign-in or meeting is required. The request moves no funds, authorizes no payment, and starts no work; a separately human-approved written SOW is required before payment or work. Google Forms processes the submitted reference, public URLs, and reply email privately for the form owner.
 
 ## Human page
 
