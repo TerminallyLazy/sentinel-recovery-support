@@ -145,32 +145,53 @@ test("renders a mobile no-login release-blocker jump link", async () => {
   assert.match(html, /id="support"/i);
 });
 
-test("agent handoff exposes one quote-first conversion path", async () => {
+test("agent handoff exposes the no-login release-blocker conversion path", async () => {
   const [response, services] = await Promise.all([
     render(),
     readJson("public/services.json"),
   ]);
   const html = await response.text();
-  const review = services.offerings.find(
-    ({ id }) => id === "agent-payment-boundary-review",
+  const releaseBlocker = services.offerings.find(
+    ({ id }) => id === "24-hour-node-typescript-release-blocker-reproduction",
   );
 
-  assert.ok(review, "expected the agent payment review offering");
-  assert.equal(review.priceUsd, 49);
+  assert.ok(releaseBlocker, "expected the release-blocker reproduction offering");
+  assert.equal(releaseBlocker.priceUsd, 750);
   assert.equal(services.contact.quoteIssuanceHumanApprovalRequired, true);
   assert.equal(services.payment.directPaymentFromThisPageEnabled, false);
   assert.match(
     html,
-    /class="agent-quote-cta"[^>]*href="https:\/\/github\.com\/TerminallyLazy\/sentinel-recovery-support\/issues\/new\?template=service-request\.yml&amp;title=Sentinel%20quote%20request%3A%20agent-payment-boundary-review"/i,
+    /class="agent-quote-cta"[^>]*href="#release-blocker-request"/i,
   );
   assert.match(
     html,
-    /Request a written \$[\s\S]{0,30}49[\s\S]{0,30}Agent Payment Boundary Review[\s\S]{0,20}quote/i,
+    /Start the no-login \$[\s\S]{0,30}750[\s\S]{0,60}24-Hour Node\/TypeScript Release-Blocker Reproduction[\s\S]{0,20}request/i,
   );
-  assert.match(html, /This request moves no funds and authorizes no payment/i);
+  assert.match(html, /The form moves no funds, authorizes no payment/i);
   assert.match(
     html,
-    /class="agent-quote-cta"[\s\S]{0,700}complete human-issued written quote is required before service payment[\s\S]{0,100}<\/a>/i,
+    /Submitting a request moves no funds and authorizes no payment or work/i,
+  );
+  assert.match(
+    html,
+    /Separately, a payer agent may donate only within its own delegated financial policy/i,
+  );
+  assert.match(
+    html,
+    /class="agent-quote-cta"[\s\S]{0,700}separately human-approved written SOW is required[\s\S]{0,100}<\/a>/i,
+  );
+  assert.match(html, /request_paid_evidence_service/i);
+  assert.match(html, /open_no_login_form/i);
+  assert.match(html, /24-hour-node-typescript-release-blocker-reproduction/i);
+  assert.match(html, /<dl[^>]*aria-label="Paid release-blocker request summary"/i);
+  assert.match(html, /<dt>transport<\/dt><dd><strong>web_form<\/strong><\/dd>/i);
+  assert.match(
+    html,
+    /<dt>inputs<\/dt><dd><strong>public_repo \+ public_ci \+ reply_email<\/strong><\/dd>/i,
+  );
+  assert.match(
+    html,
+    /<dt>request_effect<\/dt><dd><strong>no_payment_or_work<\/strong><\/dd>/i,
   );
 });
 
